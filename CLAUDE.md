@@ -227,8 +227,8 @@ Each product includes: `name`, `brand`, `description`, `price`, `product_url`, `
 - [x] Seed data script
 - [x] FastAPI app skeleton with health check
 - [x] Embeddings service (AWS Titan v2, 1024 dims)
-- [ ] Generate embeddings for products (requires AWS creds)
-- [ ] Repository layer (data access patterns)
+- [x] Generate embeddings for products
+- [x] Repository layer (Domain, Product, Session)
 - [ ] Router Agent
 - [ ] Interviewer Agent
 - [ ] Search Architect Agent

@@ -220,3 +220,22 @@ curl -X POST http://localhost:8000/chat \
   -H "Content-Type: application/json" \
   -d '{"session_id": "<returned-id>", "message": "I prefer capsules"}'
 ```
+
+
+
+
+
+
+
+## Implemented
+### Phase 1: What's implemented:
+- Product Embeddings: Successfully generated 1024-dimensional vectors for all 34 products using AWS Titan v2 and stored them in the products table.
+- Domain Repository: Created 
+app/db/repositories/domain.py
+ to handle AI personas and category configurations.
+- Product Repository: Created 
+app/db/repositories/product.py
+ containing the core Hybrid Search logic. It seamlessly combines vector similarity (semantic search) with PostgreSQL JSONB filters (metadata filtering).
+- Session Repository: Created 
+app/db/repositories/session.py
+ to manage chat history and the "short-term memory" (extracted context) for multi-turn conversations.
