@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
 from langchain_aws import ChatBedrock
-from sqlalchemy.ext.asyncio import AsyncSession
+from langchain_core.messages import HumanMessage, SystemMessage
 
 from app.config import get_settings
 from app.agents.state import AgentState
@@ -10,10 +10,17 @@ settings = get_settings()
 
 class InterviewerResponse(BaseModel):
     """Structured response from the Interviewer agent."""
-    extracted_values: Dict[str, Any] = Field(description="Dictionary of information extracted from the user's message")
-    missing_slots: List[str] = Field(description="List of required slots that are still missing")
-    question: Optional[str] = Field(description="A helpful question to ask the user if slots are missing")
-    reasoning: str = Field(description="Brief explanation of extraction and next steps")
+    extracted_values: Dict[str, Any] = Field(
+        description="Dictionary mapping slot names to extracted values from the user's message"
+    )
+    missing_slots: List[str] = Field(
+        description="List of required slot names that are still missing after extraction"
+    )
+    question: Optional[str] = Field(
+        default=None,
+        description="A helpful follow-up question if slots are missing, null if all filled"
+    )
+    reasoning: str = Field(description="Brief explanation of extraction logic")
 
 def get_interviewer_model():
     """Initialize the Bedrock model for interviewing."""
@@ -31,39 +38,56 @@ async def interviewer_agent(state: AgentState) -> AgentState:
     domain_config = state.get("domain_config") or {}
     required_slots = domain_config.get("required_slots", [])
     extracted_context = state.get("extracted_context", {})
-    
+    previous_response = state.get("response")  # The last question we asked
+
     # Identify what we still need to know
     already_filled = set(extracted_context.keys())
     missing_before = [slot for slot in required_slots if slot not in already_filled]
-    
+
     if not missing_before and state["status"] != "awaiting_slot":
         # If nothing missing and we weren't specifically waiting, move to search
         new_state = state.copy()
         new_state["next_agent"] = "search"
         return new_state
 
-    system_prompt = f"""You are a specialist health and wellness consultant for CurateAI. Your goal is to gather specific information (slots) from the user to provide a safe and accurate recommendation.
-
-Domain Context: {state.get('domain_slug')}
-Required Information (Slots): {required_slots}
-Previously Extracted Information: {extracted_context}
-
-User's Latest Message: "{state['user_message']}"
-
-Your Tasks:
-1. EXTRACT: Analyze the user's latest message for any values matching the required slots.
-2. VALIDATE: Ensure the extracted values are meaningful for the specific slots.
-3. IDENTIFY: Determine which required slots are still missing after this message.
-4. ASK: If slots are missing, generate ONE empathetic and professional question to ask the user for the missing information. Do not ask for everything at once if there are many missing; prioritize the most important one.
-
-Guidelines:
-- If all required slots are filled, set `missing_slots` to an empty list and `question` to null.
-- Maintain a professional, consultative tone.
-- Do not repeat questions the user has already answered.
+    # Build context about previous question for better slot mapping
+    previous_question_context = ""
+    if previous_response and state.get("status") == "awaiting_slot":
+        previous_question_context = f"""
+Previous Question Asked: "{previous_response}"
+The user's message is likely answering this question. Map their response to the appropriate slot.
 """
 
+    system_message = """You are a wellness consultant gathering information to recommend products.
+Extract slot values from the user's message and identify what's still missing.
+
+IMPORTANT: When the user gives a short answer (like "capsule", "yes", "powder"), it's likely answering
+the previous question. Map it to the correct slot based on context."""
+
+    user_message = f"""Domain: {state.get('domain_slug')}
+Required Slots: {required_slots}
+Already Filled: {extracted_context}
+Slots Still Needed: {missing_before}
+{previous_question_context}
+User's Message: "{state['user_message']}"
+
+Instructions:
+1. Extract any slot values from the user's message
+2. For short answers, use the previous question context to determine which slot it fills
+3. List slots that are still missing after this extraction
+4. If slots are missing, ask ONE clear question for the most important missing slot
+5. Common slot mappings:
+   - collagen_preference: powder, capsule, liquid, gummies
+   - skin_concern: acne, wrinkles, dryness, dark spots, aging, breakouts
+   - health_goal: sleep, energy, immunity, digestion, stress, weight
+   - format: melts, capsules, powder, effervescent"""
+
     model = get_interviewer_model()
-    result: InterviewerResponse = await model.ainvoke(system_prompt)
+    messages = [
+        SystemMessage(content=system_message),
+        HumanMessage(content=user_message)
+    ]
+    result: InterviewerResponse = await model.ainvoke(messages)
     
     # Update state
     new_state = state.copy()

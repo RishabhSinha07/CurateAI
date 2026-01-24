@@ -54,17 +54,15 @@ Extracted User Preferences: {extracted_context}
 Available Filter Fields: {search_filters}
 
 Your Tasks:
-1. EXPAND: Create an expanded natural language query that captures the user's intent with synonyms and related terms. This will be used for semantic (vector) search.
+1. EXPAND: Create an expanded natural language query that captures the user's intent with synonyms and related terms. This will be used for semantic (vector) search. Include the user's concerns, goals, and preferences.
 2. EXTRACT: Identify key search terms that should match product descriptions.
-3. FILTER: Map the extracted context to JSONB filters. Only include filters for fields listed in Available Filter Fields.
+3. FILTER: Only create filters for fields that are EXACTLY in the Available Filter Fields list. If a preference doesn't match an available filter field, do NOT create a filter for it - rely on semantic search instead.
 
-Guidelines:
-- The expanded query should be rich and descriptive for semantic matching.
-- Filters should use exact values from the extracted context when they match available filter fields.
-- Common filter mappings:
-  - health_goal: ["sleep", "energy", "immunity", "digestion", "skin", "hair", "stress", "weight"]
-  - skin_concern: ["acne", "dark_spots", "wrinkles", "dryness", "sensitivity"]
-  - format: ["melts", "capsules", "powder", "gummies", "effervescent"]
+IMPORTANT RULES FOR FILTERS:
+- Only use filter field names from: {search_filters}
+- If the list is empty or preferences don't match, return an empty filters object {{}}
+- Do NOT create filters for fields like "skin_concern", "format", "collagen_preference" unless they are in the Available Filter Fields
+- When in doubt, use an empty filter and let semantic search handle it
 """
 
     model = get_search_model()
@@ -73,14 +71,14 @@ Guidelines:
     # Generate embedding for the expanded query
     query_embedding = await generate_embedding_async(result.expanded_query)
 
-    # Perform hybrid search
+    # Perform hybrid search (rely on semantic search, let reranker filter)
     product_repo = ProductRepository(db)
     search_results = await product_repo.hybrid_search(
         domain_id=state["domain_id"],
         query_embedding=query_embedding,
-        filters=result.filters if result.filters else None,
+        filters=None,  # Skip JSONB filters, use semantic search + reranker
         limit=20,
-        min_similarity=0.3  # Lower threshold to get more candidates for reranking
+        min_similarity=0.3
     )
 
     # Convert results to serializable format

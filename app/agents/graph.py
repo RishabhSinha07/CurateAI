@@ -22,6 +22,7 @@ from app.agents.interviewer import interviewer_agent
 from app.agents.search import search_architect_agent
 from app.agents.reranker import reranker_agent
 from app.agents.safety import safety_agent
+from app.agents.refinement import refinement_agent
 
 
 def create_initial_state(
@@ -32,6 +33,7 @@ def create_initial_state(
     domain_id: uuid.UUID | None = None,
     domain_slug: str | None = None,
     domain_config: dict | None = None,
+    previous_response: str | None = None,
 ) -> AgentState:
     """Create the initial state for a new conversation turn."""
     return AgentState(
@@ -44,7 +46,7 @@ def create_initial_state(
         missing_slots=[],
         search_results=[],
         final_products=[],
-        response=None,
+        response=previous_response,  # Pass previous response for context
         status=existing_status,
         next_agent=None,
     )
@@ -75,15 +77,24 @@ async def safety_node(state: AgentState) -> AgentState:
     return await safety_agent(state)
 
 
-def should_route_to(state: AgentState) -> Literal["router", "interviewer"]:
+async def refinement_node(state: AgentState) -> AgentState:
+    """Refinement agent node - detects if user wants to refine results or new topic."""
+    return await refinement_agent(state)
+
+
+def should_route_to(state: AgentState) -> Literal["router", "interviewer", "refinement"]:
     """
     Determine the entry point based on session status.
 
-    If awaiting_slot, skip router and go directly to interviewer.
-    Otherwise, start with router for intent classification.
+    - awaiting_slot: Go to interviewer (answering a question)
+    - completed: Go to refinement (might be refining results or new topic)
+    - Otherwise: Go to router for intent classification
     """
-    if state.get("status") == "awaiting_slot":
+    status = state.get("status")
+    if status == "awaiting_slot":
         return "interviewer"
+    if status == "completed":
+        return "refinement"
     return "router"
 
 
@@ -114,6 +125,19 @@ def after_router(state: AgentState) -> Literal["interviewer", "safety"]:
     return "interviewer"
 
 
+def after_refinement(state: AgentState) -> Literal["search", "router"]:
+    """
+    Determine next step after refinement detection.
+
+    If refinement, go to search with updated constraints.
+    If new topic, go to router for fresh classification.
+    """
+    next_agent = state.get("next_agent")
+    if next_agent == "search":
+        return "search"
+    return "router"
+
+
 class ConsultationGraph:
     """
     Manages the LangGraph state machine for product consultations.
@@ -135,6 +159,7 @@ class ConsultationGraph:
         builder.add_node("search", self._search_wrapper)
         builder.add_node("reranker", self._reranker_wrapper)
         builder.add_node("safety", self._safety_wrapper)
+        builder.add_node("refinement", self._refinement_wrapper)
 
         # Set conditional entry point
         builder.set_conditional_entry_point(
@@ -142,6 +167,7 @@ class ConsultationGraph:
             {
                 "router": "router",
                 "interviewer": "interviewer",
+                "refinement": "refinement",
             }
         )
 
@@ -161,6 +187,15 @@ class ConsultationGraph:
             {
                 "search": "search",
                 END: END,
+            }
+        )
+
+        builder.add_conditional_edges(
+            "refinement",
+            after_refinement,
+            {
+                "search": "search",
+                "router": "router",
             }
         )
 
@@ -192,6 +227,10 @@ class ConsultationGraph:
     async def _safety_wrapper(self, state: AgentState) -> AgentState:
         """Wrapper for safety agent."""
         return await safety_node(state)
+
+    async def _refinement_wrapper(self, state: AgentState) -> AgentState:
+        """Wrapper for refinement agent."""
+        return await refinement_node(state)
 
     async def run(self, state: AgentState, db: AsyncSession) -> AgentState:
         """

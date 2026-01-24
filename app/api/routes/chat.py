@@ -71,6 +71,13 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)) -> Chat
             domain_slug = domain.slug
             domain_config = domain.get_merged_config()
 
+    # Get the last assistant message for context (helps with slot extraction)
+    previous_response = None
+    if chat_session.status == "awaiting_slot":
+        history = await session_repo.get_history(chat_session.id, limit=1)
+        if history and history[0].role == "assistant":
+            previous_response = history[0].content
+
     # Save user message
     await session_repo.add_message(
         session_id=chat_session.id,
@@ -87,6 +94,7 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)) -> Chat
         domain_id=domain_id,
         domain_slug=domain_slug,
         domain_config=domain_config,
+        previous_response=previous_response,
     )
 
     # Run the consultation graph
