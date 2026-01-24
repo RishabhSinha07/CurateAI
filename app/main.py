@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
+from app.api.routes.chat import router as chat_router
 
 settings = get_settings()
 
@@ -44,3 +45,7 @@ async def health_check() -> dict[str, str]:
 async def root() -> dict[str, str]:
     """Root endpoint."""
     return {"message": "Welcome to CurateAI API"}
+
+
+# Include routers
+app.include_router(chat_router)

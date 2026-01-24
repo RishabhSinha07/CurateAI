@@ -239,3 +239,42 @@ app/db/repositories/product.py
 - Session Repository: Created 
 app/db/repositories/session.py
  to manage chat history and the "short-term memory" (extracted context) for multi-turn conversations.
+
+
+###Phase 2: What's implemented:
+
+We have successfully initialized the Phase 2: Core Intelligent Agents by implementing the Router Agent and the shared system state.
+
+1. LangGraph State Definition (
+app/agents/state.py
+)
+We created the 
+AgentState
+ TypedDict. This is the "shared memory" that travels between agents in our LangGraph cycle. It tracks:
+
+domain_id / domain_slug: The current specialist assigned to the user.
+extracted_context: The "slots" we've filled so far (e.g., skin type, health goals).
+status
+: Whether we are still gathering info, searching, or finished.
+2. Router Agent Implementation (
+app/agents/router.py
+)
+We built the Router using AWS Bedrock Claude 3.5 Haiku with structured output.
+
+Dynamic Knowledge: It queries the database to see which domains are currently active and what they specialize in.
+Structured Reasoning: It returns a 
+RouterResponse
+ (Pydantic model) containing the domain_slug and a confidence score.
+Safety Aware: It includes an out_of_scope classification for requests that don't match our product catalog (e.g., general small talk or unrelated questions).
+
+3. Interviewer Agent Implementation (
+app/agents/interviewer.py
+)
+We implemented the Interviewer Agent, also powered by Claude 3.5 Haiku.
+
+Slot Filling: It analyzes the domain's schema and extracts missing information from the user's message.
+Contextual Memory: It uses the session history to understand what has already been discussed.
+Natural Conversation: It generates human-like follow-up questions to gather the remaining details.
+4. Search Architect Agent Implementation (
+app/agents/search.py
+)

@@ -229,11 +229,11 @@ Each product includes: `name`, `brand`, `description`, `price`, `product_url`, `
 - [x] Embeddings service (AWS Titan v2, 1024 dims)
 - [x] Generate embeddings for products
 - [x] Repository layer (Domain, Product, Session)
-- [ ] Router Agent
-- [ ] Interviewer Agent
-- [ ] Search Architect Agent
-- [ ] Reranker Agent
-- [ ] Safety Agent
-- [ ] LangGraph orchestration
-- [ ] POST /chat endpoint
+- [x] Router Agent
+- [x] Interviewer Agent
+- [x] Search Architect Agent
+- [x] Reranker Agent
+- [x] Safety Agent
+- [x] LangGraph orchestration
+- [x] POST /chat endpoint
 - [ ] Integration tests
