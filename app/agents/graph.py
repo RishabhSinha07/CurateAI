@@ -49,6 +49,7 @@ def create_initial_state(
         response=previous_response,  # Pass previous response for context
         status=existing_status,
         next_agent=None,
+        optional_slot_hint=None,
     )
 
 

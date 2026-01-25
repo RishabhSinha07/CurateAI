@@ -22,6 +22,24 @@ class InterviewerResponse(BaseModel):
     )
     reasoning: str = Field(description="Brief explanation of extraction logic")
 
+def _format_optional_slots(slots: List[str]) -> str:
+    """Convert slot names into user-friendly hints."""
+    friendly_names = {
+        "dietary_preference": "dietary preferences (vegan, vegetarian, etc.)",
+        "budget": "your budget range",
+        "flavor_preference": "flavor preferences",
+        "age_group": "your age group",
+    }
+
+    formatted = [friendly_names.get(slot, slot.replace("_", " ")) for slot in slots]
+
+    if len(formatted) == 1:
+        return formatted[0]
+    elif len(formatted) == 2:
+        return f"{formatted[0]} or {formatted[1]}"
+    else:
+        return ", ".join(formatted[:-1]) + f", or {formatted[-1]}"
+
 def get_interviewer_model():
     """Initialize the Bedrock model for interviewing."""
     llm = ChatBedrock(
@@ -37,6 +55,7 @@ async def interviewer_agent(state: AgentState) -> AgentState:
     """
     domain_config = state.get("domain_config") or {}
     required_slots = domain_config.get("required_slots", [])
+    optional_slots = domain_config.get("optional_slots", [])
     extracted_context = state.get("extracted_context", {})
     previous_response = state.get("response")  # The last question we asked
 
@@ -91,18 +110,34 @@ Instructions:
     
     # Update state
     new_state = state.copy()
-    
+
     # Update context with newly extracted values
     new_state["extracted_context"] = {**extracted_context, **result.extracted_values}
     new_state["missing_slots"] = result.missing_slots
-    
+
     if result.missing_slots:
         new_state["response"] = result.question
         new_state["status"] = "awaiting_slot"
         new_state["next_agent"] = None # End turn to wait for user input
     else:
+        # All required slots filled - check if we should suggest optional slots
+        unfilled_optional = [
+            slot for slot in optional_slots
+            if slot not in new_state["extracted_context"]
+        ]
+
+        if unfilled_optional:
+            # Format optional slot names in a user-friendly way
+            optional_hints = _format_optional_slots(unfilled_optional)
+            # Store hint to be included by safety agent in final response
+            new_state["optional_slot_hint"] = (
+                f"You can also share {optional_hints} for more personalized recommendations."
+            )
+        else:
+            new_state["optional_slot_hint"] = None
+
+        new_state["response"] = None
         new_state["status"] = "collecting_info"
         new_state["next_agent"] = "search"
-        new_state["response"] = None
 
     return new_state

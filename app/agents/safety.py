@@ -8,6 +8,27 @@ from app.agents.state import AgentState
 settings = get_settings()
 
 
+def _format_price(price: float, currency: str) -> str:
+    """Format price with appropriate currency symbol."""
+    currency_symbols = {
+        "USD": "$",
+        "INR": "₹",
+        "EUR": "€",
+        "GBP": "£",
+        "CAD": "CA$",
+        "AUD": "A$",
+        "JPY": "¥",
+    }
+
+    symbol = currency_symbols.get(currency.upper(), currency)
+
+    # For currencies like JPY that don't use decimals
+    if currency.upper() in ["JPY", "KRW"]:
+        return f"{symbol}{price:.0f}"
+
+    return f"{symbol}{price:.2f}"
+
+
 class SafetyResponse(BaseModel):
     """Structured response from the Safety agent."""
     response: str = Field(description="The final user-facing response with recommendations")
@@ -61,9 +82,10 @@ async def safety_agent(state: AgentState) -> AgentState:
     # Format products for the response
     products_info = []
     for p in final_products:
+        formatted_price = _format_price(p['price'], p['currency'])
         info = f"""
 **{p['name']}** by {p['brand']}
-- Price: ${p['price']:.2f} {p['currency']}
+- Price: {formatted_price}
 - Why it's a good fit: {', '.join(p.get('match_reasons', ['Matches your preferences']))}
 - [View Product]({p.get('product_url', '#')})
 """
@@ -71,7 +93,7 @@ async def safety_agent(state: AgentState) -> AgentState:
 
     products_text = "\n".join(products_info)
 
-    system_prompt = f"""You are a friendly wellness consultant for CurateAI. Generate a helpful, warm response presenting product recommendations to the user.
+    system_prompt = f"""You are a wellness consultant for CurateAI. Generate a clear, professional response presenting product recommendations to the user.
 
 User's Context/Preferences:
 {extracted_context}
@@ -83,11 +105,11 @@ Domain-Specific Safety Guidelines:
 {safety_disclaimers}
 
 Your Tasks:
-1. RESPOND: Write a natural, conversational response that:
-   - Acknowledges what the user was looking for
+1. RESPOND: Write a direct, professional response that:
+   - Gets straight to the recommendations without preamble or greetings
    - Presents the top recommendations with brief highlights
    - Explains why each product fits their needs
-   - Invites follow-up questions
+   - Keep it concise and focused on the products
 
 2. SAFETY CHECK: Identify if your response:
    - Makes medical claims (e.g., "cures", "treats", "prevents disease")
@@ -97,7 +119,9 @@ Your Tasks:
 3. DISCLAIMERS: Based on the domain safety guidelines, add appropriate disclaimers.
 
 Guidelines:
-- Keep the response concise but warm
+- Keep the response concise and professional
+- NO greetings like "Hey there!" or "Hello!" - get straight to the point
+- NO acknowledgment phrases like "I heard you're looking for..." - just present the recommendations
 - Focus on benefits without making medical claims
 - Use phrases like "may support", "designed to help", "formulated for"
 - Never claim products treat, cure, or prevent any disease
@@ -109,6 +133,11 @@ Guidelines:
 
     # Build final response
     final_response = result.response
+
+    # Prepend optional slot hint if present
+    optional_slot_hint = state.get("optional_slot_hint")
+    if optional_slot_hint:
+        final_response = f"{optional_slot_hint}\n\n{final_response}"
 
     # Append disclaimers if needed
     if result.disclaimers:

@@ -1,0 +1,152 @@
+{
+  "total_products": 125,
+  "domains": {
+    "slow-capsules": 20,
+    "melts": 26,
+    "wellness": 61,
+    "effervescent": 6,
+    "collagen": 12
+  },
+  "sample_products": [
+    {
+      "sku": "SLNUOMG3X-1",
+      "name": "3x Strength Omega 3 Fish Oil",
+      "brand": "Wellbeing Nutrition",
+      "description": "Introducing our 3x strength Omega 3 Fish Oil with highly concentrated 1500 mg Fish Oil with 612mg EPA & 408mg DHA in triglyceride form that helps promote heart, bone, joint, brain & skin health. Sustainably sourced from wild-caught deep sea fish, it's infused with curcumin & peppermint oil. Our ultra-purified, molecularly distilled, mercury free odorless fish oil is 1.7x more bioavailable vs ethyl ester form. Essenced with lemon & mint, it gives no fishy burp or aftertaste.",
+      "price": 854.0,
+      "currency": "INR",
+      "product_url": "https://wellbeingnutrition.com/products/3x-omega",
+      "image_url": "https://cdn.shopify.com/s/files/1/0240/2942/9840/files/01_OMEGA_3X_0622990e-3acc-470a-bbb7-ec131652ec3d.jpg?v=1752474789",
+      "domain_slug": "slow-capsules",
+      "attributes": {
+        "product_type": "Slow Capsules",
+        "tags": [
+          "4-BYOB",
+          "4-BYOB-Test",
+          "collection_specific_sale",
+          "Julyprime",
+          "New user - Shop All Page",
+          "non-veg",
+          "primecode"
+        ],
+        "format": "capsules",
+        "is_vegan": false,
+        "contains_fish": false
+      },
+      "shopify_id": 7164858335312,
+      "created_at": "2025-03-27T16:33:23+05:30"
+    },
+    {
+      "sku": "SLNUOMG4X",
+      "name": "4x Strength Omega 3 Fish Oil",
+      "brand": "Wellbeing Nutrition",
+      "description": "Introducing our 4x strength Omega 3 Fish Oil with highly concentrated 1850mg Fish Oil with 720mg EPA & 500mg DHA in triglyceride form that helps promote heart, bone, joint, brain & skin health. Sustainably sourced from wild-caught deep sea fish, it's infused with curcumin & peppermint oil. Our ultra-purified, molecularly distilled, mercury free odorless fish oil is 1.7x more bioavailable vs ethyl ester form. Essenced with lemon & mint, it gives no fishy burp or aftertaste.",
+      "price": 1329.0,
+      "currency": "INR",
+      "product_url": "https://wellbeingnutrition.com/products/high-strength-omega-3-fish-oil",
+      "image_url": "https://cdn.shopify.com/s/files/1/0240/2942/9840/files/FOP1.jpg?v=1768368987",
+      "domain_slug": "slow-capsules",
+      "attributes": {
+        "product_type": "Slow Capsules",
+        "tags": [
+          "3-BYOB",
+          "4-BYOB",
+          "4-BYOB-Test",
+          "collection_specific_sale",
+          "midnight",
+          "New user - Shop All Page",
+          "non-veg",
+          "primecode"
+        ],
+        "format": "capsules",
+        "is_vegan": false,
+        "contains_fish": false
+      },
+      "shopify_id": 7162868400208,
+      "created_at": "2025-03-19T15:15:33+05:30"
+    },
+    {
+      "sku": "SLNUOMG6X-1",
+      "name": "6x Strength Omega 3 Fish Oil",
+      "brand": "Wellbeing Nutrition",
+      "description": "",
+      "price": 1709.0,
+      "currency": "INR",
+      "product_url": "https://wellbeingnutrition.com/products/6x-strength-omega-3-fish-oil-capsule",
+      "image_url": "https://cdn.shopify.com/s/files/1/0240/2942/9840/files/01_OMEGA_6X_0f14e85b-e5f8-4bf5-bee7-672fba56d3b8.jpg?v=1752474653",
+      "domain_slug": "slow-capsules",
+      "attributes": {
+        "product_type": "Slow Capsules",
+        "tags": [
+          "3-BYOB",
+          "4-BYOB",
+          "4-BYOB-Test",
+          "collection_specific_sale",
+          "hc-protein",
+          "hc-vegan",
+          "Julyprime",
+          "New user - Shop All Page",
+          "non-veg",
+          "non-vegan",
+          "primecode"
+        ],
+        "format": "capsules",
+        "is_vegan": true,
+        "contains_fish": true
+      },
+      "shopify_id": 7164858302544,
+      "created_at": "2025-03-27T16:31:17+05:30"
+    },
+    {
+      "sku": "SLNUBC",
+      "name": "Bioactive B Complex | Methylated B Vitamins with Biotin & Vitamin C | 60 Capsules",
+      "brand": "Wellbeing Nutrition",
+      "description": "India’s first Methylated Bioactive B-Complex delivering all 8 essential B-vitamins in their methylated, bloodstream-ready forms for superior absorption and faster utilization. This scientifically validated formula combines Inositol, Choline Bitartrate, and Betaine (TMG) to support healthy methylation, cellular energy and overall vitality. Designed to amplify Vitamin B activity, it supports metabolism, mood, nerve health, detox pathways and daily performance. Powered by clinical grade Quatrefolic ® 5-MTHF (100× more soluble than standard folic acid) & Methylcobalamin (3× better retained), it delivers higher bioavailability, faster results and more efficient absorption than regular B-complex supplements. Ideal for those with low B-vitamin absorption, methylation issues, fatigue, stress, or high-performance lifestyles.",
+      "price": 854.0,
+      "currency": "INR",
+      "product_url": "https://wellbeingnutrition.com/products/b-complex-capsules",
+      "image_url": "https://cdn.shopify.com/s/files/1/0240/2942/9840/files/BcomplexListing1.png?v=1763362835",
+      "domain_slug": "slow-capsules",
+      "attributes": {
+        "product_type": "Slow Capsules",
+        "tags": [
+          "4-BYOB",
+          "4-BYOB-Test"
+        ],
+        "format": "capsules",
+        "is_vegan": false,
+        "contains_fish": false
+      },
+      "shopify_id": 7246894465104,
+      "created_at": "2025-11-15T19:23:28+05:30"
+    },
+    {
+      "sku": "SLNUBONE",
+      "name": "Bone Support Slow",
+      "brand": "Wellbeing Nutrition",
+      "description": "A consciously formulated bone and joint support supplement with clinically proven potent nutrients. Wellbeing Nutrition’s capsule uses 2-in-1 technology that combines fast acting omega-3 fish oil and a proprietary bone & joint shield matrix as enteric-coated microbeadlets. With targeted nutrients like glucosamine, chondroitin, methylsulfonylmethane (MSM), calcium, Vitamin D3 and boron among a few, SLOW Bone Support has shown to help in improved mobility and bone strength.",
+      "price": 1329.0,
+      "currency": "INR",
+      "product_url": "https://wellbeingnutrition.com/products/slow-bone-support",
+      "image_url": "https://cdn.shopify.com/s/files/1/0240/2942/9840/files/FOP_1e376032-1fc3-4e5a-befe-8314d7d84478.jpg?v=1751029155",
+      "domain_slug": "slow-capsules",
+      "attributes": {
+        "product_type": "Slow Capsules",
+        "tags": [
+          "4-BYOB",
+          "4-BYOB-Test",
+          "All products",
+          "collection_specific_sale",
+          "New user - Shop All Page",
+          "non-vegan",
+          "primecode"
+        ],
+        "format": "capsules",
+        "is_vegan": true,
+        "contains_fish": true
+      },
+      "shopify_id": 6921472540752,
+      "created_at": "2024-01-18T13:38:26+05:30"
+    }
+  ]
+}

@@ -1,0 +1,131 @@
+{
+  "total_products": 125,
+  "domains": {
+    "melts": 29,
+    "wellness": 31,
+    "protein": 27,
+    "slow-capsules": 26,
+    "collagen": 12
+  },
+  "sample_products": [
+    {
+      "sku": "SLMESP2",
+      "name": "Coffee Melts Slim Espresso",
+      "brand": "Wellbeing Nutrition",
+      "description": "Stay focused on achieving your weight goals with melts® Slim Espresso! Made with 100% roasted Arabica coffee beans along with Garcinia Cambogia, Panax Ginseng, green coffee beans, and B-vitamin extracts to provide your body with the nutrients it requires. These coffee strips will help suppress your appetite and reduce cravings for unhealthy food, all while tantalizing your tastebuds with a strong java flavor and mild vanilla notes.",
+      "price": 478.0,
+      "currency": "INR",
+      "product_url": "https://wellbeingnutrition.com/products/melts-slim-espresso-oral-strips",
+      "image_url": "https://cdn.shopify.com/s/files/1/0240/2942/9840/files/slimespresso_packof2.jpg?v=1749719418",
+      "domain_slug": "melts",
+      "attributes": {
+        "product_type": "Coffee Melts Strips",
+        "tags": [
+          "All products",
+          "BOGOTEST",
+          "collection_specific_sale",
+          "melts_coffee",
+          "New user - Shop All Page",
+          "non-vegan",
+          "primecode"
+        ],
+        "format": "melts",
+        "is_vegan": true,
+        "contains_fish": true
+      },
+      "shopify_id": 6823729463376,
+      "created_at": "2023-03-28T11:26:01+05:30"
+    },
+    {
+      "sku": "SHILAJIT10",
+      "name": "Shilajit Resin 10gm",
+      "brand": "Wellbeing Nutrition",
+      "description": "Tap into your full potential with India’s first clinically researched, purified shilajit resin, sourced from 18,000 feet of the Annapurna range of the Himalayas. Along with saffron, cinnamon, and cardamon, this beautiful blend improves your stamina and performance and boosts your vigor within four weeks.",
+      "price": 455.0,
+      "currency": "INR",
+      "product_url": "https://wellbeingnutrition.com/products/shilajit-resin-10gm",
+      "image_url": "https://cdn.shopify.com/s/files/1/0240/2942/9840/files/Image_1-100.jpg?v=1735027374",
+      "domain_slug": "wellness",
+      "attributes": {
+        "product_type": "Shilajit",
+        "tags": [
+          "All products",
+          "New user - Shop All Page"
+        ],
+        "is_vegan": false,
+        "contains_fish": false
+      },
+      "shopify_id": 7138765963344,
+      "created_at": "2024-12-24T11:33:42+05:30"
+    },
+    {
+      "sku": "SHILAJITGOLD10",
+      "name": "Shilajit Gold 10gm",
+      "brand": "Wellbeing Nutrition",
+      "description": "Experience the pinnacle of nature's wisdom with Shilajit Gold Resin — a fusion of meticulously selected, time-tested, and purified shilajit sourced from the Annapurna range at an altitude of 18,000 feet, and ayurvedic herbs like Safed Musli, Ashwagandha and Swarna Bhasma (24K Gold Leaf). Daily, a pea-sized amount of this resin can improve vigour, blood circulation, mood, and energy.",
+      "price": 524.0,
+      "currency": "INR",
+      "product_url": "https://wellbeingnutrition.com/products/shilajit-gold-10gm",
+      "image_url": "https://cdn.shopify.com/s/files/1/0240/2942/9840/files/Image_1-100_834541de-a22a-49a1-b769-6f8dd0c72e1c.jpg?v=1764759681",
+      "domain_slug": "wellness",
+      "attributes": {
+        "product_type": "Shilajit",
+        "tags": [
+          "All products",
+          "allproducts",
+          "New user - Shop All Page"
+        ],
+        "is_vegan": false,
+        "contains_fish": false
+      },
+      "shopify_id": 7138765996112,
+      "created_at": "2024-12-24T11:33:49+05:30"
+    },
+    {
+      "sku": "NEWHYBLORA-1",
+      "name": "Hydrasalt",
+      "brand": "Wellbeing Nutrition",
+      "description": "An isotonic powder mix designed for rapid hydration with a high concentration of electrolytes and zero sugar, Hydrasalt ® is precisely formulated An isotonic powder mix designed for rapid hydration with a high concentration of electrolytes and zero sugar, HydrasaltTM is precisely formulated to activate rapid rehydration, which increases fluid and electrolyte absorption. The most advanced and cleanest micronutrient powder on Earth—for cellular rehydration, natural energy, brain health, immunity, and recovery. Read More",
+      "price": 639.0,
+      "currency": "INR",
+      "product_url": "https://wellbeingnutrition.com/products/hydrasalt-electrolyte-drink",
+      "image_url": "https://cdn.shopify.com/s/files/1/0240/2942/9840/files/Catalogue-1.webp?v=1752831487",
+      "domain_slug": "wellness",
+      "attributes": {
+        "product_type": "Electrolytes",
+        "tags": [
+          "collection_specific_sale",
+          "New user - Shop All Page",
+          "non-vegan",
+          "primecode"
+        ],
+        "is_vegan": true,
+        "contains_fish": true
+      },
+      "shopify_id": 7184042459216,
+      "created_at": "2025-05-27T14:09:41+05:30"
+    },
+    {
+      "sku": "VPROCHOCOVAN",
+      "name": "Vegan Protein Flavour Combo",
+      "brand": "Wellbeing Nutrition",
+      "description": "A premium quality, all-in-one formulation with a blend of Golden European Pea Protein Isolate, Brown Rice Protein Isolate, Chia Seed Protein, Natural Superfoods & Digestive Enzymes. This vegan protein powder is scientifically-developed to give you clean and complete nutrition for holistic health along with enhancing your daily work-out.",
+      "price": 2878.0,
+      "currency": "INR",
+      "product_url": "https://wellbeingnutrition.com/products/vegan-protein-flavor-combo",
+      "image_url": "https://cdn.shopify.com/s/files/1/0240/2942/9840/files/Image1_29f8d0a1-dc19-4960-abdf-5367f1818f64.jpg?v=1729082773",
+      "domain_slug": "protein",
+      "attributes": {
+        "product_type": "Combos",
+        "tags": [
+          "All products",
+          "New user - Shop All Page"
+        ],
+        "is_vegan": false,
+        "contains_fish": false
+      },
+      "shopify_id": 7116596805712,
+      "created_at": "2024-10-15T16:36:42+05:30"
+    }
+  ]
+}
