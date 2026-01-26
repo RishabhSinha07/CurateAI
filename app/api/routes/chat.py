@@ -123,11 +123,15 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)) -> Chat
     if new_status != chat_session.status:
         await session_repo.update_status(chat_session.id, new_status)
 
+    # Use final (personalised) products when available, otherwise fall back
+    # to the initial domain products shown during the first interview pass.
+    final_products = final_state.get("final_products", [])
+    display_products = final_products or final_state.get("initial_products", [])
+
     # Save assistant response
     product_ids = None
-    final_products = final_state.get("final_products", [])
-    if final_products:
-        product_ids = [uuid.UUID(p["id"]) for p in final_products]
+    if display_products:
+        product_ids = [uuid.UUID(p["id"]) for p in display_products]
 
     await session_repo.add_message(
         session_id=chat_session.id,
@@ -138,7 +142,7 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)) -> Chat
 
     # Build product recommendations
     recommendations = []
-    for p in final_products:
+    for p in display_products:
         recommendations.append(ProductRecommendation(
             id=p["id"],
             name=p["name"],

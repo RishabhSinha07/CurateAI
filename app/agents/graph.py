@@ -2,13 +2,18 @@
 LangGraph orchestration for the multi-agent consultation system.
 
 Flow:
-Entry → Router → Interviewer → [loop if missing slots]
-                            ↓
-                      Search Architect
-                            ↓
-                        Reranker
-                            ↓
-                         Safety → Output
+                         ┌─ (slots missing) ─→ Initial Products → Interviewer ─→ [loop] ─┐
+Entry → Router ──────────┤                                                                │
+                         └─ (all filled) ────→ Interviewer → Search → Reranker → Safety ──→ END
+
+When the Router assigns a *new* domain (different from the previous turn) and
+there are unfilled required slots, the user sees a handful of domain products
+immediately while the Interviewer gathers personalisation details.  If the
+domain hasn't changed, or all required info is already available, the
+Interviewer runs directly without the product showcase.
+
+Subsequent turns (status=awaiting_slot) skip Router entirely and go to the
+Interviewer directly.
 """
 
 import uuid
@@ -18,6 +23,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.state import AgentState
 from app.agents.router import router_agent
+from app.agents.initial_products import initial_products_agent
 from app.agents.interviewer import interviewer_agent
 from app.agents.search import search_architect_agent
 from app.agents.reranker import reranker_agent
@@ -39,11 +45,13 @@ def create_initial_state(
     return AgentState(
         session_id=session_id,
         user_message=user_message,
+        previous_domain_id=domain_id,  # Snapshot current domain for change detection
         domain_id=domain_id,
         domain_slug=domain_slug,
         domain_config=domain_config,
         extracted_context=existing_context or {},
         missing_slots=[],
+        initial_products=[],
         search_results=[],
         final_products=[],
         response=previous_response,  # Pass previous response for context
@@ -56,6 +64,11 @@ def create_initial_state(
 async def router_node(state: AgentState, db: AsyncSession) -> AgentState:
     """Router agent node - classifies intent and assigns domain."""
     return await router_agent(state, db)
+
+
+async def initial_products_node(state: AgentState, db: AsyncSession) -> AgentState:
+    """Fetch a few domain products to show before the interview starts."""
+    return await initial_products_agent(state, db)
 
 
 async def interviewer_node(state: AgentState) -> AgentState:
@@ -113,16 +126,30 @@ def after_interviewer(state: AgentState) -> Literal["search", "__end__"]:
     return END
 
 
-def after_router(state: AgentState) -> Literal["interviewer", "safety"]:
+def after_router(state: AgentState) -> Literal["initial_products", "interviewer", "safety"]:
     """
     Determine next step after router.
 
-    If out_of_scope, go to safety for graceful rejection.
-    Otherwise, proceed to interviewer.
+    If out_of_scope → safety.
+    If the domain just changed AND there are unfilled required slots →
+        initial_products (show a few products while the interviewer gathers
+        details).
+    Otherwise → interviewer directly (no initial showcase).
     """
     next_agent = state.get("next_agent")
     if next_agent == "safety":
         return "safety"
+
+    domain_changed = state.get("domain_id") != state.get("previous_domain_id")
+
+    domain_config = state.get("domain_config") or {}
+    required_slots = domain_config.get("required_slots", [])
+    extracted_context = state.get("extracted_context", {})
+    already_filled = set(extracted_context.keys())
+    missing = [s for s in required_slots if s not in already_filled]
+
+    if domain_changed and missing:
+        return "initial_products"
     return "interviewer"
 
 
@@ -156,6 +183,7 @@ class ConsultationGraph:
 
         # Add nodes (we'll wrap them to inject db later)
         builder.add_node("router", self._router_wrapper)
+        builder.add_node("initial_products", self._initial_products_wrapper)
         builder.add_node("interviewer", self._interviewer_wrapper)
         builder.add_node("search", self._search_wrapper)
         builder.add_node("reranker", self._reranker_wrapper)
@@ -177,10 +205,14 @@ class ConsultationGraph:
             "router",
             after_router,
             {
+                "initial_products": "initial_products",
                 "interviewer": "interviewer",
                 "safety": "safety",
             }
         )
+
+        # After fetching initial products, always proceed to interviewer
+        builder.add_edge("initial_products", "interviewer")
 
         builder.add_conditional_edges(
             "interviewer",
@@ -211,6 +243,11 @@ class ConsultationGraph:
         """Wrapper to inject db session into router agent."""
         db = self._current_db
         return await router_node(state, db)
+
+    async def _initial_products_wrapper(self, state: AgentState) -> AgentState:
+        """Wrapper to inject db session into initial products agent."""
+        db = self._current_db
+        return await initial_products_node(state, db)
 
     async def _interviewer_wrapper(self, state: AgentState) -> AgentState:
         """Wrapper for interviewer agent."""

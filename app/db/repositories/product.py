@@ -54,6 +54,29 @@ class ProductRepository:
         result = await self.session.execute(query)
         return [(row[0], row[1]) for row in result.all()]
 
+    async def get_by_domain(
+        self,
+        domain_id: uuid.UUID,
+        limit: int = 4,
+    ) -> list[Product]:
+        """
+        Get active products for a domain, ordered by newest first.
+
+        Used for the initial product showcase before personalised search.
+        """
+        result = await self.session.execute(
+            select(Product)
+            .where(
+                and_(
+                    Product.domain_id == domain_id,
+                    Product.is_active == True,
+                )
+            )
+            .order_by(Product.created_at.desc())
+            .limit(limit)
+        )
+        return list(result.scalars().all())
+
     async def get_by_ids(self, product_ids: list[uuid.UUID]) -> list[Product]:
         """Get multiple products by their IDs."""
         if not product_ids:

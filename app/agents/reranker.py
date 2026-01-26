@@ -65,11 +65,18 @@ async def reranker_agent(state: AgentState) -> AgentState:
     for i, p in enumerate(search_results):
         desc = p.get('description') or 'No description'
         desc_preview = desc[:150] if len(desc) > 150 else desc
+        price = p.get('price', 0)
+        currency = p.get('currency', 'INR')
+        
+        # Format price with correct symbol
+        symbol = "₹" if currency == "INR" else "$" if currency == "USD" else ""
+        price_display = f"{symbol}{price:.2f}" if symbol else f"{price:.2f} {currency}"
+
         summary = f"""Product {i+1}:
   - ID: {p['id']}
   - Name: {p['name']}
   - Brand: {p.get('brand', 'Unknown')}
-  - Price: ${p.get('price', 0):.2f} {p.get('currency', 'USD')}
+  - Price: {price_display}
   - Description: {desc_preview}
   - Attributes: {p.get('attributes', {})}
   - Similarity Score: {p.get('similarity_score', 0):.2f}"""
@@ -85,11 +92,16 @@ Candidate Products:
 {products_text}
 
 Instructions:
-1. Rank the products from best to worst match (1 = best)
-2. Select top 3-5 products that best match the user's needs
-3. For each selected product, provide the product_id (exact UUID), rank, relevance_score (0.0-1.0), and match_reasons
-4. If a product violates constraints (over budget, wrong format), you may exclude it
-5. Return your analysis in the required structured format"""
+1. HARD CONSTRAINTS FIRST: Identify any hard constraints the user specified \
+(e.g. budget/price limit, weight limit, dietary restriction, allergen). \
+Products that violate ANY hard constraint MUST be excluded — add their IDs \
+to excluded_products. Do NOT include them in ranked_products under any \
+circumstances, even if they are otherwise a good match.
+2. From the remaining products, rank from best to worst match (1 = best).
+3. Select up to 5 products that best match the user's needs. If hard constraints eliminate most products, it is acceptable (and required) to return fewer than 3 products. Do not include invalid products just to fill the list.
+4. For each selected product, provide the product_id (exact UUID), rank, \
+relevance_score (0.0-1.0), and match_reasons.
+5. Return your analysis in the required structured format."""
 
     model = get_reranker_model()
     messages = [
@@ -103,6 +115,10 @@ Instructions:
     final_products = []
 
     for ranked in result.ranked_products[:5]:  # Cap at 5
+        # Double check that the product is not in the excluded list
+        if ranked.product_id in result.excluded_products:
+            continue
+
         if ranked.product_id in products_by_id:
             product_data = products_by_id[ranked.product_id].copy()
             product_data["rank"] = ranked.rank

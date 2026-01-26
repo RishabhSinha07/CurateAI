@@ -7,6 +7,7 @@ class AgentState(TypedDict):
     user_message: str
     
     # Domain information
+    previous_domain_id: uuid.UUID | None  # Domain before this turn (for change detection)
     domain_id: uuid.UUID | None
     domain_slug: str | None
     domain_config: dict | None
@@ -16,6 +17,7 @@ class AgentState(TypedDict):
     missing_slots: list[str]
     
     # Search & Results
+    initial_products: list[dict]  # First-pass domain products shown before interview
     search_results: list[dict]
     final_products: list[dict]
     
