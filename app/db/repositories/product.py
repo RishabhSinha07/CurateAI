@@ -1,6 +1,7 @@
 import uuid
-from typing import Any, Optional
-from sqlalchemy import select, and_, func
+from typing import Optional, Any
+from sqlalchemy import select, and_
+from sqlalchemy.sql import literal
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.models import Product
 
@@ -14,7 +15,7 @@ class ProductRepository:
 
     async def hybrid_search(
         self,
-        domain_id: uuid.UUID,
+        domain_slug: str,
         query_embedding: list[float],
         filters: Optional[dict[str, Any]] = None,
         limit: int = 5,
@@ -22,16 +23,16 @@ class ProductRepository:
     ) -> list[tuple[Product, float]]:
         """
         Perform hybrid search using vector similarity and JSONB filters.
-        
+
         Returns a list of tuples containing (Product, similarity_score).
         """
-        # Vector similarity: 1 - cosine distance
-        similarity = (1 - Product.description_embedding.cosine_distance(query_embedding)).label("similarity")
-        
+        # Vector similarity: 1 - cosine distance (using literal to avoid parameter)
+        similarity = (literal(1.0) - Product.description_embedding.cosine_distance(query_embedding)).label("similarity")
+
         # Base query: active products in the specified domain
         query = select(Product, similarity).where(
             and_(
-                Product.domain_id == domain_id,
+                Product.domain_slug == domain_slug,
                 Product.is_active == True,
                 Product.description_embedding.is_not(None)
             )
@@ -56,7 +57,7 @@ class ProductRepository:
 
     async def get_by_domain(
         self,
-        domain_id: uuid.UUID,
+        domain_slug: str,
         limit: int = 4,
     ) -> list[Product]:
         """
@@ -68,7 +69,7 @@ class ProductRepository:
             select(Product)
             .where(
                 and_(
-                    Product.domain_id == domain_id,
+                    Product.domain_slug == domain_slug,
                     Product.is_active == True,
                 )
             )

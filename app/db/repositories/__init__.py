@@ -1,5 +1,5 @@
-from .domain import DomainRepository
 from .product import ProductRepository
 from .session import SessionRepository
+from .journey_bundle import JourneyBundleRepository
 
-__all__ = ["DomainRepository", "ProductRepository", "SessionRepository"]
+__all__ = ["ProductRepository", "SessionRepository", "JourneyBundleRepository"]

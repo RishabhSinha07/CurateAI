@@ -14,6 +14,7 @@ from sqlalchemy import (
     String,
     Text,
     Uuid,
+    UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -29,65 +30,7 @@ class Base(DeclarativeBase):
     pass
 
 
-class Domain(Base):
-    """
-    AI Specialist configuration table.
-
-    Defines how the AI behaves for different product categories,
-    including required slots to fill and search filters to apply.
-    """
-
-    __tablename__ = "domains"
-
-    id: Mapped[uuid.UUID] = mapped_column(
-        Uuid, primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid()
-    )
-    name: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
-    slug: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
-    parent_domain_id: Mapped[uuid.UUID | None] = mapped_column(
-        Uuid, ForeignKey("domains.id"), nullable=True
-    )
-    config: Mapped[dict] = mapped_column(
-        JSONB,
-        nullable=False,
-        default=dict,
-        comment="Schema: {required_slots: [], optional_slots: [], search_filters: [], safety_disclaimers: []}",
-    )
-    system_persona: Mapped[str | None] = mapped_column(Text, nullable=True)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
-    )
-
-    # Relationships
-    parent: Mapped["Domain | None"] = relationship(
-        "Domain", remote_side=[id], back_populates="children"
-    )
-    children: Mapped[list["Domain"]] = relationship("Domain", back_populates="parent")
-    products: Mapped[list["Product"]] = relationship("Product", back_populates="domain")
-    sessions: Mapped[list["ChatSession"]] = relationship("ChatSession", back_populates="domain")
-
-    def get_merged_config(self) -> dict:
-        """
-        Returns config with parent's arrays merged in.
-        Child arrays extend parent arrays; child persona overrides parent.
-        """
-        if self.parent is None:
-            return self.config
-
-        parent_config = self.parent.get_merged_config()
-        merged = {}
-
-        # Merge array fields (child extends parent)
-        for key in ["required_slots", "optional_slots", "search_filters", "safety_disclaimers"]:
-            parent_values = parent_config.get(key, [])
-            child_values = self.config.get(key, [])
-            merged[key] = list(dict.fromkeys(parent_values + child_values))  # Dedupe, preserve order
-
-        return merged
+# Domain model removed - domain configuration now managed via knowledge graphs
 
 
 class Product(Base):
@@ -103,8 +46,8 @@ class Product(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid, primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid()
     )
-    domain_id: Mapped[uuid.UUID] = mapped_column(
-        Uuid, ForeignKey("domains.id"), nullable=False, index=True
+    domain_slug: Mapped[str] = mapped_column(
+        String(50), nullable=False, index=True
     )
     sku: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
@@ -132,8 +75,7 @@ class Product(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
 
-    # Relationships
-    domain: Mapped["Domain"] = relationship("Domain", back_populates="products")
+    # Relationships removed - domain now referenced by slug only
 
     __table_args__ = (
         Index("idx_products_attributes", "attributes", postgresql_using="gin"),
@@ -161,8 +103,8 @@ class ChatSession(Base):
         Uuid, primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid()
     )
     user_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, nullable=True)  # Optional for guests
-    current_domain_id: Mapped[uuid.UUID | None] = mapped_column(
-        Uuid, ForeignKey("domains.id"), nullable=True
+    current_domain_slug: Mapped[str | None] = mapped_column(
+        String(50), nullable=True
     )
 
     # Slot state: {"skin_type": "oily", "budget": 50, "goal": "dark spots"}
@@ -179,7 +121,6 @@ class ChatSession(Base):
     )
 
     # Relationships
-    domain: Mapped["Domain | None"] = relationship("Domain", back_populates="sessions")
     messages: Mapped[list["ChatMessage"]] = relationship(
         "ChatMessage", back_populates="session", order_by="ChatMessage.created_at"
     )
@@ -217,3 +158,54 @@ class ChatMessage(Base):
 
     # Relationships
     session: Mapped["ChatSession"] = relationship("ChatSession", back_populates="messages")
+
+
+class JourneyBundle(Base):
+    """
+    Journey bundle templates for customer journeys.
+
+    Stores predefined product bundles for common customer journeys
+    (e.g., starting gym, skincare routine, new runner) with usage guidance.
+    """
+
+    __tablename__ = "journey_bundles"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid()
+    )
+    domain_slug: Mapped[str] = mapped_column(
+        String(50), nullable=False, index=True
+    )
+    journey_id: Mapped[str] = mapped_column(String(100), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+
+    # Keywords for journey detection (e.g., ["starting gym", "beginner fitness"])
+    keywords: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False)
+
+    # Product categories needed for this journey (e.g., ["protein", "pre_workout"])
+    product_categories: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False)
+
+    # Optional product tags for filtering (e.g., ["beginner_friendly", "essential"])
+    product_tags: Mapped[list[str] | None] = mapped_column(ARRAY(String), nullable=True)
+
+    # Usage guidance templates per category
+    # Example: {"protein": "Take after workouts...", "pre_workout": "Consume 15-20 mins before..."}
+    guidance_templates: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    # Relationships removed - domain now referenced by slug only
+
+    __table_args__ = (
+        Index("idx_journey_bundles_keywords", "keywords", postgresql_using="gin"),
+        # Unique constraint on domain_slug + journey_id
+        UniqueConstraint("domain_slug", "journey_id", name="uq_journey_bundle_domain_journey"),
+    )
+

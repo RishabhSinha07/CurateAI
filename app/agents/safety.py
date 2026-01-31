@@ -55,13 +55,57 @@ async def safety_agent(state: AgentState) -> AgentState:
     1. Generates a natural recommendation response
     2. Checks for medical claims
     3. Appends domain-specific disclaimers
-    4. Handles out-of-scope requests gracefully
+    4. Includes information about safety constraints that were applied
+    5. Handles out-of-scope requests gracefully
     """
     status = state.get("status", "")
     domain_config = state.get("domain_config") or {}
     final_products = state.get("final_products", [])
     extracted_context = state.get("extracted_context", {})
     safety_disclaimers = domain_config.get("safety_disclaimers", [])
+
+    # Extract applied safety constraints from context
+    applied_constraints = []
+    graph_state = extracted_context.get("graph_state", {})
+    filled_attrs = graph_state.get("filled_attributes", {})
+
+    # Check for medical constraints
+    if "medical_constraints" in filled_attrs:
+        value = filled_attrs["medical_constraints"].get("value", "")
+        if isinstance(value, list):
+            for constraint in value:
+                if not isinstance(constraint, str):
+                    continue
+                constraint_lower = constraint.lower()
+                if constraint_lower not in ["none", "none of the above"]:
+                    applied_constraints.append(f"Medical: {constraint}")
+        elif isinstance(value, str) and value:
+            value_lower = value.lower()
+            if "none" not in value_lower:
+                applied_constraints.append(f"Medical: {value}")
+
+    # Check for allergy constraints
+    if "allergies" in filled_attrs:
+        value = filled_attrs["allergies"].get("value", "")
+        if isinstance(value, list):
+            for allergy in value:
+                if not isinstance(allergy, str):
+                    continue
+                allergy_lower = allergy.lower()
+                if "no allerg" not in allergy_lower and allergy_lower != "none":
+                    applied_constraints.append(f"Allergy: {allergy.replace(' allergy', '')}")
+        elif isinstance(value, str) and value:
+            value_lower = value.lower()
+            if "no allerg" not in value_lower:
+                applied_constraints.append(f"Allergy: {value.replace(' allergy', '')}")
+
+    # Check for dietary constraints
+    if "diet" in filled_attrs:
+        value = filled_attrs["diet"].get("value", "")
+        if isinstance(value, str) and value:
+            value_lower = value.lower()
+            if value_lower in ["vegan", "vegetarian"]:
+                applied_constraints.append(f"Diet: {value.capitalize()}")
 
     # Handle out-of-scope requests
     if status == "out_of_scope":
@@ -93,11 +137,26 @@ async def safety_agent(state: AgentState) -> AgentState:
 
     products_text = "\n".join(products_info)
 
+    # Build constraint information for the prompt
+    constraint_info = ""
+    if applied_constraints:
+        constraint_list = "\n".join(f"  - {c}" for c in applied_constraints)
+        constraint_info = f"""
+Safety Constraints Applied:
+{constraint_list}
+
+IMPORTANT: Mention these safety filters in your response to reassure the user that their constraints were considered.
+For example:
+- "All products are safe for pregnancy"
+- "These are fish-free options for your allergy"
+- "All recommendations are vegan-friendly"
+"""
+
     system_prompt = f"""You are a wellness consultant for CurateAI. Generate a clear, professional response presenting product recommendations to the user.
 
 User's Context/Preferences:
 {extracted_context}
-
+{constraint_info}
 Products to Recommend:
 {products_text}
 
@@ -107,6 +166,7 @@ Domain-Specific Safety Guidelines:
 Your Tasks:
 1. RESPOND: Write a direct, professional response that:
    - Gets straight to the recommendations without preamble or greetings
+   - If safety constraints were applied, BRIEFLY mention them (e.g., "All products below are safe for pregnancy and free of fish")
    - Presents the top recommendations with brief highlights
    - Explains why each product fits their needs
    - Keep it concise and focused on the products

@@ -13,20 +13,31 @@ from app.db.session import async_session_factory
 from app.services.embeddings import generate_embedding_async
 
 
-async def generate_product_embeddings() -> None:
-    """Generate embeddings for all products that don't have one."""
+async def generate_product_embeddings(regenerate: bool = False) -> None:
+    """
+    Generate embeddings for products.
+
+    Args:
+        regenerate: If True, regenerate embeddings for all products (even those with existing embeddings)
+    """
     async with async_session_factory() as session:
-        # Get products without embeddings
-        result = await session.execute(
-            select(Product).where(Product.description_embedding.is_(None))
-        )
-        products = result.scalars().all()
+        # Get products based on regenerate flag
+        if regenerate:
+            result = await session.execute(select(Product))
+            products = result.scalars().all()
+            print(f"Regenerating embeddings for all {len(products)} products...")
+        else:
+            result = await session.execute(
+                select(Product).where(Product.description_embedding.is_(None))
+            )
+            products = result.scalars().all()
 
-        if not products:
-            print("All products already have embeddings.")
-            return
+            if not products:
+                print("All products already have embeddings.")
+                print("Use --regenerate to regenerate embeddings for all products.")
+                return
 
-        print(f"Generating embeddings for {len(products)} products...")
+            print(f"Generating embeddings for {len(products)} new products...")
 
         for i, product in enumerate(products, 1):
             # Create text to embed (name + description + key attributes)
@@ -38,16 +49,56 @@ async def generate_product_embeddings() -> None:
 
             # Add relevant attributes
             attrs = product.attributes or {}
-            if "active_ingredients" in attrs:
-                text_parts.append(f"Ingredients: {', '.join(attrs['active_ingredients'])}")
+
+            # Ingredients (critical for matching)
+            if "ingredients" in attrs:
+                ingredients = attrs["ingredients"]
+                if isinstance(ingredients, list):
+                    text_parts.append(f"Ingredients: {', '.join(ingredients)}")
+
+            # Health goals/problems (for both skin and hair)
+            if "health_goals" in attrs:
+                goals = attrs["health_goals"]
+                if isinstance(goals, list):
+                    text_parts.append(f"Helps with: {', '.join(goals)}")
+
+            # Skin-specific attributes
             if "skin_type" in attrs:
                 skin_types = attrs["skin_type"]
                 if isinstance(skin_types, list):
                     text_parts.append(f"For skin types: {', '.join(skin_types)}")
+                elif skin_types:
+                    text_parts.append(f"For skin type: {skin_types}")
+
             if "skin_concern" in attrs:
                 concerns = attrs["skin_concern"]
                 if isinstance(concerns, list):
-                    text_parts.append(f"Addresses: {', '.join(concerns)}")
+                    text_parts.append(f"Addresses skin concerns: {', '.join(concerns)}")
+                elif concerns:
+                    text_parts.append(f"Addresses: {concerns}")
+
+            # Hair-specific attributes
+            if "hair_type" in attrs:
+                hair_types = attrs["hair_type"]
+                if isinstance(hair_types, list):
+                    text_parts.append(f"For hair types: {', '.join(hair_types)}")
+                elif hair_types:
+                    text_parts.append(f"For hair type: {hair_types}")
+
+            if "scalp_condition" in attrs:
+                scalp = attrs["scalp_condition"]
+                text_parts.append(f"Scalp condition: {scalp}")
+
+            # Gender-specific (for targeted products)
+            if "gender_specific" in attrs:
+                gender = attrs["gender_specific"]
+                if gender and gender != "all":
+                    text_parts.append(f"For {gender}")
+
+            # Category (helps with domain identification)
+            if "category" in attrs:
+                category = attrs["category"]
+                text_parts.append(f"Category: {category}")
 
             text_to_embed = " | ".join(text_parts)
 
@@ -92,7 +143,20 @@ async def check_embedding_status() -> None:
 if __name__ == "__main__":
     import sys
 
-    if len(sys.argv) > 1 and sys.argv[1] == "--status":
-        asyncio.run(check_embedding_status())
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "--status":
+            asyncio.run(check_embedding_status())
+        elif sys.argv[1] == "--regenerate":
+            print("⚠️  This will regenerate embeddings for ALL products (may take time and cost)")
+            confirm = input("Continue? (y/n): ")
+            if confirm.lower() == 'y':
+                asyncio.run(generate_product_embeddings(regenerate=True))
+            else:
+                print("Cancelled.")
+        else:
+            print("Usage:")
+            print("  python -m app.services.generate_embeddings              # Generate for new products only")
+            print("  python -m app.services.generate_embeddings --status     # Check embedding status")
+            print("  python -m app.services.generate_embeddings --regenerate # Regenerate all embeddings")
     else:
         asyncio.run(generate_product_embeddings())

@@ -2,13 +2,17 @@ from typing import Any, Dict, List
 from pydantic import BaseModel, Field
 from langchain_aws import ChatBedrock
 from sqlalchemy.ext.asyncio import AsyncSession
+import logging
 
 from app.config import get_settings
 from app.agents.state import AgentState
 from app.db.repositories.product import ProductRepository
 from app.services.embeddings import generate_embedding_async
+from app.knowledge.query_engine import GraphQueryEngine
+from app.knowledge.graph_loader import get_knowledge_graph
 
 settings = get_settings()
+logger = logging.getLogger(__name__)
 
 
 class QueryExpansion(BaseModel):
@@ -31,50 +35,102 @@ def get_search_model():
 
 async def search_architect_agent(state: AgentState, db: AsyncSession) -> AgentState:
     """
-    Expands user query and performs hybrid search to find relevant products.
+    Performs intelligent product search using knowledge graph and semantic search.
 
     This agent:
-    1. Analyzes the extracted context and user intent
-    2. Expands the query with synonyms and related terms
-    3. Maps context values to JSONB filters
+    1. Uses knowledge graph to identify relevant ingredients for the user's problem
+    2. Boosts ingredients based on user attributes (e.g., iron for women)
+    3. Builds search query with graph-recommended ingredients
     4. Performs hybrid vector + filter search
     """
-    domain_config = state.get("domain_config") or {}
     extracted_context = state.get("extracted_context", {})
-    search_filters = domain_config.get("search_filters", [])
+    graph_state = extracted_context.get("graph_state", {})
+    problem_id = graph_state.get("identified_problem")
+    graph_domain = graph_state.get("graph_domain")
 
-    # Build the expansion prompt
-    system_prompt = f"""You are a Search Query Architect for CurateAI, a wellness product recommendation system.
+    # Build search query from problem and ingredients (not user message)
+    search_query_text = None
+    graph_ingredients = []
 
-Your task is to optimize the search query for finding the best matching products.
+    if problem_id and graph_domain:
+        try:
+            # Load the knowledge graph
+            graph = get_knowledge_graph(graph_domain)
 
-Domain: {state.get('domain_slug')}
-User's Original Message: "{state['user_message']}"
-Extracted User Preferences: {extracted_context}
-Available Filter Fields: {search_filters}
+            # Get problem display name for the base query
+            problem_node = graph.get_node(problem_id)
+            problem_display = problem_node.get('display_name', problem_id) if problem_node else problem_id
 
-Your Tasks:
-1. EXPAND: Create an expanded natural language query that captures the user's intent with synonyms and related terms. This will be used for semantic (vector) search. Include the user's concerns, goals, and preferences.
-2. EXTRACT: Identify key search terms that should match product descriptions.
-3. FILTER: Only create filters for fields that are EXACTLY in the Available Filter Fields list. If a preference doesn't match an available filter field, do NOT create a filter for it - rely on semantic search instead.
+            # Get graph-recommended ingredients based on problem and user attributes
+            filled_attributes = graph_state.get("filled_attributes", {})
 
-IMPORTANT RULES FOR FILTERS:
-- Only use filter field names from: {search_filters}
-- If the list is empty or preferences don't match, return an empty filters object {{}}
-- Do NOT create filters for fields like "skin_concern", "format", "collagen_preference" unless they are in the Available Filter Fields
-- When in doubt, use an empty filter and let semantic search handle it
-"""
+            # Convert filled_attributes to format expected by query engine
+            user_attributes = {
+                attr_cat: attr_data.get("attribute_id")
+                for attr_cat, attr_data in filled_attributes.items()
+            }
 
-    model = get_search_model()
-    result: QueryExpansion = await model.ainvoke(system_prompt)
+            logger.info(f"Building graph-based search query for problem '{problem_id}' with attributes: {user_attributes}")
 
-    # Generate embedding for the expanded query
-    query_embedding = await generate_embedding_async(result.expanded_query)
+            graph_query = GraphQueryEngine.build_search_query(
+                domain=graph_domain,
+                problem_id=problem_id,
+                user_attributes=user_attributes,
+                boost_factor=0.2
+            )
+
+            graph_ingredient_ids = graph_query.get("primary_ingredients", [])
+            logger.info(f"Graph recommended ingredient IDs: {graph_ingredient_ids}")
+
+            # Convert ingredient IDs to display names for better semantic matching
+            ingredient_display_names = []
+            for ingredient_id in graph_ingredient_ids:
+                ingredient_node = graph.get_node(ingredient_id)
+                if ingredient_node:
+                    # Use display_name or name, clean up underscores
+                    display_name = ingredient_node.get('display_name') or ingredient_node.get('name', ingredient_id)
+                    display_name = display_name.replace('_', ' ')
+                    ingredient_display_names.append(display_name)
+                else:
+                    # Fallback: clean up the ID
+                    ingredient_display_names.append(ingredient_id.replace('_', ' '))
+
+            logger.info(f"Converted to display names: {ingredient_display_names}")
+
+            # Build search query from problem + ingredient display names
+            # No user message - it's just noise like "20" or "capsules"
+            if ingredient_display_names:
+                ingredient_str = ", ".join(ingredient_display_names)
+                search_query_text = f"{problem_display}: {ingredient_str}"
+            else:
+                search_query_text = problem_display
+
+            logger.info(f"Final search query: {search_query_text}")
+
+        except Exception as e:
+            logger.warning(f"Error building graph search query: {e}")
+            # Fallback: use problem display name if available
+            try:
+                graph = get_knowledge_graph(graph_domain)
+                problem_node = graph.get_node(problem_id)
+                search_query_text = problem_node.get('display_name', problem_id) if problem_node else problem_id
+            except:
+                search_query_text = problem_id
+    else:
+        logger.info("No problem identified in graph_state. Using user message for search.")
+        # Only fall back to user message if no problem identified
+        search_query_text = state['user_message']
+
+    if not search_query_text:
+        search_query_text = state['user_message']
+
+    # Generate embedding for the search query
+    query_embedding = await generate_embedding_async(search_query_text)
 
     # Perform hybrid search (rely on semantic search, let reranker filter)
     product_repo = ProductRepository(db)
     search_results = await product_repo.hybrid_search(
-        domain_id=state["domain_id"],
+        domain_slug=state["domain_slug"],
         query_embedding=query_embedding,
         filters=None,  # Skip JSONB filters, use semantic search + reranker
         limit=20,

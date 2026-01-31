@@ -36,12 +36,12 @@ class SessionRepository:
         await self.session.refresh(curr_session)
         return curr_session
 
-    async def set_domain(self, session_id: uuid.UUID, domain_id: uuid.UUID) -> None:
+    async def set_domain(self, session_id: uuid.UUID, domain_slug: str) -> None:
         """Set the current domain for the session."""
         await self.session.execute(
             update(ChatSession)
             .where(ChatSession.id == session_id)
-            .values(current_domain_id=domain_id)
+            .values(current_domain_slug=domain_slug)
         )
 
     async def add_message(

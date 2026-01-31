@@ -11,7 +11,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.db.repositories.session import SessionRepository
-from app.db.repositories.domain import DomainRepository
 from app.agents.graph import get_consultation_graph, create_initial_state
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -40,7 +39,10 @@ class ChatResponse(BaseModel):
     session_id: uuid.UUID
     response: str
     status: str
+    domain_slug: Optional[str] = None  # Identified domain
+    intent_type: Optional[str] = None  # "query" or "journey"
     products: list[ProductRecommendation] = []
+    journey_info: Optional[dict] = None  # Journey bundle info if intent_type is "journey"
 
 
 @router.post("", response_model=ChatResponse)
@@ -55,28 +57,23 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)) -> Chat
     4. Returns response with any product recommendations
     """
     session_repo = SessionRepository(db)
-    domain_repo = DomainRepository(db)
 
     # Get or create session
     chat_session = await session_repo.get_or_create(request.session_id)
 
-    # Load existing domain config if session has one
-    domain_id = chat_session.current_domain_id
-    domain_slug = None
-    domain_config = None
-
-    if domain_id:
-        domain = await domain_repo.get_by_id(domain_id)
-        if domain:
-            domain_slug = domain.slug
-            domain_config = domain.get_merged_config()
+    # Load existing domain slug if session has one
+    domain_slug = chat_session.current_domain_slug
 
     # Get the last assistant message for context (helps with slot extraction)
     previous_response = None
     if chat_session.status == "awaiting_slot":
-        history = await session_repo.get_history(chat_session.id, limit=1)
-        if history and history[0].role == "assistant":
-            previous_response = history[0].content
+        # Get last few messages to find the most recent assistant message
+        history = await session_repo.get_history(chat_session.id, limit=5)
+        # Find the last assistant message (history is in chronological order)
+        for msg in reversed(history):
+            if msg.role == "assistant":
+                previous_response = msg.content
+                break
 
     # Save user message
     await session_repo.add_message(
@@ -91,9 +88,7 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)) -> Chat
         user_message=request.message,
         existing_context=chat_session.extracted_context,
         existing_status=chat_session.status,
-        domain_id=domain_id,
         domain_slug=domain_slug,
-        domain_config=domain_config,
         previous_response=previous_response,
     )
 
@@ -115,8 +110,8 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)) -> Chat
     if final_state.get("extracted_context"):
         await session_repo.update_context(chat_session.id, final_state["extracted_context"])
 
-    if final_state.get("domain_id") and final_state["domain_id"] != domain_id:
-        await session_repo.set_domain(chat_session.id, final_state["domain_id"])
+    if final_state.get("domain_slug") and final_state["domain_slug"] != domain_slug:
+        await session_repo.set_domain(chat_session.id, final_state["domain_slug"])
 
     # Update session status
     new_status = final_state.get("status", "active")
@@ -154,11 +149,18 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)) -> Chat
             match_reasons=p.get("match_reasons", [])
         ))
 
+    # Get journey info if present
+    journey_info = final_state.get("journey_bundle")
+    intent_type = final_state.get("intent_type")
+
     return ChatResponse(
         session_id=chat_session.id,
         response=response_text,
         status=new_status,
-        products=recommendations
+        domain_slug=final_state.get("domain_slug"),
+        intent_type=intent_type,
+        products=recommendations,
+        journey_info=journey_info
     )
 
 

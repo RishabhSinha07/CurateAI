@@ -7,10 +7,13 @@ This node runs exactly once per consultation: right after the Router assigns
 a domain and before the Interviewer starts asking questions.
 """
 
+import logging
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.state import AgentState
 from app.db.repositories.product import ProductRepository
+
+logger = logging.getLogger(__name__)
 
 # How many products to show in the initial showcase.
 INITIAL_PRODUCT_LIMIT = 4
@@ -22,13 +25,13 @@ async def initial_products_agent(state: AgentState, db: AsyncSession) -> AgentSt
     store them in ``initial_products`` so the interviewer can present them
     alongside its first question.
     """
-    domain_id = state.get("domain_id")
-    if not domain_id:
+    domain_slug = state.get("domain_slug")
+    if not domain_slug:
         # Safety guard — nothing to fetch without a domain.
         return state
 
     product_repo = ProductRepository(db)
-    products = await product_repo.get_by_domain(domain_id, limit=INITIAL_PRODUCT_LIMIT)
+    products = await product_repo.get_by_domain(domain_slug, limit=INITIAL_PRODUCT_LIMIT)
 
     products_data = [
         {
@@ -45,6 +48,13 @@ async def initial_products_agent(state: AgentState, db: AsyncSession) -> AgentSt
         for p in products
     ]
 
+    # Preserve extracted_context when copying state
     new_state = state.copy()
     new_state["initial_products"] = products_data
+
+    # Ensure extracted_context is preserved from previous node (router)
+    if "extracted_context" in state:
+        new_state["extracted_context"] = state["extracted_context"].copy()
+
+    logger.info(f"Initial products agent preserving extracted_context: {new_state.get('extracted_context')}")
     return new_state

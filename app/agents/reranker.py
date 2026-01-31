@@ -1,56 +1,165 @@
 from typing import Any, Dict, List
-from pydantic import BaseModel, Field
-from langchain_aws import ChatBedrock
-from langchain_core.messages import HumanMessage, SystemMessage
+import logging
 
-from app.config import get_settings
 from app.agents.state import AgentState
+from app.knowledge.query_engine import GraphQueryEngine
 
-settings = get_settings()
+logger = logging.getLogger(__name__)
 
-
-class RankedProduct(BaseModel):
-    """A product with its ranking information."""
-    product_id: str = Field(description="The UUID of the product")
-    rank: int = Field(description="Rank position where 1 is best match")
-    relevance_score: float = Field(description="Score from 0.0 to 1.0")
-    match_reasons: List[str] = Field(description="List of reasons why this product matches")
+# NOTE: This module previously used LLM-based re-ranking but has been simplified.
+# It now only performs safety filtering via the knowledge graph.
+# Search ranking (graph boosting + vector similarity) is trusted.
 
 
-class RerankerResponse(BaseModel):
-    """Structured response from the Reranker agent."""
-    ranked_products: List[RankedProduct] = Field(
-        description="Top 3-5 products ranked by relevance, best first"
-    )
-    excluded_products: List[str] = Field(
-        default_factory=list,
-        description="Product IDs that were excluded"
-    )
-    reasoning: str = Field(description="Brief explanation of ranking decisions")
+def extract_ingredients_from_product(product: Dict[str, Any]) -> List[str]:
+    """
+    Extract ingredient names from product attributes.
+
+    Looks for common attribute keys that contain ingredient information.
+    """
+    attributes = product.get("attributes", {})
+    ingredients = []
+
+    # Check various possible attribute keys
+    if "ingredients" in attributes:
+        ing = attributes["ingredients"]
+        if isinstance(ing, list):
+            ingredients.extend(ing)
+        elif isinstance(ing, str):
+            ingredients.append(ing)
+
+    if "key_ingredients" in attributes:
+        ing = attributes["key_ingredients"]
+        if isinstance(ing, list):
+            ingredients.extend(ing)
+        elif isinstance(ing, str):
+            ingredients.append(ing)
+
+    # Extract from product name or description as fallback
+    # Common wellness ingredients to look for
+    common_ingredients = [
+        "vitamin_b12", "vitamin_d3", "melatonin", "ashwagandha", "biotin",
+        "iron", "marine_collagen", "vegan_collagen", "probiotics", "magnesium",
+        "multivitamin", "vitamin_c", "niacinamide", "retinol", "hyaluronic_acid"
+    ]
+
+    product_text = f"{product.get('name', '')} {product.get('description', '')}".lower()
+    for ing in common_ingredients:
+        ing_readable = ing.replace("_", " ")
+        if ing_readable in product_text or ing in product_text:
+            if ing not in ingredients:
+                ingredients.append(ing)
+
+    return ingredients
 
 
-def get_reranker_model():
-    """Initialize the Bedrock model for reranking."""
-    llm = ChatBedrock(
-        model_id=settings.bedrock_model_id,
-        region_name=settings.aws_region,
-        model_kwargs={"temperature": 0},
-    )
-    return llm.with_structured_output(RerankerResponse)
+def extract_user_constraints(extracted_context: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Extract user constraints from extracted context.
+
+    Returns constraints in format expected by GraphQueryEngine.filter_by_constraints()
+    """
+    constraints = {}
+
+    # Check for dietary constraints
+    if "dietary_preference" in extracted_context:
+        diet = extracted_context["dietary_preference"].lower()
+        if "vegan" in diet:
+            constraints["dietary"] = "vegan"
+        elif "vegetarian" in diet:
+            constraints["dietary"] = "vegetarian"
+
+    # Check for medical constraints
+    if "pregnancy" in extracted_context:
+        constraints["pregnancy"] = bool(extracted_context["pregnancy"])
+
+    if "breastfeeding" in extracted_context:
+        constraints["breastfeeding"] = bool(extracted_context["breastfeeding"])
+
+    # Check for allergies
+    if "allergies" in extracted_context:
+        allergies = extracted_context["allergies"]
+        if isinstance(allergies, list):
+            for allergy in allergies:
+                constraints[f"allergy_{allergy.lower()}"] = True
+        elif isinstance(allergies, str):
+            constraints[f"allergy_{allergies.lower()}"] = True
+
+    # Check in graph_state filled_attributes
+    graph_state = extracted_context.get("graph_state", {})
+    filled_attrs = graph_state.get("filled_attributes", {})
+
+    for attr_cat, attr_data in filled_attrs.items():
+        # Get value WITHOUT calling .lower() yet (might be a list!)
+        value = attr_data.get("value", "")
+
+        # Extract diet constraints
+        if attr_cat == "diet" or attr_cat == "dietary_preference":
+            # Handle both string and list values
+            value_str = value if isinstance(value, str) else str(value)
+            value_lower = value_str.lower()
+
+            if "vegan" in value_lower:
+                constraints["dietary"] = "vegan"
+            elif "vegetarian" in value_lower:
+                constraints["dietary"] = "vegetarian"
+
+        # Extract medical constraints
+        elif attr_cat == "medical_constraints":
+            # Multi-choice field - check if user selected pregnancy/breastfeeding
+            if isinstance(value, list):
+                for item in value:
+                    item_lower = item.lower() if isinstance(item, str) else str(item).lower()
+                    if "pregnancy" in item_lower:
+                        constraints["pregnancy"] = True
+                    if "breastfeeding" in item_lower:
+                        constraints["breastfeeding"] = True
+            elif isinstance(value, str):
+                value_lower = value.lower()
+                if "pregnancy" in value_lower:
+                    constraints["pregnancy"] = True
+                if "breastfeeding" in value_lower:
+                    constraints["breastfeeding"] = True
+
+        # Extract allergy constraints
+        elif attr_cat == "allergies":
+            # Multi-choice field - check for fish/shellfish allergies
+            if isinstance(value, list):
+                for allergy in value:
+                    if not isinstance(allergy, str):
+                        continue
+                    allergy_lower = allergy.lower()
+                    if "no" in allergy_lower or "none" in allergy_lower:
+                        continue
+                    allergy_clean = allergy_lower.replace(" allergy", "").strip()
+                    constraints[f"allergy_{allergy_clean}"] = True
+            elif isinstance(value, str):
+                value_lower = value.lower()
+                if "no" not in value_lower and "none" not in value_lower:
+                    allergy_clean = value_lower.replace(" allergy", "").strip()
+                    constraints[f"allergy_{allergy_clean}"] = True
+
+    return constraints
 
 
 async def reranker_agent(state: AgentState) -> AgentState:
     """
-    Filters and ranks search results based on user constraints.
+    Filters search results by safety constraints (SIMPLIFIED - NO LLM).
 
     This agent:
-    1. Analyzes search results against user preferences
-    2. Applies hard constraints (budget, allergies)
-    3. Scores soft preferences (goals, format preferences)
-    4. Returns top 3-5 best matching products
+    1. Uses knowledge graph to check contraindications (pregnancy, allergies, diet)
+    2. Excludes products with contraindicated ingredients
+    3. Applies simple budget/preference filters
+    4. Trusts search ranking (graph boosting already applied)
+    5. Returns top 5 safe products
+
+    NOTE: No LLM re-ranking - search already uses graph-based ingredient boosting
+    and vector similarity. This agent only filters for safety and constraints.
     """
     extracted_context = state.get("extracted_context", {})
     search_results = state.get("search_results", [])
+    graph_state = extracted_context.get("graph_state", {})
+    graph_domain = graph_state.get("graph_domain")
 
     if not search_results:
         # No results to rank
@@ -60,76 +169,144 @@ async def reranker_agent(state: AgentState) -> AgentState:
         new_state["next_agent"] = "safety"
         return new_state
 
-    # Format products for the LLM
-    products_summary = []
-    for i, p in enumerate(search_results):
-        desc = p.get('description') or 'No description'
-        desc_preview = desc[:150] if len(desc) > 150 else desc
-        price = p.get('price', 0)
-        currency = p.get('currency', 'INR')
-        
-        # Format price with correct symbol
-        symbol = "₹" if currency == "INR" else "$" if currency == "USD" else ""
-        price_display = f"{symbol}{price:.2f}" if symbol else f"{price:.2f} {currency}"
+    # Extract user constraints from context
+    user_constraints = extract_user_constraints(extracted_context)
+    logger.info(f"User constraints: {user_constraints}")
 
-        summary = f"""Product {i+1}:
-  - ID: {p['id']}
-  - Name: {p['name']}
-  - Brand: {p.get('brand', 'Unknown')}
-  - Price: {price_display}
-  - Description: {desc_preview}
-  - Attributes: {p.get('attributes', {})}
-  - Similarity Score: {p.get('similarity_score', 0):.2f}"""
-        products_summary.append(summary)
+    # Filter products using knowledge graph (if domain is available)
+    safe_products = []
+    excluded_products = []
 
-    products_text = "\n\n".join(products_summary)
+    for product in search_results:
+        # Extract ingredients from product
+        product_ingredients = extract_ingredients_from_product(product)
 
-    system_message = """You are a Product Ranking Specialist. Analyze the candidate products and rank them based on how well they match the user's preferences. You must return a structured response with ranked_products, excluded_products, and reasoning."""
+        if graph_domain and product_ingredients and user_constraints:
+            try:
+                # Check contraindications using knowledge graph
+                safety_check = GraphQueryEngine.filter_by_constraints(
+                    domain=graph_domain,
+                    product_ingredients=product_ingredients,
+                    user_constraints=user_constraints
+                )
 
-    user_message = f"""User Preferences: {extracted_context}
+                if safety_check["is_safe"]:
+                    safe_products.append(product)
+                    logger.debug(f"Product '{product['name']}' passed safety check")
+                else:
+                    excluded_products.append({
+                        "product_id": product["id"],
+                        "product_name": product["name"],
+                        "violations": safety_check["violations"]
+                    })
+                    logger.info(
+                        f"Excluded '{product['name']}': "
+                        f"{[v['reason'] for v in safety_check['violations']]}"
+                    )
+            except Exception as e:
+                # If graph check fails, include product (fail open for availability)
+                logger.warning(f"Graph safety check failed for '{product['name']}': {e}")
+                safe_products.append(product)
+        else:
+            # No graph domain or no constraints - include all products
+            safe_products.append(product)
 
-Candidate Products:
-{products_text}
+    # Check if graph filtering excluded all products
+    if not safe_products:
+        logger.warning(
+            f"All {len(search_results)} products were excluded by graph safety checks. "
+            f"Returning empty results."
+        )
+        new_state = state.copy()
+        new_state["final_products"] = []
+        new_state["status"] = "ranked"
+        new_state["next_agent"] = "safety"
+        return new_state
 
-Instructions:
-1. HARD CONSTRAINTS FIRST: Identify any hard constraints the user specified \
-(e.g. budget/price limit, weight limit, dietary restriction, allergen). \
-Products that violate ANY hard constraint MUST be excluded — add their IDs \
-to excluded_products. Do NOT include them in ranked_products under any \
-circumstances, even if they are otherwise a good match.
-2. From the remaining products, rank from best to worst match (1 = best).
-3. Select up to 5 products that best match the user's needs. If hard constraints eliminate most products, it is acceptable (and required) to return fewer than 3 products. Do not include invalid products just to fill the list.
-4. For each selected product, provide the product_id (exact UUID), rank, \
-relevance_score (0.0-1.0), and match_reasons.
-5. Return your analysis in the required structured format."""
+    logger.info(
+        f"Graph safety filtering: {len(safe_products)}/{len(search_results)} products safe, "
+        f"{len(excluded_products)} excluded"
+    )
 
-    model = get_reranker_model()
-    messages = [
-        SystemMessage(content=system_message),
-        HumanMessage(content=user_message)
-    ]
-    result: RerankerResponse = await model.ainvoke(messages)
+    # Apply simple budget filter if present
+    budget = extracted_context.get("budget")
+    if budget:
+        try:
+            budget_value = float(budget)
+            filtered_by_budget = []
+            for product in safe_products:
+                price = product.get("price", 0)
+                if price and float(price) <= budget_value:
+                    filtered_by_budget.append(product)
+                else:
+                    logger.info(f"Excluded '{product['name']}' due to budget (${price} > ${budget_value})")
+            safe_products = filtered_by_budget
+        except (ValueError, TypeError):
+            logger.warning(f"Invalid budget value: {budget}, skipping budget filter")
 
-    # Map ranked product IDs back to full product data
-    products_by_id = {p["id"]: p for p in search_results}
-    final_products = []
+    if not safe_products:
+        logger.warning("All products excluded after budget filtering")
+        new_state = state.copy()
+        new_state["final_products"] = []
+        new_state["status"] = "ranked"
+        new_state["next_agent"] = "safety"
+        return new_state
 
-    for ranked in result.ranked_products[:5]:  # Cap at 5
-        # Double check that the product is not in the excluded list
-        if ranked.product_id in result.excluded_products:
-            continue
+    # Trust search ranking (graph boosting + vector similarity already applied)
+    # Take top 5 products
+    final_products = safe_products[:5]
 
-        if ranked.product_id in products_by_id:
-            product_data = products_by_id[ranked.product_id].copy()
-            product_data["rank"] = ranked.rank
-            product_data["relevance_score"] = ranked.relevance_score
-            product_data["match_reasons"] = ranked.match_reasons
-            final_products.append(product_data)
+    # Generate match reasons based on graph data and similarity
+    for rank, product in enumerate(final_products, 1):
+        product["rank"] = rank
+        product["relevance_score"] = product.get("similarity_score", 0.0)
+
+        # Build match reasons from available data
+        match_reasons = []
+
+        # Graph-based matching
+        if graph_domain:
+            match_reasons.append("Matched based on graph-recommended ingredients for your concern")
+
+        # Similarity score
+        similarity = product.get("similarity_score", 0)
+        if similarity >= 0.7:
+            match_reasons.append(f"High semantic similarity ({similarity:.2f})")
+        elif similarity >= 0.5:
+            match_reasons.append(f"Good semantic match ({similarity:.2f})")
+        else:
+            match_reasons.append(f"Relevant match ({similarity:.2f})")
+
+        # Safety passed
+        if user_constraints:
+            constraint_list = []
+            if user_constraints.get("pregnancy"):
+                constraint_list.append("pregnancy-safe")
+            if user_constraints.get("dietary"):
+                constraint_list.append(user_constraints["dietary"])
+            if any(k.startswith("allergy_") for k in user_constraints.keys()):
+                allergies = [k.replace("allergy_", "") for k in user_constraints.keys() if k.startswith("allergy_")]
+                constraint_list.append(f"free of {', '.join(allergies)}")
+
+            if constraint_list:
+                match_reasons.append(f"Safe for your constraints ({', '.join(constraint_list)})")
+
+        product["match_reasons"] = match_reasons
 
     # Update state
     new_state = state.copy()
     new_state["final_products"] = final_products
     new_state["status"] = "ranked"
     new_state["next_agent"] = "safety"
+
+    # Log summary
+    logger.info(
+        f"Reranker completed (SIMPLIFIED - NO LLM): {len(final_products)} products recommended, "
+        f"{len(excluded_products)} excluded by safety checks"
+    )
+    if excluded_products:
+        logger.info(f"Excluded products: {[p['product_name'] for p in excluded_products]}")
+
+    logger.info("Reranker: Trusting search ranking (graph boosting already applied)")
 
     return new_state

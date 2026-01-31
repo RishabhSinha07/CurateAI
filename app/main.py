@@ -1,11 +1,19 @@
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
+import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.api.routes.chat import router as chat_router
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 settings = get_settings()
 
@@ -45,6 +53,32 @@ async def health_check() -> dict[str, str]:
 async def root() -> dict[str, str]:
     """Root endpoint."""
     return {"message": "Welcome to CurateAI API"}
+
+
+@app.get("/test/graph")
+async def test_graph() -> dict:
+    """Test knowledge graph integration."""
+    try:
+        from app.knowledge.query_engine import GraphQueryEngine
+        from app.knowledge.graph_loader import list_available_graphs
+
+        graphs = list_available_graphs()
+        test_problem = GraphQueryEngine.extract_problem_from_text("wellness", "tired")
+
+        return {
+            "status": "success",
+            "available_graphs": graphs,
+            "test_query": {
+                "input": "tired",
+                "result": test_problem
+            }
+        }
+    except Exception as e:
+        logger.error(f"Graph test failed: {e}", exc_info=True)
+        return {
+            "status": "error",
+            "message": str(e)
+        }
 
 
 # Include routers

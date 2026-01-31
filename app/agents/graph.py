@@ -2,15 +2,18 @@
 LangGraph orchestration for the multi-agent consultation system.
 
 Flow:
-                         ┌─ (slots missing) ─→ Initial Products → Interviewer ─→ [loop] ─┐
-Entry → Router ──────────┤                                                                │
-                         └─ (all filled) ────→ Interviewer → Search → Reranker → Safety ──→ END
+                         ┌─ (journey intent) ──→ Journey → Safety ──→ END
+                         │
+Entry → Router ──────────┼─ (query + slots missing) ─→ Initial Products → Interviewer ─→ [loop] ─┐
+                         │                                                                         │
+                         └─ (query + all filled) ──────→ Interviewer → Search → Reranker → Safety ─→ END
 
-When the Router assigns a *new* domain (different from the previous turn) and
-there are unfilled required slots, the user sees a handful of domain products
-immediately while the Interviewer gathers personalisation details.  If the
-domain hasn't changed, or all required info is already available, the
-Interviewer runs directly without the product showcase.
+When the Router detects journey intent (e.g., "starting gym"), it routes directly to
+the Journey agent which provides a complete product bundle with usage guidance.
+
+For query intent, the flow continues as before: if there are unfilled slots and the
+domain just changed, show initial products while interviewing. Otherwise proceed
+with search after collecting info.
 
 Subsequent turns (status=awaiting_slot) skip Router entirely and go to the
 Interviewer directly.
@@ -29,6 +32,7 @@ from app.agents.search import search_architect_agent
 from app.agents.reranker import reranker_agent
 from app.agents.safety import safety_agent
 from app.agents.refinement import refinement_agent
+from app.agents.journey import journey_agent
 
 
 def create_initial_state(
@@ -36,19 +40,15 @@ def create_initial_state(
     user_message: str,
     existing_context: dict | None = None,
     existing_status: str = "active",
-    domain_id: uuid.UUID | None = None,
     domain_slug: str | None = None,
-    domain_config: dict | None = None,
     previous_response: str | None = None,
 ) -> AgentState:
     """Create the initial state for a new conversation turn."""
     return AgentState(
         session_id=session_id,
         user_message=user_message,
-        previous_domain_id=domain_id,  # Snapshot current domain for change detection
-        domain_id=domain_id,
+        previous_domain_slug=domain_slug,  # Snapshot current domain for change detection
         domain_slug=domain_slug,
-        domain_config=domain_config,
         extracted_context=existing_context or {},
         missing_slots=[],
         initial_products=[],
@@ -58,6 +58,9 @@ def create_initial_state(
         status=existing_status,
         next_agent=None,
         optional_slot_hint=None,
+        intent_type=None,
+        journey_type=None,
+        journey_bundle=None,
     )
 
 
@@ -96,6 +99,11 @@ async def refinement_node(state: AgentState) -> AgentState:
     return await refinement_agent(state)
 
 
+async def journey_node(state: AgentState, db: AsyncSession) -> AgentState:
+    """Journey agent node - provides comprehensive product bundles for customer journeys."""
+    return await journey_agent(state, db)
+
+
 def should_route_to(state: AgentState) -> Literal["router", "interviewer", "refinement"]:
     """
     Determine the entry point based on session status.
@@ -126,31 +134,50 @@ def after_interviewer(state: AgentState) -> Literal["search", "__end__"]:
     return END
 
 
-def after_router(state: AgentState) -> Literal["initial_products", "interviewer", "safety"]:
+def after_router(state: AgentState) -> Literal["initial_products", "interviewer", "journey", "safety"]:
     """
     Determine next step after router.
 
     If out_of_scope → safety.
-    If the domain just changed AND there are unfilled required slots →
+    If journey intent → journey agent.
+    If query intent and domain just changed AND problem identified →
         initial_products (show a few products while the interviewer gathers
         details).
     Otherwise → interviewer directly (no initial showcase).
     """
     next_agent = state.get("next_agent")
+
     if next_agent == "safety":
         return "safety"
 
-    domain_changed = state.get("domain_id") != state.get("previous_domain_id")
+    if next_agent == "journey":
+        return "journey"
 
-    domain_config = state.get("domain_config") or {}
-    required_slots = domain_config.get("required_slots", [])
+    domain_changed = state.get("domain_slug") != state.get("previous_domain_slug")
+
+    # Check if we have a problem identified in the graph
     extracted_context = state.get("extracted_context", {})
-    already_filled = set(extracted_context.keys())
-    missing = [s for s in required_slots if s not in already_filled]
+    graph_state = extracted_context.get("graph_state", {})
+    has_problem = bool(graph_state.get("identified_problem"))
 
-    if domain_changed and missing:
+    # If domain just changed and we have a problem, show initial products
+    # while interviewer asks questions
+    if domain_changed and has_problem:
         return "initial_products"
+
     return "interviewer"
+
+
+def after_journey(state: AgentState) -> Literal["safety", "interviewer"]:
+    """
+    Determine next step after journey agent.
+    
+    If journey agent found products -> safety.
+    If journey agent failed (no products) -> fallback to interviewer.
+    """
+    if state.get("next_agent") == "interviewer":
+        return "interviewer"
+    return "safety"
 
 
 def after_refinement(state: AgentState) -> Literal["search", "router"]:
@@ -189,6 +216,7 @@ class ConsultationGraph:
         builder.add_node("reranker", self._reranker_wrapper)
         builder.add_node("safety", self._safety_wrapper)
         builder.add_node("refinement", self._refinement_wrapper)
+        builder.add_node("journey", self._journey_wrapper)
 
         # Set conditional entry point
         builder.set_conditional_entry_point(
@@ -207,7 +235,18 @@ class ConsultationGraph:
             {
                 "initial_products": "initial_products",
                 "interviewer": "interviewer",
+                "journey": "journey",
                 "safety": "safety",
+            }
+        )
+
+        # Journey conditional edge (safety or fallback to interviewer)
+        builder.add_conditional_edges(
+            "journey",
+            after_journey,
+            {
+                "safety": "safety",
+                "interviewer": "interviewer"
             }
         )
 
@@ -269,6 +308,11 @@ class ConsultationGraph:
     async def _refinement_wrapper(self, state: AgentState) -> AgentState:
         """Wrapper for refinement agent."""
         return await refinement_node(state)
+
+    async def _journey_wrapper(self, state: AgentState) -> AgentState:
+        """Wrapper to inject db session into journey agent."""
+        db = self._current_db
+        return await journey_node(state, db)
 
     async def run(self, state: AgentState, db: AsyncSession) -> AgentState:
         """

@@ -6,11 +6,9 @@ class AgentState(TypedDict):
     session_id: uuid.UUID
     user_message: str
     
-    # Domain information
-    previous_domain_id: uuid.UUID | None  # Domain before this turn (for change detection)
-    domain_id: uuid.UUID | None
+    # Domain information (now graph-based, no DB FK needed)
+    previous_domain_slug: str | None  # Domain before this turn (for change detection)
     domain_slug: str | None
-    domain_config: dict | None
     
     # Intelligence state
     extracted_context: dict
@@ -26,3 +24,8 @@ class AgentState(TypedDict):
     status: str  # active, collecting_info, awaiting_slot, completed, out_of_scope
     next_agent: str | None
     optional_slot_hint: str | None  # Hint about optional slots to show with final response
+    
+    # Journey-specific fields
+    intent_type: str | None  # "query" or "journey"
+    journey_type: str | None  # e.g., "beginner_gym", "skincare_routine_start"
+    journey_bundle: dict | None  # Journey info with name, description, and products with usage guidance
