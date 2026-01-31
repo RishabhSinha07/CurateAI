@@ -321,8 +321,9 @@ If the match is not obvious, choose the closest related problem."""
                     examples_text = "\n".join(problem_examples)
 
                     new_state["response"] = (
-                        f"I'd love to help you with {domain_display}! To give you the best recommendations, "
-                        f"could you tell me what specific concern you'd like to address? For example:\n"
+                        f"### {domain_display}\n\n"
+                        f"To give you the best recommendations, could you tell me what specific concern you'd like to address?\n\n"
+                        f"**Common concerns:**\n"
                         f"{examples_text}"
                     )
                 else:
@@ -629,11 +630,12 @@ Respond with:
             # Compact preamble that sits between the product cards and the
             # interviewer's first question.  The LLM has been told to skip
             # greetings and start directly with the ask.
-            domain_name = (state.get("domain_slug") or "this category").replace("-", " ")
+            domain_name = (state.get("domain_slug") or "this category").replace("_", " ").title()
             preamble = (
-                f"Here are some popular **{domain_name}** products to get you started.\n\n"
+                f"### Popular {domain_name} Products\n\n"
+                f"Here are some popular options to browse while we find the perfect match for you.\n\n"
                 "---\n\n"
-                "I can find a better match with a couple of quick questions:\n\n"
+                "**Let me personalize these recommendations with a couple of quick questions:**\n\n"
             )
             question_text = preamble + question_text
 

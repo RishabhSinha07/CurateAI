@@ -4,29 +4,16 @@ from langchain_aws import ChatBedrock
 
 from app.config import get_settings
 from app.agents.state import AgentState
+from app.agents.response_formatter import (
+    format_product_recommendations,
+    format_journey_bundle,
+    format_intro_with_constraints,
+    format_disclaimers,
+    format_no_results_message,
+    format_out_of_scope_message,
+)
 
 settings = get_settings()
-
-
-def _format_price(price: float, currency: str) -> str:
-    """Format price with appropriate currency symbol."""
-    currency_symbols = {
-        "USD": "$",
-        "INR": "₹",
-        "EUR": "€",
-        "GBP": "£",
-        "CAD": "CA$",
-        "AUD": "A$",
-        "JPY": "¥",
-    }
-
-    symbol = currency_symbols.get(currency.upper(), currency)
-
-    # For currencies like JPY that don't use decimals
-    if currency.upper() in ["JPY", "KRW"]:
-        return f"{symbol}{price:.0f}"
-
-    return f"{symbol}{price:.2f}"
 
 
 class SafetyResponse(BaseModel):
@@ -110,7 +97,7 @@ async def safety_agent(state: AgentState) -> AgentState:
     # Handle out-of-scope requests
     if status == "out_of_scope":
         new_state = state.copy()
-        new_state["response"] = "I'm a wellness product consultant and can help you find supplements, vitamins, and health products. Is there something in that area I can help you with today?"
+        new_state["response"] = format_out_of_scope_message()
         new_state["status"] = "completed"
         new_state["next_agent"] = None
         return new_state
@@ -118,26 +105,52 @@ async def safety_agent(state: AgentState) -> AgentState:
     # Handle no results
     if not final_products:
         new_state = state.copy()
-        new_state["response"] = "I couldn't find products that match your specific requirements. Could you tell me more about what you're looking for, or would you like me to broaden the search?"
+        has_constraints = bool(applied_constraints)
+        new_state["response"] = format_no_results_message(extracted_context, has_constraints)
         new_state["status"] = "completed"
         new_state["next_agent"] = None
         return new_state
 
-    # Format products for the response
-    products_info = []
-    for p in final_products:
-        formatted_price = _format_price(p['price'], p['currency'])
-        info = f"""
-**{p['name']}** by {p['brand']}
-- Price: {formatted_price}
-- Why it's a good fit: {', '.join(p.get('match_reasons', ['Matches your preferences']))}
-- [View Product]({p.get('product_url', '#')})
-"""
-        products_info.append(info)
+    # Check if this is a journey bundle response
+    journey_bundle = state.get("journey_bundle")
+    intent_type = state.get("intent_type")
 
-    products_text = "\n".join(products_info)
+    if intent_type == "journey" and journey_bundle:
+        # Format as journey bundle with usage guidance
+        journey_response = format_journey_bundle(
+            journey_name=journey_bundle["journey_name"],
+            journey_description=journey_bundle["journey_description"],
+            products=final_products
+        )
 
-    # Build constraint information for the prompt
+        # Add disclaimers
+        if safety_disclaimers:
+            journey_response += "\n\n" + format_disclaimers(safety_disclaimers)
+        else:
+            # Default disclaimer
+            default_disclaimer = [
+                "These statements have not been evaluated by the FDA. These products are not intended to diagnose, treat, cure, or prevent any disease. Please consult with a healthcare professional before starting any new supplement regimen."
+            ]
+            journey_response += "\n\n" + format_disclaimers(default_disclaimer)
+
+        new_state = state.copy()
+        new_state["response"] = journey_response
+        new_state["status"] = "completed"
+        new_state["next_agent"] = None
+        return new_state
+
+    # Regular query flow - format product recommendations
+    # Build intro mentioning constraints if any
+    intro = format_intro_with_constraints(applied_constraints)
+
+    # Format products as markdown cards
+    products_markdown = format_product_recommendations(
+        products=final_products,
+        include_ranks=True,
+        include_usage_guidance=False
+    )
+
+    # Build constraint information for the LLM prompt
     constraint_info = ""
     if applied_constraints:
         constraint_list = "\n".join(f"  - {c}" for c in applied_constraints)
@@ -145,67 +158,70 @@ async def safety_agent(state: AgentState) -> AgentState:
 Safety Constraints Applied:
 {constraint_list}
 
-IMPORTANT: Mention these safety filters in your response to reassure the user that their constraints were considered.
-For example:
-- "All products are safe for pregnancy"
-- "These are fish-free options for your allergy"
-- "All recommendations are vegan-friendly"
+IMPORTANT: The intro already mentions these constraints. DO NOT repeat them in your response.
 """
 
-    system_prompt = f"""You are a wellness consultant for CurateAI. Generate a clear, professional response presenting product recommendations to the user.
+    system_prompt = f"""You are a wellness consultant for CurateAI. Generate a brief, natural intro paragraph for product recommendations.
 
 User's Context/Preferences:
 {extracted_context}
 {constraint_info}
-Products to Recommend:
-{products_text}
+
+The formatted product cards are already prepared. Your job is ONLY to write a SHORT intro paragraph (2-3 sentences max) that:
+- Introduces the recommendations naturally
+- DOES NOT repeat constraint information (it's already in the intro)
+- DOES NOT greet the user ("Hey there!", "Hello!")
+- DOES NOT use acknowledgment phrases ("I heard you're looking for...")
+- Highlights what makes these products good choices for their needs
+
+Keep it very brief - the formatted product cards will appear right after your intro.
 
 Domain-Specific Safety Guidelines:
 {safety_disclaimers}
 
 Your Tasks:
-1. RESPOND: Write a direct, professional response that:
-   - Gets straight to the recommendations without preamble or greetings
-   - If safety constraints were applied, BRIEFLY mention them (e.g., "All products below are safe for pregnancy and free of fish")
-   - Presents the top recommendations with brief highlights
-   - Explains why each product fits their needs
-   - Keep it concise and focused on the products
-
-2. SAFETY CHECK: Identify if your response:
-   - Makes medical claims (e.g., "cures", "treats", "prevents disease")
-   - Suggests diagnosis or treatment
-   - Could be interpreted as medical advice
-
-3. DISCLAIMERS: Based on the domain safety guidelines, add appropriate disclaimers.
+1. INTRO: Write a 2-3 sentence intro paragraph only
+2. SAFETY CHECK: Note if you make any medical claims
+3. DISCLAIMERS: List any needed disclaimers based on domain guidelines
 
 Guidelines:
-- Keep the response concise and professional
-- NO greetings like "Hey there!" or "Hello!" - get straight to the point
-- NO acknowledgment phrases like "I heard you're looking for..." - just present the recommendations
-- Focus on benefits without making medical claims
 - Use phrases like "may support", "designed to help", "formulated for"
 - Never claim products treat, cure, or prevent any disease
-- Always encourage consulting a healthcare professional for medical concerns
 """
 
     model = get_safety_model()
     result: SafetyResponse = await model.ainvoke(system_prompt)
 
-    # Build final response
-    final_response = result.response
+    # Build final response with proper sections
+    response_parts = []
 
-    # Prepend optional slot hint if present
+    # Add intro with constraints if present
+    if intro:
+        response_parts.append(intro.strip())
+
+    # Add LLM-generated intro paragraph
+    if result.response:
+        response_parts.append(result.response.strip())
+
+    # Add formatted product cards
+    response_parts.append(products_markdown)
+
+    final_response = "\n\n".join(response_parts)
+
+    # Add optional slot hint at the top if present
     optional_slot_hint = state.get("optional_slot_hint")
     if optional_slot_hint:
         final_response = f"{optional_slot_hint}\n\n{final_response}"
 
     # Append disclaimers if needed
     if result.disclaimers:
-        disclaimer_text = "\n\n---\n" + "\n".join(f"⚠️ {d}" for d in result.disclaimers)
-        final_response += disclaimer_text
+        final_response += "\n\n" + format_disclaimers(result.disclaimers)
     elif result.contains_medical_claims:
         # Default disclaimer for health products
-        final_response += "\n\n---\n⚠️ These statements have not been evaluated by the FDA. These products are not intended to diagnose, treat, cure, or prevent any disease. Please consult with a healthcare professional before starting any new supplement regimen."
+        default_disclaimer = [
+            "These statements have not been evaluated by the FDA. These products are not intended to diagnose, treat, cure, or prevent any disease. Please consult with a healthcare professional before starting any new supplement regimen."
+        ]
+        final_response += "\n\n" + format_disclaimers(default_disclaimer)
 
     # Update state
     new_state = state.copy()
