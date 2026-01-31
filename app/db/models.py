@@ -39,6 +39,8 @@ class Product(Base):
 
     Supports any domain (wellness, tools, etc.) through the
     polymorphic attributes column.
+
+    Products can belong to multiple domains via domain_slugs array.
     """
 
     __tablename__ = "products"
@@ -46,8 +48,8 @@ class Product(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid, primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid()
     )
-    domain_slug: Mapped[str] = mapped_column(
-        String(50), nullable=False, index=True
+    domain_slugs: Mapped[list[str]] = mapped_column(
+        ARRAY(String(50)), nullable=False
     )
     sku: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)

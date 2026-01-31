@@ -1,0 +1,162 @@
+# Product-Domain Mapping Configuration
+#
+# This file defines which products should belong to multiple knowledge graph domains.
+# Products can have one primary domain and multiple secondary domains.
+#
+# Format:
+#   sku: [primary_domain, secondary_domain_1, secondary_domain_2, ...]
+#
+# Guidelines:
+# - First domain in array is the PRIMARY domain (main use case)
+# - Additional domains are SECONDARY (additional benefits)
+# - Only add secondary domains if the product genuinely addresses problems in that domain
+# - Maximum 3-4 domains per product (avoid over-tagging)
+
+# =============================================================================
+# PROBIOTICS - Primary: Gut Health, Secondary: Skin, Immunity
+# =============================================================================
+SLNUGUT:  # Daily Probiotic Slow
+  - gut_health_digestion
+  - skin_health_radiance
+  # Note: Probiotics support gut-skin axis (reduces inflammation, improves skin from within)
+
+WBNPRO-1:  # Probiotic + Prebiotic (Effervescent)
+  - gut_health_digestion
+  - skin_health_radiance
+
+WBNMHGUT:  # Healthy Gut (Melts)
+  - gut_health_digestion
+
+FROZENPROBIOTIC:  # Disney Frozen Probiotic
+  - gut_health_digestion
+
+MARVELPROBIOTIC:  # Marvel Active Probiotic
+  - gut_health_digestion
+
+# =============================================================================
+# COLLAGEN - Primary: Skin, Secondary: Hair, Gut
+# =============================================================================
+# Note: Marine collagen products are currently in "collagen" domain
+# Add gut_health_digestion as secondary because collagen repairs gut lining
+
+# Example (update actual SKUs based on your product catalog):
+# COLLAGEN_MARINE_SKU:
+#   - skin_health_radiance
+#   - hair_health_growth
+#   - gut_health_digestion  # Collagen peptides repair intestinal lining
+
+# =============================================================================
+# FIBER - Primary: Gut Health
+# =============================================================================
+FBRPC:  # Daily Fiber | Pina Colada
+  - gut_health_digestion
+
+FBRCOMBO:  # Daily Fiber | Two Flavour Combo
+  - gut_health_digestion
+
+FBRVB:  # Daily Fiber | Vanilla Berry
+  - gut_health_digestion
+
+# =============================================================================
+# DIGESTIVE SUPPORT - Primary: Gut Health
+# =============================================================================
+WNTEADIGEST:  # Digest Adaptogenic Green Tea
+  - gut_health_digestion
+
+WBN-01-2:  # Daily Greens
+  - gut_health_digestion
+
+WBNMLTACD:  # Acidity Relief
+  - gut_health_digestion
+
+# =============================================================================
+# APPLE CIDER VINEGAR - Primary: Gut Health, Secondary: Weight Management
+# =============================================================================
+WBNACV-1:  # Apple Cider Vinegar
+  - gut_health_digestion
+
+WBNACVFL:  # Apple Cider Vinegar with Amla And Turmeric
+  - gut_health_digestion
+
+ACVEFF-02:  # Apple Cider Vinegar with Garcinia Cambogia and Pomegranate
+  - gut_health_digestion
+
+# =============================================================================
+# OMEGA-3 - Primary: Heart/Brain Health, Secondary: Skin, Joints
+# =============================================================================
+# Example (update with actual SKUs):
+# OMEGA3_SKU:
+#   - heart_health  # Primary
+#   - brain_health
+#   - skin_health_radiance  # Anti-inflammatory for skin
+#   - joint_health
+
+# =============================================================================
+# BIOTIN - Primary: Hair, Secondary: Skin, Nails
+# =============================================================================
+# Example:
+# BIOTIN_SKU:
+#   - hair_health_growth
+#   - skin_health_radiance
+
+# =============================================================================
+# VITAMIN D - Primary: Immunity, Secondary: Bone, Hair, Gut, Mood
+# =============================================================================
+# Example:
+# VITAMIN_D_SKU:
+#   - immunity
+#   - bone_health
+#   - hair_health_growth
+#   - gut_health_digestion
+#   - mental_wellness
+
+# =============================================================================
+# L-GLUTAMINE - Primary: Gut Health, Secondary: Muscle Recovery, Immunity
+# =============================================================================
+# Example:
+# GLUTAMINE_SKU:
+#   - gut_health_digestion  # Repairs gut lining
+#   - fitness_recovery  # Post-workout recovery
+#   - immunity  # Immune support
+
+# =============================================================================
+# TURMERIC/CURCUMIN - Primary: Inflammation, Secondary: Gut, Joints
+# =============================================================================
+# Example:
+# TURMERIC_SKU:
+#   - inflammation_support
+#   - gut_health_digestion  # Anti-inflammatory for gut
+#   - joint_health
+
+# =============================================================================
+# ZINC - Primary: Immunity, Secondary: Skin, Hair, Gut
+# =============================================================================
+# Example:
+# ZINC_SKU:
+#   - immunity
+#   - skin_health_radiance  # Collagen synthesis, skin repair
+#   - hair_health_growth  # Protein synthesis
+#   - gut_health_digestion  # Gut barrier integrity
+
+# =============================================================================
+# NOTES FOR DOMAIN ASSIGNMENT
+# =============================================================================
+#
+# When to add a secondary domain:
+# ✓ Product contains key ingredients for that domain (check knowledge graph)
+# ✓ Product description mentions benefits for that domain
+# ✓ Scientific evidence supports use for that domain
+# ✓ Users searching in that domain would benefit from seeing this product
+#
+# When NOT to add a secondary domain:
+# ✗ Only tangential/minor benefit
+# ✗ No relevant ingredients for that domain
+# ✗ Would create confusion for users
+# ✗ Product is too specialized for primary domain only
+#
+# Example Decision Tree:
+# Q: Should "Daily Probiotic" be in skin_health_radiance?
+# - Does it contain ingredients that treat skin problems? → Yes (probiotics reduce inflammation)
+# - Would a user searching for "dull skin" benefit from this? → Yes (gut-skin axis)
+# - Is there scientific evidence? → Yes (clinical trials on probiotics and acne/skin health)
+# → Decision: YES, add skin_health_radiance as secondary domain

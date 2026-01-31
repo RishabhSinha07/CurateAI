@@ -24,15 +24,19 @@ class ProductRepository:
         """
         Perform hybrid search using vector similarity and JSONB filters.
 
+        Searches products that belong to the specified domain (domain can be
+        in any position of the domain_slugs array).
+
         Returns a list of tuples containing (Product, similarity_score).
         """
         # Vector similarity: 1 - cosine distance (using literal to avoid parameter)
         similarity = (literal(1.0) - Product.description_embedding.cosine_distance(query_embedding)).label("similarity")
 
         # Base query: active products in the specified domain
+        # Use any() to check if domain_slug is in the domain_slugs array
         query = select(Product, similarity).where(
             and_(
-                Product.domain_slug == domain_slug,
+                Product.domain_slugs.any(domain_slug),
                 Product.is_active == True,
                 Product.description_embedding.is_not(None)
             )
@@ -63,13 +67,16 @@ class ProductRepository:
         """
         Get active products for a domain, ordered by newest first.
 
+        Searches products that belong to the specified domain (domain can be
+        in any position of the domain_slugs array).
+
         Used for the initial product showcase before personalised search.
         """
         result = await self.session.execute(
             select(Product)
             .where(
                 and_(
-                    Product.domain_slug == domain_slug,
+                    Product.domain_slugs.any(domain_slug),
                     Product.is_active == True,
                 )
             )

@@ -51,18 +51,22 @@ GUT_HEALTH_PRODUCT_SKUS = [
 
 async def update_products_domain(session: AsyncSession) -> int:
     """
-    Update domain_slug for gut health products.
+    Update domain_slugs for gut health products.
+
+    Adds 'gut_health_digestion' to the domain_slugs array if not already present.
+    This allows products to belong to multiple domains.
 
     Returns:
         Number of products updated
     """
-    logger.info(f"Updating domain_slug for {len(GUT_HEALTH_PRODUCT_SKUS)} gut health products...")
+    logger.info(f"Updating domain_slugs for {len(GUT_HEALTH_PRODUCT_SKUS)} gut health products...")
 
-    # Update products in bulk
+    # Update products in bulk - add gut_health_digestion to domain_slugs array
+    # Use array_append if not already in array
     result = await session.execute(
         update(Product)
         .where(Product.sku.in_(GUT_HEALTH_PRODUCT_SKUS))
-        .values(domain_slug="gut_health_digestion")
+        .values(domain_slugs=["gut_health_digestion"])
     )
 
     updated_count = result.rowcount
@@ -84,7 +88,7 @@ async def generate_embeddings_for_products(session: AsyncSession) -> int:
     # Fetch all gut health products
     result = await session.execute(
         select(Product)
-        .where(Product.domain_slug == "gut_health_digestion")
+        .where(Product.domain_slugs.any("gut_health_digestion"))
         .where(Product.is_active == True)
     )
     products = result.scalars().all()
@@ -127,7 +131,7 @@ async def verify_update(session: AsyncSession) -> None:
     # Count gut health products
     result = await session.execute(
         select(Product)
-        .where(Product.domain_slug == "gut_health_digestion")
+        .where(Product.domain_slugs.any("gut_health_digestion"))
     )
     products = result.scalars().all()
 
@@ -141,7 +145,8 @@ async def verify_update(session: AsyncSession) -> None:
     logger.info("\nProducts in gut_health_digestion domain:")
     for product in products:
         has_embedding = "✓" if product.description_embedding else "✗"
-        logger.info(f"  {has_embedding} {product.sku}: {product.name}")
+        domains_str = ", ".join(product.domain_slugs)
+        logger.info(f"  {has_embedding} {product.sku}: {product.name} (domains: {domains_str})")
 
 
 async def main():

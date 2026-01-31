@@ -42,6 +42,7 @@ def _load_products_from_json() -> list[dict]:
       - Strip Shopify ``tags`` from attributes (marketing noise).
       - Convert price from float to ``Decimal``.
       - Default ``inventory_count`` to 100 (not available in scraped data).
+      - Convert domain_slug to domain_slugs array for multi-domain support.
     """
     with open(PRODUCTS_JSON, encoding="utf-8") as f:
         raw: list[dict] = json.load(f)
@@ -51,9 +52,13 @@ def _load_products_from_json() -> list[dict]:
         # Clean attributes: remove noisy fields
         attrs = {k: v for k, v in item.get("attributes", {}).items() if k not in _TAGS_TO_STRIP}
 
+        # Convert single domain_slug to array for multi-domain support
+        domain_slug = item.get("domain_slug")
+        domain_slugs = [domain_slug] if domain_slug else []
+
         products.append(
             {
-                "domain_slug": item["domain_slug"],
+                "domain_slugs": domain_slugs,
                 "sku": item["sku"],
                 "name": item["name"],
                 "brand": item.get("brand", "Wellbeing Nutrition"),
@@ -79,12 +84,12 @@ def _load_products_from_json() -> list[dict]:
 
 
 async def seed_products(session, products: list[dict]) -> int:
-    """Create products using domain_slug directly. Returns the count of products seeded."""
+    """Create products using domain_slugs array. Returns the count of products seeded."""
     count = 0
 
     for product_data in products:
         product = Product(
-            domain_slug=product_data["domain_slug"],
+            domain_slugs=product_data["domain_slugs"],
             sku=product_data["sku"],
             name=product_data["name"],
             brand=product_data.get("brand"),
@@ -132,10 +137,13 @@ async def seed_database() -> None:
         print("Done!")
 
         # Print summary
-        print("\nProducts by domain:")
+        print("\nProducts by domain (primary domain only):")
         domain_counts: dict[str, int] = {}
         for p in products:
-            domain_counts[p["domain_slug"]] = domain_counts.get(p["domain_slug"], 0) + 1
+            # Count only the first (primary) domain
+            if p["domain_slugs"]:
+                primary_domain = p["domain_slugs"][0]
+                domain_counts[primary_domain] = domain_counts.get(primary_domain, 0) + 1
         for slug, cnt in sorted(domain_counts.items()):
             print(f"  {slug}: {cnt} products")
 
