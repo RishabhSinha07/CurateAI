@@ -1,0 +1,1268 @@
+# Skin Health & Radiance Knowledge Graph
+#
+# This graph defines the domain knowledge for nutraceutical product recommendations
+# focused on skin health, radiance, anti-aging, and beauty from within.
+#
+# UPDATING THIS GRAPH:
+# 1. Add new nodes under the appropriate section (problems, attributes, etc.)
+# 2. Ensure all IDs are unique and use snake_case
+# 3. Add edges to connect new nodes to existing ones
+# 4. Run validation: python -m app.knowledge.validate skin_health_radiance
+# 5. Reload graph in development: reload_graph('skin_health_radiance')
+
+metadata:
+  domain: skin_health_radiance
+  version: 1.0.0
+  created_at: "2026-01-31"
+  description: "Knowledge graph for skin health & radiance nutraceutical recommendations"
+  display_name: "Skin Health & Radiance"
+  persona: "You are a beauty and wellness nutrition specialist who helps users find science-backed nutraceutical supplements for skin health, radiance, and anti-aging. You focus on collagen, vitamins, antioxidants, and minerals that support skin from within. You consider dietary preferences, age, and specific skin concerns to provide personalized recommendations."
+  is_active: true
+  parent_domain: null
+
+nodes:
+  # ============================================================================
+  # PROBLEMS - Consumer skin health concerns and wellness goals
+  # ============================================================================
+  problems:
+    - id: poor_elasticity
+      name: "poor_elasticity"
+      display_name: "Loss of Skin Elasticity"
+      synonyms:
+        - "sagging skin"
+        - "loose skin"
+        - "skin firmness"
+        - "loss of firmness"
+        - "lack of bounce"
+        - "skin laxity"
+      severity_levels: [mild, moderate, severe]
+      description: "Loss of skin's ability to bounce back and maintain firmness"
+
+    - id: dull_skin
+      name: "dull_skin"
+      display_name: "Dull & Lackluster Skin"
+      synonyms:
+        - "dull"
+        - "dull skin"
+        - "dull complexion"
+        - "lack of glow"
+        - "tired skin"
+        - "lackluster skin"
+        - "no radiance"
+        - "skin radiance"
+        - "glowing skin"
+      severity_levels: [mild, moderate, severe]
+      description: "Skin that lacks natural radiance and appears tired or lifeless"
+
+    - id: dehydration
+      name: "dehydration"
+      display_name: "Skin Dehydration"
+      synonyms:
+        - "dry skin"
+        - "skin dryness"
+        - "lack of moisture"
+        - "dehydrated skin"
+        - "flaky skin"
+        - "tight skin"
+      severity_levels: [mild, moderate, severe]
+      description: "Lack of water content in the skin leading to tightness and flaking"
+
+    - id: fine_lines
+      name: "fine_lines"
+      display_name: "Fine Lines"
+      synonyms:
+        - "early wrinkles"
+        - "expression lines"
+        - "smile lines"
+        - "forehead lines"
+        - "eye wrinkles"
+      severity_levels: [mild, moderate, severe]
+      description: "Small, shallow wrinkles that appear with age and facial expressions"
+
+    - id: wrinkles
+      name: "wrinkles"
+      display_name: "Deep Wrinkles"
+      synonyms:
+        - "deep lines"
+        - "aging lines"
+        - "creases"
+        - "skin aging"
+        - "crow's feet"
+        - "nasolabial folds"
+      severity_levels: [mild, moderate, severe]
+      description: "Deeper creases and folds in the skin due to collagen loss and aging"
+
+    - id: uneven_tone
+      name: "uneven_tone"
+      display_name: "Uneven Skin Tone"
+      synonyms:
+        - "dark spots"
+        - "hyperpigmentation"
+        - "discoloration"
+        - "patchy skin"
+        - "age spots"
+      severity_levels: [mild, moderate, severe]
+      description: "Inconsistent skin color with patches of darker or lighter areas"
+
+    - id: oxidative_stress
+      name: "oxidative_stress"
+      display_name: "Oxidative Stress & Free Radical Damage"
+      synonyms:
+        - "free radical damage"
+        - "environmental damage"
+        - "pollution damage"
+        - "sun damage"
+        - "premature aging"
+      severity_levels: [mild, moderate, severe]
+      description: "Cellular damage from environmental stressors and free radicals"
+
+    - id: weak_nails_hair
+      name: "weak_nails_hair"
+      display_name: "Weak Nails & Hair"
+      synonyms:
+        - "brittle nails"
+        - "weak hair"
+        - "hair breakage"
+        - "nail breakage"
+        - "thin hair"
+      severity_levels: [mild, moderate, severe]
+      description: "Brittle, weak nails and hair that lack strength and shine"
+
+  # ============================================================================
+  # ATTRIBUTES - User characteristics that influence recommendations
+  # ============================================================================
+  attributes:
+    # Age Group - Critical for anti-aging recommendations
+    - id: age_group_18_25
+      category: age_group
+      value: "18-25"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    - id: age_group_26_35
+      category: age_group
+      value: "26-35"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    - id: age_group_36_45
+      category: age_group
+      value: "36-45"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    - id: age_group_46_plus
+      category: age_group
+      value: "46+"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    # Dietary Preference - Critical for collagen type
+    - id: diet_vegetarian
+      category: diet
+      value: vegetarian
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    - id: diet_vegan
+      category: diet
+      value: vegan
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    - id: diet_pescatarian
+      category: diet
+      value: pescatarian
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    - id: diet_non_veg
+      category: diet
+      value: non_vegetarian
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    # Gender - Influences recommendations
+    - id: gender_female
+      category: gender
+      value: female
+      data_type: single_choice
+      elicitation_priority: 3
+      is_global: true
+
+    - id: gender_male
+      category: gender
+      value: male
+      data_type: single_choice
+      elicitation_priority: 3
+      is_global: true
+
+    # Skin Type
+    - id: skin_type_dry
+      category: skin_type
+      value: dry
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    - id: skin_type_oily
+      category: skin_type
+      value: oily
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    - id: skin_type_combination
+      category: skin_type
+      value: combination
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    - id: skin_type_normal
+      category: skin_type
+      value: normal
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    - id: skin_type_sensitive
+      category: skin_type
+      value: sensitive
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    # Sun Exposure
+    - id: sun_exposure_minimal
+      category: sun_exposure
+      value: minimal
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    - id: sun_exposure_moderate
+      category: sun_exposure
+      value: moderate
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    - id: sun_exposure_high
+      category: sun_exposure
+      value: high
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    # Lifestyle Factors
+    - id: lifestyle_stressful
+      category: lifestyle
+      value: stressful
+      data_type: single_choice
+      elicitation_priority: 6
+      is_global: false
+
+    - id: lifestyle_moderate_stress
+      category: lifestyle
+      value: moderate_stress
+      data_type: single_choice
+      elicitation_priority: 6
+      is_global: false
+
+    - id: lifestyle_relaxed
+      category: lifestyle
+      value: relaxed
+      data_type: single_choice
+      elicitation_priority: 6
+      is_global: false
+
+    # ============================================================================
+    # SAFETY CONSTRAINTS - Global hard constraints (ALWAYS ask these first)
+    # ============================================================================
+
+    # Medical Constraints
+    - id: medical_constraint_pregnancy
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: medical_constraint_breastfeeding
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    # Allergy Constraints
+    - id: allergy_constraint_fish
+      category: allergies
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: allergy_constraint_shellfish
+      category: allergies
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+  # ============================================================================
+  # INGREDIENTS - Key actives for skin health & radiance
+  # ============================================================================
+  ingredients:
+    # COLLAGEN - Types I & III
+    - id: collagen_type_1_3_marine
+      name: "collagen_type_1_3_marine"
+      display_name: "Marine Collagen (Type I & III)"
+      function: "skin_elasticity_hydration"
+      category: "collagen"
+      strength_levels: ["5g", "10g", "15g"]
+
+    - id: collagen_type_1_3_bovine
+      name: "collagen_type_1_3_bovine"
+      display_name: "Bovine Collagen (Type I & III)"
+      function: "skin_elasticity_hydration"
+      category: "collagen"
+      strength_levels: ["5g", "10g", "15g"]
+
+    - id: vegan_collagen_builder
+      name: "vegan_collagen_builder"
+      display_name: "Vegan Collagen Builder"
+      function: "collagen_synthesis_support"
+      category: "collagen"
+      strength_levels: ["standard"]
+
+    # HYALURONIC ACID
+    - id: hyaluronic_acid
+      name: "hyaluronic_acid"
+      display_name: "Hyaluronic Acid"
+      function: "hydration_plumping"
+      category: "beauty"
+      strength_levels: ["50mg", "100mg", "200mg"]
+
+    # VITAMIN C
+    - id: vitamin_c
+      name: "vitamin_c"
+      display_name: "Vitamin C (Ascorbic Acid)"
+      function: "collagen_synthesis_brightening"
+      category: "vitamins"
+      strength_levels: ["500mg", "1000mg", "2000mg"]
+
+    - id: vitamin_c_liposomal
+      name: "vitamin_c_liposomal"
+      display_name: "Liposomal Vitamin C"
+      function: "enhanced_absorption_collagen_synthesis"
+      category: "vitamins"
+      strength_levels: ["500mg", "1000mg"]
+
+    # VITAMIN E
+    - id: vitamin_e
+      name: "vitamin_e"
+      display_name: "Vitamin E (Tocopherol)"
+      function: "antioxidant_protection"
+      category: "vitamins"
+      strength_levels: ["200 IU", "400 IU", "800 IU"]
+
+    # GLUTATHIONE
+    - id: glutathione
+      name: "glutathione"
+      display_name: "Glutathione"
+      function: "master_antioxidant_brightening"
+      category: "antioxidants"
+      strength_levels: ["250mg", "500mg", "1000mg"]
+
+    - id: glutathione_liposomal
+      name: "glutathione_liposomal"
+      display_name: "Liposomal Glutathione"
+      function: "enhanced_absorption_antioxidant"
+      category: "antioxidants"
+      strength_levels: ["250mg", "500mg"]
+
+    # ZINC
+    - id: zinc
+      name: "zinc"
+      display_name: "Zinc"
+      function: "collagen_synthesis_skin_repair"
+      category: "minerals"
+      strength_levels: ["15mg", "25mg", "50mg"]
+
+    # OTHER ANTIOXIDANTS
+    - id: astaxanthin
+      name: "astaxanthin"
+      display_name: "Astaxanthin"
+      function: "powerful_antioxidant_uv_protection"
+      category: "antioxidants"
+      strength_levels: ["4mg", "8mg", "12mg"]
+
+    - id: resveratrol
+      name: "resveratrol"
+      display_name: "Resveratrol"
+      function: "antioxidant_anti_aging"
+      category: "antioxidants"
+      strength_levels: ["100mg", "250mg", "500mg"]
+
+    - id: coq10
+      name: "coq10"
+      display_name: "Coenzyme Q10 (CoQ10)"
+      function: "cellular_energy_antioxidant"
+      category: "antioxidants"
+      strength_levels: ["100mg", "200mg", "300mg"]
+
+    - id: vitamin_a
+      name: "vitamin_a"
+      display_name: "Vitamin A (Retinol Precursor)"
+      function: "skin_renewal_cell_turnover"
+      category: "vitamins"
+      strength_levels: ["2500 IU", "5000 IU", "10000 IU"]
+
+    # SUPPORTING NUTRIENTS
+    - id: biotin
+      name: "biotin"
+      display_name: "Biotin (Vitamin B7)"
+      function: "hair_skin_nail_health"
+      category: "vitamins"
+      strength_levels: ["5000mcg", "10000mcg"]
+
+    - id: selenium
+      name: "selenium"
+      display_name: "Selenium"
+      function: "antioxidant_thyroid_support"
+      category: "minerals"
+      strength_levels: ["55mcg", "100mcg", "200mcg"]
+
+    - id: silica
+      name: "silica"
+      display_name: "Silica (Bamboo Extract)"
+      function: "collagen_support_hair_nails"
+      category: "minerals"
+      strength_levels: ["standard"]
+
+    - id: omega_3
+      name: "omega_3"
+      display_name: "Omega-3 Fatty Acids"
+      function: "inflammation_reduction_hydration"
+      category: "beauty"
+      strength_levels: ["500mg", "1000mg", "2000mg"]
+
+  # ============================================================================
+  # CONSTRAINTS - User limitations that exclude certain products
+  # ============================================================================
+  constraints:
+    - id: pregnancy
+      type: "medical"
+      value: "true"
+      severity: "hard"
+
+    - id: breastfeeding
+      type: "medical"
+      value: "true"
+      severity: "hard"
+
+    - id: allergy_shellfish
+      type: "allergy"
+      value: "shellfish"
+      severity: "hard"
+
+    - id: allergy_fish
+      type: "allergy"
+      value: "fish"
+      severity: "hard"
+
+    - id: diet_vegan_constraint
+      type: "dietary"
+      value: "vegan"
+      severity: "hard"
+
+    - id: diet_vegetarian_constraint
+      type: "dietary"
+      value: "vegetarian"
+      severity: "hard"
+
+  # ============================================================================
+  # QUESTIONS - Templates for eliciting information
+  # ============================================================================
+  questions:
+    - id: q_primary_skin_concern
+      text: "What is your primary skin concern?"
+      response_type: "single_choice"
+      options:
+        - "Loss of elasticity/firmness"
+        - "Dull, tired-looking skin"
+        - "Dryness and dehydration"
+        - "Fine lines"
+        - "Deep wrinkles"
+        - "Uneven skin tone/dark spots"
+        - "Overall anti-aging"
+
+    - id: q_age_group
+      text: "What is your age group?"
+      response_type: "single_choice"
+      options:
+        - "18-25"
+        - "26-35"
+        - "36-45"
+        - "46+"
+
+    - id: q_diet
+      text: "What is your dietary preference?"
+      response_type: "single_choice"
+      options:
+        - "Vegetarian"
+        - "Vegan"
+        - "Pescatarian"
+        - "Non-vegetarian"
+
+    - id: q_collagen_preference
+      text: "Do you have a preference for collagen type?"
+      response_type: "single_choice"
+      options:
+        - "Marine collagen (fish-derived)"
+        - "Bovine collagen (grass-fed)"
+        - "Vegan collagen builder"
+        - "No preference"
+
+    - id: q_skin_type
+      text: "What is your skin type?"
+      response_type: "single_choice"
+      options:
+        - "Dry"
+        - "Oily"
+        - "Combination"
+        - "Normal"
+        - "Sensitive"
+
+    - id: q_sun_exposure
+      text: "How much daily sun exposure do you get?"
+      response_type: "single_choice"
+      options:
+        - "Minimal (mostly indoors)"
+        - "Moderate (1-2 hours outdoors)"
+        - "High (3+ hours outdoors)"
+
+    - id: q_lifestyle_stress
+      text: "How would you describe your stress levels?"
+      response_type: "single_choice"
+      options:
+        - "High stress/demanding lifestyle"
+        - "Moderate stress"
+        - "Low stress/relaxed"
+
+    - id: q_gender
+      text: "What is your gender?"
+      response_type: "single_choice"
+      options:
+        - "Female"
+        - "Male"
+        - "Prefer not to say"
+
+    # Safety Constraint Questions (asked first for all users)
+    - id: q_medical_constraints
+      text: "Do any of these medical conditions apply to you?"
+      response_type: "multi_choice"
+      options:
+        - "Pregnancy"
+        - "Breastfeeding"
+        - "None of the above"
+      validation_rules:
+        allow_none: true
+
+    - id: q_allergies
+      text: "Do you have any of these allergies?"
+      response_type: "multi_choice"
+      options:
+        - "Fish allergy"
+        - "Shellfish allergy"
+        - "No allergies"
+      validation_rules:
+        allow_none: true
+
+# ============================================================================
+# EDGES - Relationships between nodes
+# ============================================================================
+edges:
+  # --------------------------------------------------------------------------
+  # PROBLEM → REQUIRES_KNOWING → ATTRIBUTE
+  # Defines which attributes are needed to recommend solutions for a problem
+  # --------------------------------------------------------------------------
+
+  # Poor Elasticity requires knowing age and diet (for collagen type)
+  - source: poor_elasticity
+    target: age_group_18_25
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Age determines collagen loss severity and appropriate dosage"
+
+  - source: poor_elasticity
+    target: diet_vegan
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Dietary preference determines collagen source (marine/bovine vs vegan builder)"
+
+  # Dull Skin
+  - source: dull_skin
+    target: age_group_26_35
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: true
+      reason: "Age affects skin cell turnover rate"
+
+  - source: dull_skin
+    target: skin_type_dry
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 3
+      is_optional: true
+      reason: "Dry skin may need additional hydration support"
+
+  # Dehydration
+  - source: dehydration
+    target: skin_type_dry
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Skin type determines hydration strategy"
+
+  - source: dehydration
+    target: age_group_36_45
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: true
+      reason: "Aging affects skin's moisture retention capacity"
+
+  # Fine Lines & Wrinkles
+  - source: fine_lines
+    target: age_group_26_35
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Age determines appropriate anti-aging intervention"
+
+  - source: fine_lines
+    target: sun_exposure_minimal
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: true
+      reason: "Sun exposure affects antioxidant needs"
+
+  - source: wrinkles
+    target: age_group_36_45
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Age determines collagen supplementation approach"
+
+  - source: wrinkles
+    target: diet_vegan
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Determines collagen source availability"
+
+  # Oxidative Stress
+  - source: oxidative_stress
+    target: sun_exposure_high
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Sun exposure determines antioxidant dosage needs"
+
+  - source: oxidative_stress
+    target: lifestyle_stressful
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: true
+      reason: "Lifestyle stress increases free radical production"
+
+  # Weak Nails & Hair
+  - source: weak_nails_hair
+    target: diet_vegetarian
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: true
+      reason: "Plant-based diets may need additional biotin and minerals"
+
+  # --------------------------------------------------------------------------
+  # ATTRIBUTE → ELICITS_QUESTION → QUESTION
+  # Maps attributes to questions that elicit them
+  # --------------------------------------------------------------------------
+
+  - source: age_group_18_25
+    target: q_age_group
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+
+  - source: diet_vegan
+    target: q_diet
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+
+  - source: gender_female
+    target: q_gender
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_not_known"
+      timing: "immediate"
+
+  - source: skin_type_dry
+    target: q_skin_type
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_problem_includes_dehydration"
+      timing: "immediate"
+
+  - source: sun_exposure_minimal
+    target: q_sun_exposure
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_problem_includes_oxidative_stress"
+      timing: "immediate"
+
+  - source: lifestyle_stressful
+    target: q_lifestyle_stress
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_problem_includes_oxidative_stress"
+      timing: "immediate"
+
+  # Global Safety Constraint Questions (asked FIRST for everyone)
+  - source: medical_constraint_pregnancy
+    target: q_medical_constraints
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+      is_safety_critical: true
+
+  - source: medical_constraint_breastfeeding
+    target: q_medical_constraints
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+      is_safety_critical: true
+
+  - source: allergy_constraint_fish
+    target: q_allergies
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+      is_safety_critical: true
+
+  - source: allergy_constraint_shellfish
+    target: q_allergies
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+      is_safety_critical: true
+
+  # --------------------------------------------------------------------------
+  # INGREDIENT → TREATS → PROBLEM
+  # Defines which ingredients are effective for which problems
+  # --------------------------------------------------------------------------
+
+  # COLLAGEN for Elasticity & Wrinkles
+  - source: collagen_type_1_3_marine
+    target: poor_elasticity
+    relation: TREATS
+    properties:
+      mechanism: "Provides bioavailable collagen peptides to restore skin structure and firmness"
+      efficacy: 0.90
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: collagen_type_1_3_marine
+    target: wrinkles
+    relation: TREATS
+    properties:
+      mechanism: "Stimulates fibroblast collagen production and reduces collagen degradation"
+      efficacy: 0.85
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: collagen_type_1_3_bovine
+    target: poor_elasticity
+    relation: TREATS
+    properties:
+      mechanism: "Provides collagen peptides to support skin structure"
+      efficacy: 0.88
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: vegan_collagen_builder
+    target: poor_elasticity
+    relation: TREATS
+    properties:
+      mechanism: "Provides amino acids and cofactors to support natural collagen synthesis"
+      efficacy: 0.70
+      onset_time: "12-16 weeks"
+      evidence_level: "anecdotal"
+
+  # HYALURONIC ACID for Hydration & Plumping
+  - source: hyaluronic_acid
+    target: dehydration
+    relation: TREATS
+    properties:
+      mechanism: "Binds water molecules to increase skin moisture content"
+      efficacy: 0.85
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: hyaluronic_acid
+    target: fine_lines
+    relation: TREATS
+    properties:
+      mechanism: "Plumps skin and reduces appearance of fine lines through hydration"
+      efficacy: 0.75
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  # VITAMIN C for Collagen Synthesis & Brightening
+  - source: vitamin_c
+    target: dull_skin
+    relation: TREATS
+    properties:
+      mechanism: "Promotes skin radiance through antioxidant protection and melanin regulation"
+      efficacy: 0.85
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: vitamin_c
+    target: wrinkles
+    relation: TREATS
+    properties:
+      mechanism: "Essential cofactor for collagen synthesis enzymes"
+      efficacy: 0.80
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: vitamin_c
+    target: uneven_tone
+    relation: TREATS
+    properties:
+      mechanism: "Inhibits tyrosinase to reduce hyperpigmentation"
+      efficacy: 0.75
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: vitamin_c_liposomal
+    target: wrinkles
+    relation: TREATS
+    properties:
+      mechanism: "Enhanced absorption for superior collagen synthesis support"
+      efficacy: 0.88
+      onset_time: "6-10 weeks"
+      evidence_level: "clinical_trial"
+
+  # VITAMIN E for Antioxidant Protection
+  - source: vitamin_e
+    target: oxidative_stress
+    relation: TREATS
+    properties:
+      mechanism: "Neutralizes free radicals and protects cell membranes from oxidative damage"
+      efficacy: 0.80
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: vitamin_e
+    target: wrinkles
+    relation: TREATS
+    properties:
+      mechanism: "Protects collagen from free radical damage"
+      efficacy: 0.70
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  # GLUTATHIONE for Master Antioxidant & Brightening
+  - source: glutathione
+    target: dull_skin
+    relation: TREATS
+    properties:
+      mechanism: "Master antioxidant that promotes skin radiance and cellular health"
+      efficacy: 0.85
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: glutathione
+    target: oxidative_stress
+    relation: TREATS
+    properties:
+      mechanism: "Master antioxidant that regenerates other antioxidants and neutralizes free radicals"
+      efficacy: 0.95
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: glutathione
+    target: uneven_tone
+    relation: TREATS
+    properties:
+      mechanism: "Inhibits melanin synthesis for even skin tone"
+      efficacy: 0.80
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: glutathione_liposomal
+    target: dull_skin
+    relation: TREATS
+    properties:
+      mechanism: "Enhanced bioavailability for superior skin brightening"
+      efficacy: 0.90
+      onset_time: "6-10 weeks"
+      evidence_level: "clinical_trial"
+
+  # ZINC for Collagen Synthesis & Skin Repair
+  - source: zinc
+    target: wrinkles
+    relation: TREATS
+    properties:
+      mechanism: "Essential cofactor for collagen synthesis and skin repair enzymes"
+      efficacy: 0.75
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: zinc
+    target: weak_nails_hair
+    relation: TREATS
+    properties:
+      mechanism: "Supports keratin production and protein synthesis"
+      efficacy: 0.80
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  # ASTAXANTHIN for UV Protection & Antioxidant
+  - source: astaxanthin
+    target: oxidative_stress
+    relation: TREATS
+    properties:
+      mechanism: "One of nature's most powerful antioxidants, provides UV protection"
+      efficacy: 0.90
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: astaxanthin
+    target: fine_lines
+    relation: TREATS
+    properties:
+      mechanism: "Protects against photoaging and reduces fine lines"
+      efficacy: 0.75
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  # RESVERATROL for Anti-Aging
+  - source: resveratrol
+    target: wrinkles
+    relation: TREATS
+    properties:
+      mechanism: "Activates longevity genes and provides antioxidant protection"
+      efficacy: 0.75
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: resveratrol
+    target: oxidative_stress
+    relation: TREATS
+    properties:
+      mechanism: "Powerful polyphenol antioxidant"
+      efficacy: 0.85
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  # COQ10 for Cellular Energy & Antioxidant
+  - source: coq10
+    target: dull_skin
+    relation: TREATS
+    properties:
+      mechanism: "Boosts cellular energy production for skin vitality and radiance"
+      efficacy: 0.75
+      onset_time: "6-10 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: coq10
+    target: fine_lines
+    relation: TREATS
+    properties:
+      mechanism: "Provides antioxidant protection and supports cellular energy"
+      efficacy: 0.70
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  # BIOTIN for Hair, Skin, Nails
+  - source: biotin
+    target: weak_nails_hair
+    relation: TREATS
+    properties:
+      mechanism: "Essential for keratin production and protein metabolism"
+      efficacy: 0.85
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  # SILICA for Collagen Support
+  - source: silica
+    target: poor_elasticity
+    relation: TREATS
+    properties:
+      mechanism: "Supports collagen formation and connective tissue integrity"
+      efficacy: 0.70
+      onset_time: "8-12 weeks"
+      evidence_level: "anecdotal"
+
+  - source: silica
+    target: weak_nails_hair
+    relation: TREATS
+    properties:
+      mechanism: "Strengthens hair and nails through collagen support"
+      efficacy: 0.75
+      onset_time: "8-12 weeks"
+      evidence_level: "anecdotal"
+
+  # OMEGA-3 for Inflammation & Hydration
+  - source: omega_3
+    target: dehydration
+    relation: TREATS
+    properties:
+      mechanism: "Supports skin barrier function and moisture retention"
+      efficacy: 0.75
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: omega_3
+    target: oxidative_stress
+    relation: TREATS
+    properties:
+      mechanism: "Reduces inflammation and oxidative stress"
+      efficacy: 0.70
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  # --------------------------------------------------------------------------
+  # INGREDIENT → RECOMMENDED_FOR → ATTRIBUTE
+  # Defines which ingredients work best for specific user attributes
+  # --------------------------------------------------------------------------
+
+  # Marine Collagen for Non-Veg/Pescatarian
+  - source: collagen_type_1_3_marine
+    target: diet_pescatarian
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 1.0
+      evidence: "proven"
+
+  - source: collagen_type_1_3_marine
+    target: diet_non_veg
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.95
+      evidence: "proven"
+
+  # Vegan Collagen Builder for Vegan/Vegetarian
+  - source: vegan_collagen_builder
+    target: diet_vegan
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 1.0
+      evidence: "proven"
+
+  - source: vegan_collagen_builder
+    target: diet_vegetarian
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.90
+      evidence: "proven"
+
+  # Higher doses for older age groups
+  - source: collagen_type_1_3_marine
+    target: age_group_36_45
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.95
+      evidence: "proven"
+
+  - source: collagen_type_1_3_marine
+    target: age_group_46_plus
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 1.0
+      evidence: "proven"
+
+  # Astaxanthin for high sun exposure
+  - source: astaxanthin
+    target: sun_exposure_high
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.95
+      evidence: "proven"
+
+  # Hyaluronic Acid for dry skin
+  - source: hyaluronic_acid
+    target: skin_type_dry
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.95
+      evidence: "proven"
+
+  # Biotin for women (hair/nail health)
+  - source: biotin
+    target: gender_female
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.85
+      evidence: "proven"
+
+  # --------------------------------------------------------------------------
+  # INGREDIENT → CONTRAINDICATED_FOR → CONSTRAINT
+  # Safety rules for ingredients
+  # --------------------------------------------------------------------------
+
+  # Marine Collagen contraindications
+  - source: collagen_type_1_3_marine
+    target: allergy_fish
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "Derived from fish, may cause allergic reactions"
+      severity: "avoid"
+      alternative_ingredients:
+        - "vegan_collagen_builder"
+        - "collagen_type_1_3_bovine"
+
+  - source: collagen_type_1_3_marine
+    target: diet_vegan_constraint
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "Animal-derived, not suitable for vegans"
+      severity: "avoid"
+      alternative_ingredients:
+        - "vegan_collagen_builder"
+
+  - source: collagen_type_1_3_marine
+    target: diet_vegetarian_constraint
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "Animal-derived, not suitable for vegetarians"
+      severity: "avoid"
+      alternative_ingredients:
+        - "vegan_collagen_builder"
+
+  # Bovine Collagen contraindications
+  - source: collagen_type_1_3_bovine
+    target: diet_vegan_constraint
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "Animal-derived, not suitable for vegans"
+      severity: "avoid"
+      alternative_ingredients:
+        - "vegan_collagen_builder"
+
+  - source: collagen_type_1_3_bovine
+    target: diet_vegetarian_constraint
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "Animal-derived, not suitable for vegetarians"
+      severity: "avoid"
+      alternative_ingredients:
+        - "vegan_collagen_builder"
+
+  # Vitamin A during pregnancy
+  - source: vitamin_a
+    target: pregnancy
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "High doses may cause birth defects"
+      severity: "avoid"
+      alternative_ingredients:
+        - "vitamin_c"
+        - "vitamin_e"
+
+  # --------------------------------------------------------------------------
+  # PROBLEM → SIMILAR_TO → PROBLEM
+  # Semantic relationships between problems
+  # --------------------------------------------------------------------------
+
+  - source: fine_lines
+    target: wrinkles
+    relation: SIMILAR_TO
+    properties:
+      similarity_score: 0.85
+      shared_symptoms:
+        - "collagen_loss"
+        - "aging"
+
+  - source: dull_skin
+    target: uneven_tone
+    relation: SIMILAR_TO
+    properties:
+      similarity_score: 0.70
+      shared_symptoms:
+        - "pigmentation_issues"
+        - "lack_of_radiance"
+
+  # --------------------------------------------------------------------------
+  # PROBLEM → OFTEN_PAIRED_WITH → PROBLEM
+  # Problems that commonly occur together
+  # --------------------------------------------------------------------------
+
+  - source: poor_elasticity
+    target: wrinkles
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.85
+      recommendation: "treat_together"
+
+  - source: fine_lines
+    target: dehydration
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.75
+      recommendation: "treat_together"
+
+  - source: dull_skin
+    target: dehydration
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.70
+      recommendation: "treat_together"
+
+  - source: oxidative_stress
+    target: wrinkles
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.80
+      recommendation: "treat_together"
+
+  - source: poor_elasticity
+    target: dull_skin
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.65
+      recommendation: "treat_together"

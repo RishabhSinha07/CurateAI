@@ -1,0 +1,667 @@
+metadata:
+  domain: hormonal_balance
+  version: 1.0.0
+  created_at: '2026-01-31'
+  description: Support for hormone regulation across life stages including PCOS, PMS, and menopause
+  display_name: Hormonal Balance
+  persona: You are a hormonal health specialist who helps users find science-backed nutraceutical supplements for hormone
+    balance, PCOS, PMS, menopause, and reproductive health. You focus on adaptogens, hormone-modulating herbs, and micronutrients.
+  is_active: true
+  parent_domain: null
+nodes:
+  problems:
+  - id: pcos
+    name: pcos
+    display_name: PCOS (Polycystic Ovary Syndrome)
+    synonyms:
+    - irregular periods
+    - acne
+    - hirsutism
+    - weight gain
+    - insulin resistance
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Hormonal disorder causing irregular periods, insulin resistance, and elevated androgens
+  - id: pms_symptoms
+    name: pms_symptoms
+    display_name: PMS (Premenstrual Syndrome)
+    synonyms:
+    - mood swings
+    - bloating
+    - breast tenderness
+    - cramps
+    - fatigue
+    - irritability
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Physical and emotional symptoms before menstruation
+  - id: menopause_symptoms
+    name: menopause_symptoms
+    display_name: Menopause Symptoms
+    synonyms:
+    - hot flashes
+    - night sweats
+    - mood swings
+    - sleep disturbance
+    - vaginal dryness
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Hot flashes, night sweats, mood changes during menopause transition
+  - id: irregular_periods
+    name: irregular_periods
+    display_name: Irregular Menstrual Cycles
+    synonyms:
+    - missed periods
+    - heavy bleeding
+    - spotting
+    - cycle length variation
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Unpredictable period timing, heavy or light flow
+  - id: hormonal_acne
+    name: hormonal_acne
+    display_name: Hormonal Acne
+    synonyms:
+    - cystic acne
+    - jawline breakouts
+    - premenstrual acne
+    - adult acne
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Acne driven by hormonal fluctuations, especially around jawline and chin
+  - id: low_libido
+    name: low_libido
+    display_name: Low Sex Drive
+    synonyms:
+    - decreased libido
+    - low arousal
+    - sexual dysfunction
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Reduced sexual desire often linked to hormonal imbalance
+  - id: estrogen_dominance
+    name: estrogen_dominance
+    display_name: Estrogen Dominance
+    synonyms:
+    - heavy periods
+    - breast tenderness
+    - mood swings
+    - weight gain
+    - fibroids
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Excess estrogen relative to progesterone causing various symptoms
+  - id: thyroid_imbalance
+    name: thyroid_imbalance
+    display_name: Thyroid Dysfunction
+    synonyms:
+    - fatigue
+    - weight changes
+    - hair loss
+    - cold intolerance
+    - brain fog
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Hypothyroid or hyperthyroid symptoms affecting metabolism and energy
+  - id: fertility_issues
+    name: fertility_issues
+    display_name: Fertility Challenges
+    synonyms:
+    - anovulation
+    - luteal phase defect
+    - poor egg quality
+    - implantation failure
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Difficulty conceiving related to hormonal imbalances
+  attributes:
+  - id: life_stage
+    category: life
+    value: stage
+    data_type: single_choice
+    elicitation_priority: 3
+    is_global: true
+  - id: menstrual_cycle_regularity
+    category: menstrual
+    value: regularity
+    data_type: single_choice
+    elicitation_priority: 3
+    is_global: false
+  - id: diagnosed_conditions
+    category: diagnosed
+    value: conditions
+    data_type: single_choice
+    elicitation_priority: 3
+    is_global: false
+  - id: hormonal_contraception
+    category: hormonal
+    value: contraception
+    data_type: single_choice
+    elicitation_priority: 3
+    is_global: false
+  - id: pregnancy_status
+    category: pregnancy
+    value: status
+    data_type: single_choice
+    elicitation_priority: 3
+    is_global: true
+  ingredients:
+  - id: myo_inositol
+    name: myo_inositol
+    display_name: Myo-Inositol
+    function: general_support
+    category: supplement
+    strength_levels:
+    - 2000-4000mg
+  - id: d_chiro_inositol
+    name: d_chiro_inositol
+    display_name: D-Chiro-Inositol
+    function: general_support
+    category: supplement
+    strength_levels:
+    - 50-100mg
+  - id: ashwagandha_hormonal
+    name: ashwagandha_hormonal
+    display_name: Ashwagandha (Withania somnifera)
+    function: general_support
+    category: adaptogen
+    strength_levels:
+    - 300-600mg
+  - id: vitex
+    name: vitex
+    display_name: Vitex (Chasteberry)
+    function: general_support
+    category: herb
+    strength_levels:
+    - 400-1000mg
+  - id: maca
+    name: maca
+    display_name: Maca Root
+    function: general_support
+    category: adaptogen
+    strength_levels:
+    - 1500-3000mg
+  - id: black_cohosh
+    name: black_cohosh
+    display_name: Black Cohosh
+    function: general_support
+    category: herb
+    strength_levels:
+    - 40-80mg
+  - id: red_clover
+    name: red_clover
+    display_name: Red Clover
+    function: general_support
+    category: herb
+    strength_levels:
+    - 40-80mg
+  - id: dim
+    name: dim
+    display_name: DIM (Diindolylmethane)
+    function: general_support
+    category: supplement
+    strength_levels:
+    - 100-200mg
+  - id: calcium_d_glucarate
+    name: calcium_d_glucarate
+    display_name: Calcium D-Glucarate
+    function: general_support
+    category: supplement
+    strength_levels:
+    - 500-1000mg
+  - id: evening_primrose_oil
+    name: evening_primrose_oil
+    display_name: Evening Primrose Oil
+    function: general_support
+    category: omega
+    strength_levels:
+    - 1000-3000mg
+  - id: omega3_hormonal
+    name: omega3_hormonal
+    display_name: Omega-3 (EPA/DHA)
+    function: general_support
+    category: omega
+    strength_levels:
+    - 1000-2000mg
+  - id: zinc_hormonal
+    name: zinc_hormonal
+    display_name: Zinc
+    function: general_support
+    category: mineral
+    strength_levels:
+    - 15-30mg
+  - id: magnesium_hormonal
+    name: magnesium_hormonal
+    display_name: Magnesium
+    function: general_support
+    category: mineral
+    strength_levels:
+    - 300-400mg
+  - id: selenium
+    name: selenium
+    display_name: Selenium
+    function: general_support
+    category: mineral
+    strength_levels:
+    - 100-200mcg
+  - id: iodine
+    name: iodine
+    display_name: Iodine
+    function: general_support
+    category: mineral
+    strength_levels:
+    - 150-300mcg
+  - id: vitamin_b6_hormonal
+    name: vitamin_b6_hormonal
+    display_name: Vitamin B6 (Pyridoxine)
+    function: general_support
+    category: vitamin
+    strength_levels:
+    - 50-100mg
+  - id: vitamin_d_hormonal
+    name: vitamin_d_hormonal
+    display_name: Vitamin D3
+    function: general_support
+    category: vitamin
+    strength_levels:
+    - cholecalciferol
+  - id: vitamin_e
+    name: vitamin_e
+    display_name: Vitamin E
+    function: general_support
+    category: vitamin
+    strength_levels:
+    - mixed tocopherols
+  - id: folate_hormonal
+    name: folate_hormonal
+    display_name: Folate (Methylfolate)
+    function: general_support
+    category: vitamin
+    strength_levels:
+    - 400-800mcg
+  - id: nac
+    name: nac
+    display_name: N-Acetyl Cysteine (NAC)
+    function: general_support
+    category: antioxidant
+    strength_levels:
+    - 600-1200mg
+  - id: coq10_hormonal
+    name: coq10_hormonal
+    display_name: Coenzyme Q10
+    function: general_support
+    category: antioxidant
+    strength_levels:
+    - 100-300mg
+  constraints:
+  - id: pregnancy_contraindication
+    type: contraindication
+    value: pregnancy contraindication
+    severity: critical
+  - id: breastfeeding_caution
+    type: contraindication
+    value: breastfeeding caution
+    severity: moderate
+  - id: hormone_sensitive_conditions
+    type: contraindication
+    value: hormone sensitive conditions
+    severity: high
+  - id: thyroid_medication_interaction
+    type: interaction
+    value: thyroid medication interaction
+    severity: moderate
+  questions: []
+  products: []
+  domains: []
+  subdomains: []
+edges:
+- source: myo_inositol
+  target: pcos
+  relation: TREATS
+  properties:
+    efficacy: 0.85
+    mechanism: Improves insulin sensitivity, reduces androgens, restores ovulation
+    evidence_level: meta_analysis
+    onset: 3-6 months
+- source: myo_inositol
+  target: fertility_issues
+  relation: TREATS
+  properties:
+    efficacy: 0.8
+    mechanism: Improves egg quality and ovulation in PCOS patients
+    evidence_level: clinical_trial
+    onset: 3-6 months
+- source: d_chiro_inositol
+  target: pcos
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Complements myo-inositol in 40:1 ratio for insulin signaling
+    evidence_level: clinical_trial
+    onset: 3-6 months
+- source: vitex
+  target: pms_symptoms
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Modulates prolactin, balances progesterone/estrogen ratio
+    evidence_level: clinical_trial
+    onset: 2-3 cycles
+- source: vitex
+  target: irregular_periods
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Regulates menstrual cycle by influencing pituitary hormones
+    evidence_level: clinical_trial
+    onset: 2-4 months
+- source: vitex
+  target: hormonal_acne
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: Reduces androgen-driven acne via hormonal balance
+    evidence_level: observational
+    onset: 2-3 months
+- source: ashwagandha_hormonal
+  target: thyroid_imbalance
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Supports thyroid function, may increase T3/T4 in hypothyroid
+    evidence_level: clinical_trial
+    onset: 8 weeks
+- source: ashwagandha_hormonal
+  target: fertility_issues
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: Reduces cortisol, improves reproductive hormone balance
+    evidence_level: clinical_trial
+    onset: 2-3 months
+- source: ashwagandha_hormonal
+  target: low_libido
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Reduces stress hormones, supports testosterone and sexual function
+    evidence_level: clinical_trial
+    onset: 8-12 weeks
+- source: black_cohosh
+  target: menopause_symptoms
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Reduces hot flashes and night sweats via serotonergic action
+    evidence_level: meta_analysis
+    onset: 4-8 weeks
+- source: red_clover
+  target: menopause_symptoms
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: Phytoestrogens provide mild estrogen-like effects
+    evidence_level: clinical_trial
+    onset: 4-12 weeks
+- source: maca
+  target: low_libido
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Enhances sexual desire in both men and women
+    evidence_level: clinical_trial
+    onset: 6-8 weeks
+- source: maca
+  target: menopause_symptoms
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: Balances hormones and reduces menopausal symptoms
+    evidence_level: clinical_trial
+    onset: 6-12 weeks
+- source: dim
+  target: estrogen_dominance
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Promotes healthy estrogen metabolism via 2-hydroxy pathway
+    evidence_level: clinical_trial
+    onset: 4-8 weeks
+- source: dim
+  target: hormonal_acne
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: Balances estrogen metabolism, reduces androgenic acne
+    evidence_level: observational
+    onset: 6-12 weeks
+- source: evening_primrose_oil
+  target: pms_symptoms
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: GLA reduces inflammation and breast tenderness
+    evidence_level: clinical_trial
+    onset: 2-3 cycles
+- source: omega3_hormonal
+  target: pms_symptoms
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: EPA/DHA reduce inflammatory prostaglandins and menstrual pain
+    evidence_level: clinical_trial
+    onset: 2-3 months
+- source: omega3_hormonal
+  target: pcos
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: Reduces inflammation and improves insulin sensitivity
+    evidence_level: clinical_trial
+    onset: 3-6 months
+- source: zinc_hormonal
+  target: hormonal_acne
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Reduces androgens, decreases sebum production and inflammation
+    evidence_level: meta_analysis
+    onset: 8-12 weeks
+- source: zinc_hormonal
+  target: pcos
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: Improves insulin sensitivity and reduces androgens
+    evidence_level: clinical_trial
+    onset: 3-6 months
+- source: zinc_hormonal
+  target: fertility_issues
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Essential for egg development and hormone synthesis
+    evidence_level: clinical_trial
+    onset: 3-6 months
+- source: magnesium_hormonal
+  target: pms_symptoms
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Reduces cramping, mood swings, and water retention
+    evidence_level: meta_analysis
+    onset: 2-3 cycles
+- source: magnesium_hormonal
+  target: irregular_periods
+  relation: TREATS
+  properties:
+    efficacy: 0.6
+    mechanism: Supports progesterone production and cycle regulation
+    evidence_level: observational
+    onset: 2-3 months
+- source: vitamin_b6_hormonal
+  target: pms_symptoms
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Supports neurotransmitter synthesis, reduces PMS mood symptoms
+    evidence_level: clinical_trial
+    onset: 2-3 cycles
+- source: vitamin_b6_hormonal
+  target: irregular_periods
+  relation: TREATS
+  properties:
+    efficacy: 0.6
+    mechanism: Supports progesterone production and hormone balance
+    evidence_level: observational
+    onset: 2-3 months
+- source: vitamin_d_hormonal
+  target: pcos
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Improves insulin sensitivity and reproductive hormone levels
+    evidence_level: meta_analysis
+    onset: 3-6 months
+- source: vitamin_d_hormonal
+  target: fertility_issues
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: Essential for reproductive health and pregnancy outcomes
+    evidence_level: clinical_trial
+    onset: 3-6 months
+- source: vitamin_d_hormonal
+  target: thyroid_imbalance
+  relation: TREATS
+  properties:
+    efficacy: 0.6
+    mechanism: Supports thyroid hormone production and immune function
+    evidence_level: observational
+    onset: 3-6 months
+- source: selenium
+  target: thyroid_imbalance
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Critical for thyroid hormone conversion (T4 to T3)
+    evidence_level: clinical_trial
+    onset: 3-6 months
+- source: iodine
+  target: thyroid_imbalance
+  relation: TREATS
+  properties:
+    efficacy: 0.8
+    mechanism: Essential component of thyroid hormones T3 and T4
+    evidence_level: clinical_trial
+    onset: 2-4 months
+- source: nac
+  target: pcos
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Improves insulin sensitivity and reduces inflammation in PCOS
+    evidence_level: clinical_trial
+    onset: 3-6 months
+- source: coq10_hormonal
+  target: fertility_issues
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Improves egg quality and mitochondrial function
+    evidence_level: clinical_trial
+    onset: 3-6 months
+- source: vitamin_e
+  target: pms_symptoms
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: Reduces breast tenderness and oxidative stress
+    evidence_level: clinical_trial
+    onset: 2-3 cycles
+- source: folate_hormonal
+  target: fertility_issues
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Critical for DNA synthesis and healthy egg development
+    evidence_level: meta_analysis
+    onset: 3 months pre-conception
+- source: pcos
+  target: menstrual_cycle_regularity
+  relation: REQUIRES_KNOWING
+  properties:
+    reason: Need to assess cycle regularity for PCOS diagnosis
+- source: fertility_issues
+  target: pregnancy_status
+  relation: REQUIRES_KNOWING
+  properties:
+    reason: Must know if actively trying to conceive
+- source: menopause_symptoms
+  target: life_stage
+  relation: REQUIRES_KNOWING
+  properties:
+    reason: Treatment differs for perimenopause vs. postmenopause
+- source: thyroid_imbalance
+  target: diagnosed_conditions
+  relation: REQUIRES_KNOWING
+  properties:
+    reason: Need to know if on thyroid medication for safety
+- source: myo_inositol
+  target: d_chiro_inositol
+  relation: SYNERGISTIC_WITH
+  properties:
+    mechanism: 40:1 ratio optimizes insulin sensitivity in PCOS
+- source: magnesium_hormonal
+  target: vitamin_b6_hormonal
+  relation: SYNERGISTIC_WITH
+  properties:
+    mechanism: Work together to reduce PMS symptoms
+- source: selenium
+  target: iodine
+  relation: SYNERGISTIC_WITH
+  properties:
+    mechanism: Selenium protects thyroid from iodine-induced damage
+- source: zinc_hormonal
+  target: vitamin_d_hormonal
+  relation: SYNERGISTIC_WITH
+  properties:
+    mechanism: Both support reproductive health and hormone balance
+- source: vitex
+  target: pregnancy_contraindication
+  relation: CONTRAINDICATED_FOR
+  properties:
+    severity: high
+- source: black_cohosh
+  target: pregnancy_contraindication
+  relation: CONTRAINDICATED_FOR
+  properties:
+    severity: high
+- source: ashwagandha_hormonal
+  target: thyroid_medication_interaction
+  relation: CONTRAINDICATED_FOR
+  properties:
+    severity: moderate
+- source: maca
+  target: hormone_sensitive_conditions
+  relation: CONTRAINDICATED_FOR
+  properties:
+    severity: moderate

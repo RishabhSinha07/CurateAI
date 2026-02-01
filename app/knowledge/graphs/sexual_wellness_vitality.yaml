@@ -1,0 +1,743 @@
+metadata:
+  domain: sexual_wellness_vitality
+  version: 1.0.0
+  created_at: '2026-01-31'
+  description: Support for libido, sexual performance, fertility, and overall vitality
+  display_name: Sexual Wellness & Vitality
+  persona: You are a sexual wellness and vitality specialist who helps users find science-backed nutraceutical supplements
+    for libido, sexual performance, fertility, and vitality. You focus on circulation enhancers, hormone supporters, and energy
+    boosters.
+  is_active: true
+  parent_domain: null
+nodes:
+  problems:
+  - id: low_libido_sexual
+    name: low_libido_sexual
+    display_name: Low Sex Drive
+    synonyms:
+    - decreased desire
+    - low arousal
+    - lack of interest
+    - relationship strain
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Reduced sexual desire and interest in sexual activity
+  - id: erectile_dysfunction
+    name: erectile_dysfunction
+    display_name: Erectile Dysfunction (ED)
+    synonyms:
+    - weak erections
+    - inability to maintain
+    - reduced hardness
+    - performance anxiety
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Difficulty achieving or maintaining erections
+  - id: low_sexual_stamina
+    name: low_sexual_stamina
+    display_name: Low Sexual Stamina
+    synonyms:
+    - quick fatigue
+    - low endurance
+    - premature ejaculation
+    - reduced staying power
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Premature fatigue and reduced endurance during intimacy
+  - id: male_fertility_issues
+    name: male_fertility_issues
+    display_name: Male Fertility Issues
+    synonyms:
+    - low sperm count
+    - poor motility
+    - abnormal morphology
+    - difficulty conceiving
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Low sperm count, poor motility, or abnormal morphology
+  - id: female_fertility_sexual
+    name: female_fertility_sexual
+    display_name: Female Fertility Challenges
+    synonyms:
+    - irregular ovulation
+    - luteal phase defect
+    - poor egg quality
+    - difficulty conceiving
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Ovulation issues, hormonal imbalances affecting conception
+  - id: low_testosterone
+    name: low_testosterone
+    display_name: Low Testosterone (Hypogonadism)
+    synonyms:
+    - low energy
+    - muscle loss
+    - fat gain
+    - reduced libido
+    - mood changes
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Reduced testosterone levels affecting vitality and sexual function
+  - id: sexual_performance_anxiety
+    name: sexual_performance_anxiety
+    display_name: Sexual Performance Anxiety
+    synonyms:
+    - stress before intimacy
+    - fear of failure
+    - mental blocks
+    - tension
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Psychological stress affecting sexual performance
+  - id: vaginal_dryness
+    name: vaginal_dryness
+    display_name: Vaginal Dryness & Discomfort
+    synonyms:
+    - dryness
+    - pain during sex
+    - discomfort
+    - reduced arousal
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Lack of natural lubrication causing discomfort during intimacy
+  - id: poor_circulation_sexual
+    name: poor_circulation_sexual
+    display_name: Poor Blood Circulation (Sexual)
+    synonyms:
+    - cold extremities
+    - weak erections
+    - reduced arousal
+    - numbness
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Reduced blood flow affecting arousal and performance
+  attributes:
+  - id: biological_sex
+    category: biological
+    value: sex
+    data_type: single_choice
+    elicitation_priority: 3
+    is_global: false
+  - id: age_group_sexual
+    category: age
+    value: sexual
+    data_type: single_choice
+    elicitation_priority: 3
+    is_global: true
+  - id: trying_to_conceive_sexual
+    category: trying
+    value: sexual
+    data_type: single_choice
+    elicitation_priority: 3
+    is_global: false
+  - id: current_medications
+    category: current
+    value: medications
+    data_type: single_choice
+    elicitation_priority: 3
+    is_global: false
+  - id: lifestyle_factors
+    category: lifestyle
+    value: factors
+    data_type: single_choice
+    elicitation_priority: 3
+    is_global: false
+  ingredients:
+  - id: maca_sexual
+    name: maca_sexual
+    display_name: Maca Root (Lepidium meyenii)
+    function: general_support
+    category: adaptogen
+    strength_levels:
+    - 1500-3000mg
+  - id: shilajit
+    name: shilajit
+    display_name: Shilajit (Mineral Pitch)
+    function: general_support
+    category: adaptogen
+    strength_levels:
+    - 300-500mg
+  - id: ashwagandha_sexual
+    name: ashwagandha_sexual
+    display_name: Ashwagandha (Withania somnifera)
+    function: general_support
+    category: adaptogen
+    strength_levels:
+    - 300-600mg
+  - id: korean_red_ginseng
+    name: korean_red_ginseng
+    display_name: Korean Red Ginseng (Panax ginseng)
+    function: general_support
+    category: adaptogen
+    strength_levels:
+    - 1000-2000mg
+  - id: panax_ginseng
+    name: panax_ginseng
+    display_name: Panax Ginseng
+    function: general_support
+    category: adaptogen
+    strength_levels:
+    - 200-400mg
+  - id: l_arginine
+    name: l_arginine
+    display_name: L-Arginine
+    function: general_support
+    category: amino_acid
+    strength_levels:
+    - 3000-6000mg
+  - id: l_citrulline
+    name: l_citrulline
+    display_name: L-Citrulline
+    function: general_support
+    category: amino_acid
+    strength_levels:
+    - 3000-6000mg
+  - id: beetroot_extract
+    name: beetroot_extract
+    display_name: Beetroot Extract (Nitrate)
+    function: general_support
+    category: plant_extract
+    strength_levels:
+    - 500-1000mg
+  - id: fenugreek
+    name: fenugreek
+    display_name: Fenugreek (Trigonella foenum-graecum)
+    function: general_support
+    category: herb
+    strength_levels:
+    - 500-600mg
+  - id: tribulus_terrestris
+    name: tribulus_terrestris
+    display_name: Tribulus Terrestris
+    function: general_support
+    category: herb
+    strength_levels:
+    - 500-1500mg
+  - id: tongkat_ali
+    name: tongkat_ali
+    display_name: Tongkat Ali (Eurycoma longifolia)
+    function: general_support
+    category: herb
+    strength_levels:
+    - 200-400mg
+  - id: saffron_sexual
+    name: saffron_sexual
+    display_name: Saffron (Crocus sativus)
+    function: general_support
+    category: spice
+    strength_levels:
+    - 30mg
+  - id: damiana
+    name: damiana
+    display_name: Damiana (Turnera diffusa)
+    function: general_support
+    category: herb
+    strength_levels:
+    - 400-800mg
+  - id: horny_goat_weed
+    name: horny_goat_weed
+    display_name: Horny Goat Weed (Epimedium)
+    function: general_support
+    category: herb
+    strength_levels:
+    - 500-1000mg
+  - id: zinc_sexual
+    name: zinc_sexual
+    display_name: Zinc
+    function: general_support
+    category: mineral
+    strength_levels:
+    - 15-30mg
+  - id: magnesium_sexual
+    name: magnesium_sexual
+    display_name: Magnesium
+    function: general_support
+    category: mineral
+    strength_levels:
+    - 300-400mg
+  - id: selenium_sexual
+    name: selenium_sexual
+    display_name: Selenium
+    function: general_support
+    category: mineral
+    strength_levels:
+    - 100-200mcg
+  - id: vitamin_d_sexual
+    name: vitamin_d_sexual
+    display_name: Vitamin D3
+    function: general_support
+    category: vitamin
+    strength_levels:
+    - cholecalciferol
+  - id: vitamin_e_sexual
+    name: vitamin_e_sexual
+    display_name: Vitamin E
+    function: general_support
+    category: vitamin
+    strength_levels:
+    - mixed tocopherols
+  - id: vitamin_b_complex_sexual
+    name: vitamin_b_complex_sexual
+    display_name: B-Complex Vitamins
+    function: general_support
+    category: vitamin
+    strength_levels:
+    - 50-100mg
+    - 500-1000mcg
+  - id: omega3_sexual
+    name: omega3_sexual
+    display_name: Omega-3 (EPA/DHA)
+    function: general_support
+    category: omega
+    strength_levels:
+    - 1000-2000mg
+  - id: coq10_sexual
+    name: coq10_sexual
+    display_name: Coenzyme Q10
+    function: general_support
+    category: antioxidant
+    strength_levels:
+    - 100-300mg
+  - id: pycnogenol
+    name: pycnogenol
+    display_name: Pycnogenol (Pine Bark Extract)
+    function: general_support
+    category: antioxidant
+    strength_levels:
+    - 100-200mg
+  - id: dhea
+    name: dhea
+    display_name: DHEA (Dehydroepiandrosterone)
+    function: general_support
+    category: hormone_precursor
+    strength_levels:
+    - 25-50mg
+  - id: mucuna_pruriens
+    name: mucuna_pruriens
+    display_name: Mucuna Pruriens (L-Dopa)
+    function: general_support
+    category: herb
+    strength_levels:
+    - 300-500mg
+  constraints:
+  - id: blood_pressure_medication_interaction
+    type: interaction
+    value: blood pressure medication interaction
+    severity: high
+  - id: pregnancy_unsafe_sexual
+    type: contraindication
+    value: pregnancy unsafe sexual
+    severity: critical
+  - id: hormone_sensitive_cancer_risk
+    type: contraindication
+    value: hormone sensitive cancer risk
+    severity: high
+  - id: antidepressant_interaction
+    type: interaction
+    value: antidepressant interaction
+    severity: moderate
+  questions: []
+  products: []
+  domains: []
+  subdomains: []
+edges:
+- source: maca_sexual
+  target: low_libido_sexual
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Enhances sexual desire in men and women via hormonal modulation
+    evidence_level: meta_analysis
+    onset: 6-8 weeks
+- source: maca_sexual
+  target: male_fertility_issues
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Improves sperm count, motility, and semen volume
+    evidence_level: clinical_trial
+    onset: 12 weeks
+- source: maca_sexual
+  target: female_fertility_sexual
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: Balances hormones and supports reproductive health
+    evidence_level: observational
+    onset: 8-12 weeks
+- source: shilajit
+  target: low_testosterone
+  relation: TREATS
+  properties:
+    efficacy: 0.8
+    mechanism: Increases total and free testosterone, improves energy
+    evidence_level: clinical_trial
+    onset: 90 days
+- source: shilajit
+  target: male_fertility_issues
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Increases sperm count and motility, enhances sperm quality
+    evidence_level: clinical_trial
+    onset: 90 days
+- source: shilajit
+  target: low_sexual_stamina
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Enhances mitochondrial function and ATP production
+    evidence_level: clinical_trial
+    onset: 8-12 weeks
+- source: ashwagandha_sexual
+  target: low_libido_sexual
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Reduces cortisol, increases testosterone, enhances sexual function
+    evidence_level: clinical_trial
+    onset: 8-12 weeks
+- source: ashwagandha_sexual
+  target: sexual_performance_anxiety
+  relation: TREATS
+  properties:
+    efficacy: 0.8
+    mechanism: Reduces anxiety and stress hormones, improves confidence
+    evidence_level: clinical_trial
+    onset: 8 weeks
+- source: ashwagandha_sexual
+  target: male_fertility_issues
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Improves sperm count, motility, and testosterone levels
+    evidence_level: meta_analysis
+    onset: 12 weeks
+- source: korean_red_ginseng
+  target: erectile_dysfunction
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Enhances nitric oxide production, improves endothelial function
+    evidence_level: meta_analysis
+    onset: 8-12 weeks
+- source: korean_red_ginseng
+  target: low_sexual_stamina
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Improves energy, reduces fatigue, enhances endurance
+    evidence_level: clinical_trial
+    onset: 4-8 weeks
+- source: panax_ginseng
+  target: low_libido_sexual
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Modulates neurotransmitters and hormones affecting desire
+    evidence_level: clinical_trial
+    onset: 8 weeks
+- source: l_arginine
+  target: erectile_dysfunction
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Converts to nitric oxide, improves blood flow to genitals
+    evidence_level: clinical_trial
+    onset: 4-6 weeks
+- source: l_arginine
+  target: poor_circulation_sexual
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Enhances vasodilation and blood flow throughout body
+    evidence_level: clinical_trial
+    onset: 2-4 weeks
+- source: l_citrulline
+  target: erectile_dysfunction
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: More effective than L-arginine at raising nitric oxide levels
+    evidence_level: clinical_trial
+    onset: 4-6 weeks
+- source: beetroot_extract
+  target: poor_circulation_sexual
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: High nitrate content converts to nitric oxide, improves blood flow
+    evidence_level: clinical_trial
+    onset: 2-4 weeks
+- source: fenugreek
+  target: low_testosterone
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Inhibits enzymes that convert testosterone to estrogen
+    evidence_level: clinical_trial
+    onset: 8-12 weeks
+- source: fenugreek
+  target: low_libido_sexual
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Increases free testosterone, enhances sexual arousal
+    evidence_level: clinical_trial
+    onset: 6-12 weeks
+- source: tribulus_terrestris
+  target: low_libido_sexual
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: May increase testosterone and enhance sexual desire
+    evidence_level: observational
+    onset: 4-8 weeks
+- source: tongkat_ali
+  target: low_testosterone
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Increases testosterone, reduces SHBG, improves free testosterone
+    evidence_level: clinical_trial
+    onset: 4-12 weeks
+- source: tongkat_ali
+  target: male_fertility_issues
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Improves sperm parameters and semen quality
+    evidence_level: clinical_trial
+    onset: 12 weeks
+- source: saffron_sexual
+  target: low_libido_sexual
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Enhances serotonin and dopamine, improves sexual function
+    evidence_level: clinical_trial
+    onset: 4 weeks
+- source: saffron_sexual
+  target: erectile_dysfunction
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: Reverses SSRI-induced sexual dysfunction
+    evidence_level: clinical_trial
+    onset: 4 weeks
+- source: horny_goat_weed
+  target: erectile_dysfunction
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: Icariin acts as mild PDE5 inhibitor, improves blood flow
+    evidence_level: preclinical
+    onset: 4-8 weeks
+- source: zinc_sexual
+  target: low_testosterone
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Essential for testosterone synthesis and hormone regulation
+    evidence_level: clinical_trial
+    onset: 3-6 months
+- source: zinc_sexual
+  target: male_fertility_issues
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Critical for sperm production, motility, and DNA integrity
+    evidence_level: meta_analysis
+    onset: 3-6 months
+- source: magnesium_sexual
+  target: low_testosterone
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: Increases free and total testosterone, especially in athletes
+    evidence_level: clinical_trial
+    onset: 4 weeks
+- source: selenium_sexual
+  target: male_fertility_issues
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Protects sperm from oxidative damage, improves motility
+    evidence_level: clinical_trial
+    onset: 3-6 months
+- source: vitamin_d_sexual
+  target: low_testosterone
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Supports testosterone production and hormone balance
+    evidence_level: meta_analysis
+    onset: 3-6 months
+- source: vitamin_d_sexual
+  target: erectile_dysfunction
+  relation: TREATS
+  properties:
+    efficacy: 0.6
+    mechanism: Improves endothelial function and blood flow
+    evidence_level: observational
+    onset: 3-6 months
+- source: omega3_sexual
+  target: poor_circulation_sexual
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: EPA/DHA improve endothelial function and blood flow
+    evidence_level: clinical_trial
+    onset: 4-8 weeks
+- source: omega3_sexual
+  target: male_fertility_issues
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: DHA essential for sperm membrane structure and motility
+    evidence_level: clinical_trial
+    onset: 3-6 months
+- source: coq10_sexual
+  target: male_fertility_issues
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Improves sperm count, motility, and antioxidant protection
+    evidence_level: meta_analysis
+    onset: 3-6 months
+- source: coq10_sexual
+  target: female_fertility_sexual
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Improves egg quality and mitochondrial function
+    evidence_level: clinical_trial
+    onset: 3-6 months
+- source: coq10_sexual
+  target: low_sexual_stamina
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Enhances cellular energy production and reduces fatigue
+    evidence_level: clinical_trial
+    onset: 4-8 weeks
+- source: pycnogenol
+  target: erectile_dysfunction
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Enhances nitric oxide, improves endothelial function
+    evidence_level: clinical_trial
+    onset: 4-8 weeks
+- source: vitamin_b_complex_sexual
+  target: low_sexual_stamina
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: B vitamins support energy metabolism and reduce fatigue
+    evidence_level: observational
+    onset: 2-4 weeks
+- source: mucuna_pruriens
+  target: low_libido_sexual
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: L-dopa increases dopamine, improving desire and pleasure
+    evidence_level: clinical_trial
+    onset: 8-12 weeks
+- source: mucuna_pruriens
+  target: low_testosterone
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: Increases testosterone and improves sperm parameters
+    evidence_level: clinical_trial
+    onset: 12 weeks
+- source: erectile_dysfunction
+  target: biological_sex
+  relation: REQUIRES_KNOWING
+  properties:
+    reason: ED is male-specific concern
+- source: male_fertility_issues
+  target: trying_to_conceive_sexual
+  relation: REQUIRES_KNOWING
+  properties:
+    reason: Fertility support relevant when actively trying to conceive
+- source: low_testosterone
+  target: age_group_sexual
+  relation: REQUIRES_KNOWING
+  properties:
+    reason: Testosterone naturally declines with age
+- source: erectile_dysfunction
+  target: current_medications
+  relation: REQUIRES_KNOWING
+  properties:
+    reason: Many medications affect erectile function
+- source: l_arginine
+  target: pycnogenol
+  relation: SYNERGISTIC_WITH
+  properties:
+    mechanism: Combination more effective for ED than either alone
+- source: l_citrulline
+  target: beetroot_extract
+  relation: SYNERGISTIC_WITH
+  properties:
+    mechanism: Both boost nitric oxide via different pathways
+- source: zinc_sexual
+  target: magnesium_sexual
+  relation: SYNERGISTIC_WITH
+  properties:
+    mechanism: Both support testosterone production
+- source: coq10_sexual
+  target: selenium_sexual
+  relation: SYNERGISTIC_WITH
+  properties:
+    mechanism: Antioxidant synergy for sperm protection
+- source: maca_sexual
+  target: ashwagandha_sexual
+  relation: SYNERGISTIC_WITH
+  properties:
+    mechanism: Complementary adaptogenic effects on libido and stress
+- source: l_arginine
+  target: blood_pressure_medication_interaction
+  relation: CONTRAINDICATED_FOR
+  properties:
+    severity: high
+- source: korean_red_ginseng
+  target: blood_pressure_medication_interaction
+  relation: CONTRAINDICATED_FOR
+  properties:
+    severity: moderate
+- source: tribulus_terrestris
+  target: pregnancy_unsafe_sexual
+  relation: CONTRAINDICATED_FOR
+  properties:
+    severity: high
+- source: dhea
+  target: hormone_sensitive_cancer_risk
+  relation: CONTRAINDICATED_FOR
+  properties:
+    severity: high
+- source: saffron_sexual
+  target: antidepressant_interaction
+  relation: CONTRAINDICATED_FOR
+  properties:
+    severity: moderate

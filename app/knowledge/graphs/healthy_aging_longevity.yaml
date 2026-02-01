@@ -1,0 +1,806 @@
+metadata:
+  domain: healthy_aging_longevity
+  version: 1.0.0
+  created_at: '2026-01-31'
+  description: Support for graceful aging, cellular health, longevity, and vitality
+  display_name: Healthy Aging & Longevity
+  persona: You are a longevity and healthy aging specialist who helps users find science-backed nutraceutical supplements
+    for cellular health, anti-aging, and vitality. You focus on NAD+ boosters, antioxidants, senolytics, and longevity nutrients.
+  is_active: true
+  parent_domain: null
+nodes:
+  problems:
+  - id: chronic_inflammation_aging
+    name: chronic_inflammation_aging
+    display_name: Chronic Inflammation (Inflammaging)
+    synonyms:
+    - joint pain
+    - fatigue
+    - brain fog
+    - metabolic issues
+    - increased disease risk
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Low-grade systemic inflammation that accelerates aging
+  - id: cellular_aging
+    name: cellular_aging
+    display_name: Cellular Aging & Senescence
+    synonyms:
+    - decreased energy
+    - slower recovery
+    - reduced vitality
+    - age-related decline
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Accumulation of senescent cells and cellular damage
+  - id: oxidative_stress_aging
+    name: oxidative_stress_aging
+    display_name: Oxidative Stress & Free Radical Damage
+    synonyms:
+    - premature aging
+    - wrinkles
+    - fatigue
+    - cognitive decline
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Excess free radicals damaging cells, DNA, and proteins
+  - id: mitochondrial_dysfunction
+    name: mitochondrial_dysfunction
+    display_name: Mitochondrial Decline
+    synonyms:
+    - fatigue
+    - muscle weakness
+    - brain fog
+    - metabolic slowdown
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Reduced mitochondrial function and energy production with age
+  - id: cognitive_decline_aging
+    name: cognitive_decline_aging
+    display_name: Age-Related Cognitive Decline
+    synonyms:
+    - memory problems
+    - brain fog
+    - slow thinking
+    - reduced focus
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Memory loss, reduced mental clarity, slower processing speed
+  - id: skin_aging
+    name: skin_aging
+    display_name: Skin Aging (Wrinkles, Loss of Elasticity)
+    synonyms:
+    - wrinkles
+    - fine lines
+    - sagging skin
+    - age spots
+    - dryness
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Visible signs of aging including wrinkles, sagging, age spots
+  - id: sarcopenia
+    name: sarcopenia
+    display_name: Sarcopenia (Age-Related Muscle Loss)
+    synonyms:
+    - muscle loss
+    - weakness
+    - reduced mobility
+    - frailty
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Progressive loss of muscle mass and strength with aging
+  - id: metabolic_decline_aging
+    name: metabolic_decline_aging
+    display_name: Metabolic Decline with Age
+    synonyms:
+    - weight gain
+    - metabolic slowdown
+    - insulin resistance
+    - fatigue
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Slower metabolism, insulin resistance, weight gain
+  - id: telomere_shortening
+    name: telomere_shortening
+    display_name: Telomere Shortening
+    synonyms:
+    - cellular aging
+    - reduced regeneration
+    - increased disease risk
+    severity_levels:
+    - mild
+    - moderate
+    - severe
+    description: Erosion of protective chromosome caps linked to cellular aging
+  attributes:
+  - id: age_longevity
+    category: age
+    value: longevity
+    data_type: single_choice
+    elicitation_priority: 3
+    is_global: true
+  - id: primary_aging_concern
+    category: primary
+    value: concern
+    data_type: single_choice
+    elicitation_priority: 3
+    is_global: false
+  - id: health_optimization_level
+    category: health
+    value: level
+    data_type: single_choice
+    elicitation_priority: 3
+    is_global: false
+  - id: chronic_conditions_aging
+    category: chronic
+    value: aging
+    data_type: single_choice
+    elicitation_priority: 3
+    is_global: false
+  ingredients:
+  - id: nmn
+    name: nmn
+    display_name: NMN (Nicotinamide Mononucleotide)
+    function: general_support
+    category: nad_precursor
+    strength_levels:
+    - 250-500mg
+  - id: nr
+    name: nr
+    display_name: NR (Nicotinamide Riboside)
+    function: general_support
+    category: nad_precursor
+    strength_levels:
+    - 300-500mg
+  - id: nad
+    name: nad
+    display_name: NAD+ (Direct)
+    function: general_support
+    category: nad_precursor
+    strength_levels:
+    - sublingual
+    - IV
+  - id: resveratrol
+    name: resveratrol
+    display_name: Resveratrol (Trans-Resveratrol)
+    function: general_support
+    category: polyphenol
+    strength_levels:
+    - 150-500mg
+  - id: pterostilbene
+    name: pterostilbene
+    display_name: Pterostilbene
+    function: general_support
+    category: polyphenol
+    strength_levels:
+    - 50-250mg
+  - id: coq10_aging
+    name: coq10_aging
+    display_name: Coenzyme Q10 (Ubiquinol)
+    function: general_support
+    category: antioxidant
+    strength_levels:
+    - 100-300mg
+  - id: pqq
+    name: pqq
+    display_name: PQQ (Pyrroloquinoline Quinone)
+    function: general_support
+    category: antioxidant
+    strength_levels:
+    - 10-20mg
+  - id: ala
+    name: ala
+    display_name: Alpha Lipoic Acid (ALA)
+    function: general_support
+    category: antioxidant
+    strength_levels:
+    - 300-600mg
+  - id: glutathione_aging
+    name: glutathione_aging
+    display_name: Glutathione (Reduced)
+    function: general_support
+    category: antioxidant
+    strength_levels:
+    - 250-500mg
+  - id: nac_aging
+    name: nac_aging
+    display_name: N-Acetyl Cysteine (NAC)
+    function: general_support
+    category: antioxidant
+    strength_levels:
+    - 600-1200mg
+  - id: curcumin_aging
+    name: curcumin_aging
+    display_name: Curcumin (Turmeric Extract)
+    function: general_support
+    category: polyphenol
+    strength_levels:
+    - 500-1000mg
+  - id: quercetin
+    name: quercetin
+    display_name: Quercetin
+    function: general_support
+    category: flavonoid
+    strength_levels:
+    - 500-1000mg
+  - id: egcg
+    name: egcg
+    display_name: EGCG (Green Tea Extract)
+    function: general_support
+    category: polyphenol
+    strength_levels:
+    - 300-800mg
+  - id: astaxanthin
+    name: astaxanthin
+    display_name: Astaxanthin
+    function: general_support
+    category: carotenoid
+    strength_levels:
+    - 4-12mg
+  - id: collagen_aging
+    name: collagen_aging
+    display_name: Collagen Peptides (Type I, III)
+    function: general_support
+    category: protein
+    strength_levels:
+    - 10-20g
+  - id: hyaluronic_acid_aging
+    name: hyaluronic_acid_aging
+    display_name: Hyaluronic Acid
+    function: general_support
+    category: glycosaminoglycan
+    strength_levels:
+    - 100-200mg
+  - id: vitamin_c_aging
+    name: vitamin_c_aging
+    display_name: Vitamin C (Ascorbic Acid)
+    function: general_support
+    category: vitamin
+    strength_levels:
+    - 1000-2000mg
+  - id: vitamin_e_aging
+    name: vitamin_e_aging
+    display_name: Vitamin E (Mixed Tocopherols)
+    function: general_support
+    category: vitamin
+    strength_levels:
+    - mixed tocopherols
+    - tocotrienols
+  - id: vitamin_d_aging
+    name: vitamin_d_aging
+    display_name: Vitamin D3
+    function: general_support
+    category: vitamin
+    strength_levels:
+    - cholecalciferol
+  - id: vitamin_k2_aging
+    name: vitamin_k2_aging
+    display_name: Vitamin K2 (MK-7)
+    function: general_support
+    category: vitamin
+    strength_levels:
+    - 100-200mcg
+  - id: b_vitamins_aging
+    name: b_vitamins_aging
+    display_name: B-Complex (Methylated)
+    function: general_support
+    category: vitamin
+    strength_levels:
+    - 1000mcg
+    - 400mcg
+    - 50mg
+  - id: omega3_aging
+    name: omega3_aging
+    display_name: Omega-3 (EPA/DHA)
+    function: general_support
+    category: omega
+    strength_levels:
+    - 2000-3000mg
+  - id: magnesium_aging
+    name: magnesium_aging
+    display_name: Magnesium (Glycinate/Threonate)
+    function: general_support
+    category: mineral
+    strength_levels:
+    - 300-400mg
+  - id: zinc_aging
+    name: zinc_aging
+    display_name: Zinc
+    function: general_support
+    category: mineral
+    strength_levels:
+    - 15-30mg
+  - id: selenium_aging
+    name: selenium_aging
+    display_name: Selenium
+    function: general_support
+    category: mineral
+    strength_levels:
+    - 100-200mcg
+  - id: fisetin
+    name: fisetin
+    display_name: Fisetin
+    function: general_support
+    category: flavonoid
+    strength_levels:
+    - 100-500mg
+  - id: spermidine
+    name: spermidine
+    display_name: Spermidine
+    function: general_support
+    category: polyamine
+    strength_levels:
+    - 1-5mg
+  - id: ashwagandha_aging
+    name: ashwagandha_aging
+    display_name: Ashwagandha
+    function: general_support
+    category: adaptogen
+    strength_levels:
+    - 300-600mg
+  - id: rhodiola
+    name: rhodiola
+    display_name: Rhodiola Rosea
+    function: general_support
+    category: adaptogen
+    strength_levels:
+    - 200-600mg
+  constraints:
+  - id: blood_thinner_interaction_aging
+    type: interaction
+    value: blood thinner interaction aging
+    severity: high
+  - id: chemotherapy_interaction
+    type: interaction
+    value: chemotherapy interaction
+    severity: critical
+  - id: autoimmune_caution
+    type: contraindication
+    value: autoimmune caution
+    severity: moderate
+  questions: []
+  products: []
+  domains: []
+  subdomains: []
+edges:
+- source: nmn
+  target: cellular_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.85
+    mechanism: Boosts NAD+ levels, activating sirtuins and enhancing cellular repair
+    evidence_level: clinical_trial
+    onset: 4-8 weeks
+- source: nmn
+  target: mitochondrial_dysfunction
+  relation: TREATS
+  properties:
+    efficacy: 0.8
+    mechanism: Restores NAD+ for mitochondrial energy production and function
+    evidence_level: clinical_trial
+    onset: 4-12 weeks
+- source: nmn
+  target: metabolic_decline_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Improves insulin sensitivity and metabolic function
+    evidence_level: clinical_trial
+    onset: 8-12 weeks
+- source: nr
+  target: cellular_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.8
+    mechanism: Increases NAD+ levels, supporting cellular repair and longevity
+    evidence_level: clinical_trial
+    onset: 4-8 weeks
+- source: nr
+  target: mitochondrial_dysfunction
+  relation: TREATS
+  properties:
+    efficacy: 0.8
+    mechanism: Enhances mitochondrial biogenesis and ATP production
+    evidence_level: clinical_trial
+    onset: 4-8 weeks
+- source: resveratrol
+  target: cellular_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Activates sirtuins (longevity genes), mimics caloric restriction
+    evidence_level: meta_analysis
+    onset: 8-12 weeks
+- source: resveratrol
+  target: chronic_inflammation_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Reduces NF-kB inflammatory pathways
+    evidence_level: clinical_trial
+    onset: 4-8 weeks
+- source: resveratrol
+  target: oxidative_stress_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.8
+    mechanism: Powerful antioxidant, neutralizes free radicals
+    evidence_level: meta_analysis
+    onset: 4-8 weeks
+- source: coq10_aging
+  target: mitochondrial_dysfunction
+  relation: TREATS
+  properties:
+    efficacy: 0.85
+    mechanism: Essential for electron transport chain and ATP production
+    evidence_level: meta_analysis
+    onset: 4-8 weeks
+- source: coq10_aging
+  target: oxidative_stress_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.8
+    mechanism: Powerful lipid-soluble antioxidant protecting cell membranes
+    evidence_level: clinical_trial
+    onset: 4-8 weeks
+- source: coq10_aging
+  target: cognitive_decline_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Protects brain cells from oxidative damage
+    evidence_level: clinical_trial
+    onset: 8-12 weeks
+- source: pqq
+  target: mitochondrial_dysfunction
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Stimulates mitochondrial biogenesis (creation of new mitochondria)
+    evidence_level: clinical_trial
+    onset: 8-12 weeks
+- source: pqq
+  target: cognitive_decline_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Protects neurons and enhances cognitive function
+    evidence_level: clinical_trial
+    onset: 8-12 weeks
+- source: glutathione_aging
+  target: oxidative_stress_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.9
+    mechanism: Master antioxidant, neutralizes free radicals and regenerates other antioxidants
+    evidence_level: meta_analysis
+    onset: 2-4 weeks
+- source: glutathione_aging
+  target: cellular_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.8
+    mechanism: Protects cells from oxidative damage and supports detoxification
+    evidence_level: clinical_trial
+    onset: 4-8 weeks
+- source: nac_aging
+  target: oxidative_stress_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.8
+    mechanism: Precursor to glutathione, boosts cellular antioxidant capacity
+    evidence_level: meta_analysis
+    onset: 2-4 weeks
+- source: curcumin_aging
+  target: chronic_inflammation_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.85
+    mechanism: Powerful anti-inflammatory, inhibits NF-kB and COX-2
+    evidence_level: meta_analysis
+    onset: 4-8 weeks
+- source: curcumin_aging
+  target: oxidative_stress_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.8
+    mechanism: Antioxidant properties, upregulates Nrf2 pathway
+    evidence_level: clinical_trial
+    onset: 4-8 weeks
+- source: curcumin_aging
+  target: cognitive_decline_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Crosses blood-brain barrier, protects against neurodegeneration
+    evidence_level: clinical_trial
+    onset: 8-12 weeks
+- source: quercetin
+  target: cellular_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Senolytic properties, helps clear senescent cells
+    evidence_level: preclinical
+    onset: 4-12 weeks
+- source: quercetin
+  target: chronic_inflammation_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Anti-inflammatory flavonoid, reduces inflammatory markers
+    evidence_level: clinical_trial
+    onset: 4-8 weeks
+- source: fisetin
+  target: cellular_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Powerful senolytic, clears senescent zombie cells
+    evidence_level: preclinical
+    onset: intermittent dosing
+- source: fisetin
+  target: cognitive_decline_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Neuroprotective, reduces neuroinflammation
+    evidence_level: preclinical
+    onset: 4-12 weeks
+- source: collagen_aging
+  target: skin_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.85
+    mechanism: Increases skin elasticity, hydration, and reduces wrinkles
+    evidence_level: meta_analysis
+    onset: 8-12 weeks
+- source: collagen_aging
+  target: sarcopenia
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: Supports muscle protein synthesis and connective tissue
+    evidence_level: clinical_trial
+    onset: 12-24 weeks
+- source: omega3_aging
+  target: chronic_inflammation_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.8
+    mechanism: EPA/DHA reduce inflammatory cytokines and prostaglandins
+    evidence_level: meta_analysis
+    onset: 4-8 weeks
+- source: omega3_aging
+  target: cognitive_decline_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: DHA essential for brain structure, reduces neuroinflammation
+    evidence_level: meta_analysis
+    onset: 8-12 weeks
+- source: omega3_aging
+  target: telomere_shortening
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: Reduces oxidative stress, may slow telomere shortening
+    evidence_level: observational
+    onset: 3-6 months
+- source: vitamin_c_aging
+  target: oxidative_stress_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.8
+    mechanism: Water-soluble antioxidant, regenerates vitamin E
+    evidence_level: meta_analysis
+    onset: 2-4 weeks
+- source: vitamin_c_aging
+  target: skin_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Essential for collagen synthesis and skin health
+    evidence_level: clinical_trial
+    onset: 8-12 weeks
+- source: vitamin_d_aging
+  target: cellular_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Regulates gene expression, supports immune function and longevity
+    evidence_level: meta_analysis
+    onset: 8-12 weeks
+- source: vitamin_d_aging
+  target: sarcopenia
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Essential for muscle function and preventing age-related muscle loss
+    evidence_level: meta_analysis
+    onset: 12-24 weeks
+- source: b_vitamins_aging
+  target: cognitive_decline_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: B12, B6, folate reduce homocysteine, protect brain
+    evidence_level: meta_analysis
+    onset: 12-24 months
+- source: b_vitamins_aging
+  target: mitochondrial_dysfunction
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: B vitamins essential for mitochondrial energy production
+    evidence_level: clinical_trial
+    onset: 4-8 weeks
+- source: magnesium_aging
+  target: metabolic_decline_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Improves insulin sensitivity and glucose metabolism
+    evidence_level: meta_analysis
+    onset: 8-12 weeks
+- source: magnesium_aging
+  target: telomere_shortening
+  relation: TREATS
+  properties:
+    efficacy: 0.65
+    mechanism: Essential for DNA repair and telomere maintenance
+    evidence_level: observational
+    onset: long-term
+- source: zinc_aging
+  target: cellular_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Essential for DNA repair, immune function, and cellular health
+    evidence_level: clinical_trial
+    onset: 8-12 weeks
+- source: astaxanthin
+  target: oxidative_stress_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.85
+    mechanism: Most powerful carotenoid antioxidant, crosses blood-brain barrier
+    evidence_level: clinical_trial
+    onset: 4-8 weeks
+- source: astaxanthin
+  target: skin_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Protects skin from UV damage, improves elasticity
+    evidence_level: clinical_trial
+    onset: 8-12 weeks
+- source: ashwagandha_aging
+  target: cellular_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Reduces cortisol and oxidative stress, supports cellular health
+    evidence_level: clinical_trial
+    onset: 8-12 weeks
+- source: ashwagandha_aging
+  target: sarcopenia
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Supports muscle mass and strength, reduces age-related muscle loss
+    evidence_level: clinical_trial
+    onset: 8-12 weeks
+- source: spermidine
+  target: cellular_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Induces autophagy, cellular cleanup and renewal
+    evidence_level: clinical_trial
+    onset: 12-24 weeks
+- source: spermidine
+  target: cognitive_decline_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.7
+    mechanism: Neuroprotective, enhances cognitive function
+    evidence_level: observational
+    onset: 12-24 weeks
+- source: ala
+  target: mitochondrial_dysfunction
+  relation: TREATS
+  properties:
+    efficacy: 0.75
+    mechanism: Supports mitochondrial energy production and antioxidant recycling
+    evidence_level: clinical_trial
+    onset: 4-8 weeks
+- source: ala
+  target: oxidative_stress_aging
+  relation: TREATS
+  properties:
+    efficacy: 0.8
+    mechanism: Universal antioxidant, works in water and fat
+    evidence_level: clinical_trial
+    onset: 4-8 weeks
+- source: sarcopenia
+  target: age_longevity
+  relation: REQUIRES_KNOWING
+  properties:
+    reason: Muscle loss primarily affects those 50+
+- source: cognitive_decline_aging
+  target: primary_aging_concern
+  relation: REQUIRES_KNOWING
+  properties:
+    reason: Treatment varies based on primary concern
+- source: cellular_aging
+  target: health_optimization_level
+  relation: REQUIRES_KNOWING
+  properties:
+    reason: Dosing and approach varies by optimization level
+- source: nmn
+  target: resveratrol
+  relation: SYNERGISTIC_WITH
+  properties:
+    mechanism: NMN provides NAD+ substrate, resveratrol activates sirtuins that use NAD+
+- source: coq10_aging
+  target: pqq
+  relation: SYNERGISTIC_WITH
+  properties:
+    mechanism: CoQ10 optimizes existing mitochondria, PQQ creates new ones
+- source: glutathione_aging
+  target: nac_aging
+  relation: SYNERGISTIC_WITH
+  properties:
+    mechanism: NAC replenishes glutathione stores
+- source: quercetin
+  target: fisetin
+  relation: SYNERGISTIC_WITH
+  properties:
+    mechanism: Complementary senolytic effects
+- source: vitamin_c_aging
+  target: vitamin_e_aging
+  relation: SYNERGISTIC_WITH
+  properties:
+    mechanism: Vitamin C regenerates vitamin E
+- source: vitamin_d_aging
+  target: vitamin_k2_aging
+  relation: SYNERGISTIC_WITH
+  properties:
+    mechanism: Work together for bone health and calcium metabolism
+- source: resveratrol
+  target: blood_thinner_interaction_aging
+  relation: CONTRAINDICATED_FOR
+  properties:
+    severity: moderate
+- source: curcumin_aging
+  target: blood_thinner_interaction_aging
+  relation: CONTRAINDICATED_FOR
+  properties:
+    severity: moderate
+- source: glutathione_aging
+  target: chemotherapy_interaction
+  relation: CONTRAINDICATED_FOR
+  properties:
+    severity: high
+- source: nac_aging
+  target: chemotherapy_interaction
+  relation: CONTRAINDICATED_FOR
+  properties:
+    severity: high

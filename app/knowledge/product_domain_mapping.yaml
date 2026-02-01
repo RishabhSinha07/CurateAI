@@ -46,40 +46,48 @@ MARVELPROBIOTIC:  # Marvel Active Probiotic
 #   - gut_health_digestion  # Collagen peptides repair intestinal lining
 
 # =============================================================================
-# FIBER - Primary: Gut Health
+# FIBER - Multi-domain: Gut Health + Weight Management
 # =============================================================================
 FBRPC:  # Daily Fiber | Pina Colada
   - gut_health_digestion
+  - weight_management_metabolism  # Fiber promotes satiety and appetite control
 
 FBRCOMBO:  # Daily Fiber | Two Flavour Combo
   - gut_health_digestion
+  - weight_management_metabolism  # Fiber promotes satiety and appetite control
 
 FBRVB:  # Daily Fiber | Vanilla Berry
   - gut_health_digestion
+  - weight_management_metabolism  # Fiber promotes satiety and appetite control
 
 # =============================================================================
-# DIGESTIVE SUPPORT - Primary: Gut Health
+# DIGESTIVE SUPPORT - Multi-domain: Gut Health + Weight (Green Tea)
 # =============================================================================
 WNTEADIGEST:  # Digest Adaptogenic Green Tea
   - gut_health_digestion
+  - weight_management_metabolism  # Green tea EGCG for metabolism and digestion
 
 WBN-01-2:  # Daily Greens
   - gut_health_digestion
+  - weight_management_metabolism  # Nutrient-dense greens support metabolism and detox
 
 WBNMLTACD:  # Acidity Relief
   - gut_health_digestion
 
 # =============================================================================
-# APPLE CIDER VINEGAR - Primary: Gut Health, Secondary: Weight Management
+# APPLE CIDER VINEGAR - Multi-domain: Gut Health + Weight Management
 # =============================================================================
 WBNACV-1:  # Apple Cider Vinegar
   - gut_health_digestion
+  - weight_management_metabolism  # Acetic acid improves insulin sensitivity and satiety
 
 WBNACVFL:  # Apple Cider Vinegar with Amla And Turmeric
   - gut_health_digestion
+  - weight_management_metabolism  # ACV for metabolism + Turmeric anti-inflammatory
 
 ACVEFF-02:  # Apple Cider Vinegar with Garcinia Cambogia and Pomegranate
   - gut_health_digestion
+  - weight_management_metabolism  # ACV + Garcinia (HCA) for appetite suppression and fat loss
 
 # =============================================================================
 # OMEGA-3 - Primary: Heart/Brain Health, Secondary: Skin, Joints
@@ -137,6 +145,482 @@ ACVEFF-02:  # Apple Cider Vinegar with Garcinia Cambogia and Pomegranate
 #   - skin_health_radiance  # Collagen synthesis, skin repair
 #   - hair_health_growth  # Protein synthesis
 #   - gut_health_digestion  # Gut barrier integrity
+
+# =============================================================================
+# IMMUNITY & RECOVERY - Primary: Immunity
+# =============================================================================
+MARVELIMMUNITY:  # Marvel Advanced Immunity
+  - immunity_recovery
+
+WBNMD3:  # Natural Vitamin D3
+  - immunity_recovery
+  - joint_bone_mobility
+  - hormonal_balance
+  - sexual_wellness_vitality
+  - healthy_aging_longevity  # Regulates longevity genes, prevents sarcopenia, supports cellular health
+
+WBNVITC-02:  # Organic Vitamin C + Zinc
+  - immunity_recovery
+  - skin_health_radiance
+  - hormonal_balance
+  - sexual_wellness_vitality
+  - healthy_aging_longevity  # Vitamin C for collagen synthesis and antioxidant protection, Zinc for cellular health
+
+FROZENB12:  # Disney Frozen Natural B12 + D3
+  - immunity_recovery
+  - energy_stamina_performance
+  - brain_focus_memory  # B12 critical for myelin production and nerve function
+
+MARVELB12:  # Marvel Natural B12+ D3
+  - immunity_recovery
+  - energy_stamina_performance
+  - brain_focus_memory  # B12 critical for myelin production and nerve function
+
+WBNMB12:  # Vitamin B12
+  - immunity_recovery
+  - energy_stamina_performance
+  - brain_focus_memory  # B12 critical for myelin production and nerve function
+
+WBNMLTASH:  # Pure Ashwagandha
+  - immunity_recovery
+  - energy_stamina_performance
+  - muscle_strength_recovery
+  - sleep_stress_mental_calm
+  - hormonal_balance
+  - sexual_wellness_vitality
+  - healthy_aging_longevity  # Reduces cellular aging, prevents sarcopenia, lowers cortisol and oxidative stress
+  # Note: Powerful adaptogen supporting immunity, energy, strength, stress, sleep, hormones, sexual health, and longevity (7 domains!)
+
+FROZENMULTI:  # Disney Frozen Multivitamins
+  - immunity_recovery
+
+MARVELMULTI:  # Marvel Multivitamins
+  - immunity_recovery
+
+WNMMULTI:  # Multivitamins (Melts)
+  - immunity_recovery
+
+SLNUMULHER:  # Multi + Omega for Her
+  - immunity_recovery
+  - energy_stamina_performance
+  - muscle_strength_recovery
+  - brain_focus_memory
+  - joint_bone_mobility
+  - hormonal_balance
+  - sexual_wellness_vitality
+  - healthy_aging_longevity  # Comprehensive vitamins, minerals, and Omega-3 for graceful aging
+  # Note: Supports immune health, energy, muscle recovery, brain function, bone/joint health, hormones, sexual wellness, and longevity
+
+SLNUMULHIM:  # Multi + Omega for Him
+  - immunity_recovery
+  - energy_stamina_performance
+  - muscle_strength_recovery
+  - brain_focus_memory
+  - joint_bone_mobility
+  - hormonal_balance
+  - sexual_wellness_vitality
+  - healthy_aging_longevity  # Full-spectrum support for male vitality and healthy aging
+  # Note: Comprehensive support for immune health, energy, muscle recovery, brain function, bone/joint health, hormones, sexual performance, and longevity
+
+SNMULUNI50:  # Multi + Omega 50+
+  - immunity_recovery
+  - energy_stamina_performance
+  - muscle_strength_recovery
+  - brain_focus_memory
+  - joint_bone_mobility
+  - hormonal_balance
+  - sexual_wellness_vitality
+  - healthy_aging_longevity  # Age-appropriate formula for cellular health, longevity, and vitality
+  # Note: Essential for maintaining muscle mass, energy, immunity, cognitive function, bone/joint health, hormones, sexual vitality, and longevity with age
+
+SLNUBC:  # Bioactive B Complex with Vitamin C
+  - immunity_recovery
+  - energy_stamina_performance
+  - muscle_strength_recovery
+  - brain_focus_memory
+  - hormonal_balance
+  - sexual_wellness_vitality
+  - healthy_aging_longevity  # B vitamins reduce homocysteine, support DNA repair, prevent cognitive decline
+  # Note: B vitamins critical for immune cells, ATP, protein metabolism, brain function, hormone production, sexual vitality, and longevity
+
+# Note: Omega-3 products serve NINE domains! (9-domain products!)
+# - Immunity: Anti-inflammatory, immune modulation
+# - Energy: Enhances recovery, reduces fatigue
+# - Muscle: Reduces DOMS, accelerates muscle repair
+# - Weight: Reduces inflammation, improves insulin sensitivity
+# - Brain: DHA for brain structure, EPA for brain inflammation reduction
+# - Joint/Bone: EPA reduces joint inflammation, supports bone density
+# - Hormonal: Reduces PMS symptoms, improves PCOS, supports fertility
+# - Sexual: DHA for sperm quality, improves circulation and erectile function
+# - Longevity: Reduces inflammaging, protects telomeres, prevents cognitive decline
+SLNUOMG3X-1:  # 3x Strength Omega 3
+  - immunity_recovery
+  - energy_stamina_performance
+  - muscle_strength_recovery
+  - weight_management_metabolism
+  - brain_focus_memory
+  - joint_bone_mobility
+  - hormonal_balance
+  - sexual_wellness_vitality
+  - healthy_aging_longevity  # EPA/DHA reduce inflammaging, protect brain, slow telomere shortening
+
+SLNUOMG4X:  # 4x Strength Omega 3
+  - immunity_recovery
+  - energy_stamina_performance
+  - muscle_strength_recovery
+  - weight_management_metabolism
+  - brain_focus_memory
+  - joint_bone_mobility
+  - hormonal_balance
+  - sexual_wellness_vitality
+  - healthy_aging_longevity  # EPA/DHA reduce inflammaging, protect brain, slow telomere shortening
+
+SLNUOMG6X-1:  # 6x Strength Omega 3
+  - immunity_recovery
+  - energy_stamina_performance
+  - muscle_strength_recovery
+  - weight_management_metabolism
+  - brain_focus_memory
+  - joint_bone_mobility
+  - hormonal_balance
+  - sexual_wellness_vitality
+  - healthy_aging_longevity  # High-dose EPA/DHA for comprehensive anti-aging and longevity support
+
+# =============================================================================
+# ENERGY, STAMINA & PERFORMANCE - Primary: Energy/Performance
+# =============================================================================
+
+# PROTEIN SUPPLEMENTS - Multi-domain: Energy + Muscle
+# Note: Proteins serve both energy (ATP, stamina) AND muscle (protein synthesis, recovery)
+WPIBV-1:  # Whey Protein Isolate Bourbon Vanilla 26g
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Fast-absorbing for muscle protein synthesis
+
+WPIDC-1:  # Whey Protein Isolate Dark Chocolate 26g
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Fast-absorbing for muscle protein synthesis
+
+WPIU-1:  # Whey Protein Isolate Unflavoured 31g
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Fast-absorbing for muscle protein synthesis
+
+NWPIDC2-1:  # Whey Protein Isolate 26g 2kg Dark Chocolate
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Fast-absorbing for muscle protein synthesis
+
+NWPIU2-1:  # Whey Protein Isolate 31g 2kg Unflavoured
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Fast-absorbing for muscle protein synthesis
+
+WPBC-1:  # Whey Protein Isolate + Concentrate Cappuccino 24g
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Balanced protein for muscle building
+
+WPBM-1:  # Whey Protein Isolate + Concentrate Mango 24g
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Balanced protein for muscle building
+
+WPBSC-1:  # Whey Protein Isolate + Concentrate Swiss Chocolate 24g
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Balanced protein for muscle building
+
+WPCU-1:  # Whey Protein Concentrate Unflavoured 27g
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Cost-effective muscle protein
+
+# WHEY + CREATINE COMBO PRODUCTS - Perfect for muscle + strength
+WPBCCMU:  # Whey Protein + Concentrate Cappuccino & Creatine
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Protein + creatine for muscle and strength
+
+WPBSCCMU:  # Whey Protein + Concentrate Swiss Chocolate & Creatine
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Protein + creatine for muscle and strength
+
+WPCUCMU:  # Whey Protein Concentrate Unflavoured & Creatine
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Protein + creatine for muscle and strength
+
+WPIDCCMU:  # Whey Protein Isolate Dark Chocolate & Creatine
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Protein + creatine for muscle and strength
+
+WPIUCMU:  # Whey Protein Isolate Unflavoured & Creatine
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Protein + creatine for muscle and strength
+
+# WHEY PROTEIN SACHETS
+WPIBVP6-1:  # Whey Protein Isolate Bourbon Vanilla Sachets
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Convenient on-the-go muscle protein
+
+WPBMP6-1:  # Whey Protein Isolate + Concentrate Mango Sachets
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Convenient on-the-go muscle protein
+
+WPVPP6-1:  # Whey Protein Variety Pack Sachets
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Convenient on-the-go muscle protein
+
+# VEGAN/PLANT PROTEIN - For plant-based muscle building
+PLPRODCH-1:  # Vegan Protein 22g Dark Chocolate Hazelnut 500g
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Plant protein for vegan muscle building
+
+PLPROFV-1:  # Vegan Protein 22g French Vanilla Caramel 500g
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Plant protein for vegan muscle building
+
+PLPROFV1-1:  # Vegan Protein 22g French Vanilla Caramel 907g
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Plant protein for vegan muscle building
+
+PLPROHER-1:  # Vegan Protein 22g Belgian Dark Chocolate 500g
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Plant protein for vegan muscle building
+
+PLPROHER1-1:  # Vegan Protein 22g Belgian Dark Chocolate 907g
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Plant protein for vegan muscle building
+
+PLPROIC-1:  # Vegan Protein 22g Italian Café Mocha 500g
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Plant protein for vegan muscle building
+
+PLPROCMB-1:  # Vegan Protein 22g Canadian Mixed Berry 500g
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Plant protein for vegan muscle building
+
+HERPRO:  # Her Superfood Plant Protein Chocolate Peanut Butter
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Plant protein for female athletes
+
+PROBPIE1:  # Superfood Plant Protein British Banoffee Pie
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Plant protein for muscle building
+
+VPROCHOCOVAN:  # Vegan Protein Flavour Combo
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Plant protein variety pack
+
+# VEGAN COLLAGEN - Connective tissue support
+COLLEMLIMVEG-1:  # Vegan Pro Collagen Lemon Lime
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Plant-based collagen precursors for tissue repair
+  # Note: Supports connective tissue repair and recovery
+
+COLMIXBERVEG-1:  # Vegan Pro Collagen Mixed Berries
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Plant-based collagen precursors for tissue repair
+  # Note: Supports connective tissue repair and recovery
+
+# CREATINE - Strength and muscle mass
+CMU-1:  # Creatine Monohydrate 100g
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Increases strength, power, and muscle mass
+
+CMHU-1:  # Creatine Monohydrate + HCL 100g with Taurine
+  - energy_stamina_performance
+  - muscle_strength_recovery  # Enhanced absorption for strength gains
+
+# MAGNESIUM - Multi-domain: Energy + Muscle + Sleep + Joint/Bone + Hormonal + Sexual + Longevity
+SLNUMG:  # Triple Magnesium Complex
+  - energy_stamina_performance
+  - muscle_strength_recovery
+  - sleep_stress_mental_calm
+  - joint_bone_mobility
+  - hormonal_balance
+  - sexual_wellness_vitality
+  - healthy_aging_longevity  # Essential for DNA repair, telomere maintenance, metabolic health
+  # Note: Magnesium supports ATP, muscle function, recovery, GABA activation, bone health, hormones, sexual vitality, and longevity
+
+SLNUMGPLUS:  # Ultra Strength Magnesium+
+  - energy_stamina_performance
+  - muscle_strength_recovery
+  - sleep_stress_mental_calm
+  - joint_bone_mobility
+  - hormonal_balance
+  - sexual_wellness_vitality
+  - healthy_aging_longevity  # Higher dose for cellular health and age-related metabolic support
+  # Note: Comprehensive support for performance, recovery, relaxation, bone/joint health, hormones, sexual vitality, and longevity
+
+# IRON - Oxygen transport and energy
+WBNMNIRON:  # Vital Iron
+  - energy_stamina_performance
+  # Note: Prevents fatigue from iron deficiency, supports oxygen delivery
+
+# INSTANT ENERGY - Quick energy boost
+WBNMENR-1:  # Instant Energy Melts
+  - energy_stamina_performance
+
+# TRACE MINERALS - Electrolytes and performance
+WBNTMD:  # Trace Mineral Drops (70+ Ionic Minerals)
+  - energy_stamina_performance
+  # Note: Supports hydration, electrolyte balance, and exercise performance
+
+# =============================================================================
+# MULTI-DOMAIN UPDATES - Add Energy as Secondary Domain
+# =============================================================================
+
+# Update B12 products to include energy domain (B12 fights fatigue)
+# Updated inline above in immunity section
+
+# Update Omega-3 products to include energy domain (supports recovery)
+# Updated inline above in immunity section
+
+# Update Multi+Omega products to include energy domain
+# Updated inline above in immunity section
+
+# Update Disney/Marvel Omega products for kids' energy and brain development
+FROZENOMEGA:  # Disney Frozen Omega
+  - energy_stamina_performance
+  - brain_focus_memory  # Omega-3 DHA for children's brain development and focus
+
+MARVELOMEGA:  # Marvel Mighty Omega
+  - energy_stamina_performance
+  - brain_focus_memory  # Omega-3 DHA for children's brain development and focus
+
+# =============================================================================
+# MUSCLE, STRENGTH & RECOVERY - Primary: Muscle Building
+# =============================================================================
+
+# MARINE COLLAGEN - Multi-domain: Muscle + Joint/Bone + Healthy Aging
+WBNCL:  # Pure Korean Marine Collagen Peptides Unflavored
+  - muscle_strength_recovery
+  - joint_bone_mobility
+  - healthy_aging_longevity  # Reduces wrinkles, improves skin elasticity and hydration
+
+WBNCLBTY-1:  # Beauty Korean Marine Collagen Peptides Mango Peach
+  - muscle_strength_recovery
+  - joint_bone_mobility
+  - healthy_aging_longevity  # Anti-aging for skin, reduces wrinkles and fine lines
+
+WBNCLGLW-1:  # Glow Korean Marine Collagen Peptides
+  - muscle_strength_recovery
+  - joint_bone_mobility
+  - healthy_aging_longevity  # Anti-aging for skin, improves elasticity
+
+GLOWVALENCIA-1:  # Glow Korean Marine Collagen with Glutathione & Vitamin C
+  - muscle_strength_recovery
+  - joint_bone_mobility
+  - healthy_aging_longevity  # Collagen + Glutathione + Vitamin C for comprehensive anti-aging
+
+COLVALORA-1:  # Marine Collagen Valencia Orange
+  - muscle_strength_recovery
+  - joint_bone_mobility
+  - healthy_aging_longevity  # Supports skin aging and cellular health
+
+COLMIXBER-1:  # Korean Marine Collagen Blueberry Mint
+  - muscle_strength_recovery
+  - joint_bone_mobility
+  - healthy_aging_longevity  # Anti-aging for skin and overall vitality
+
+BEAUTYMELON-1:  # Beauty Collagen Strawberry Watermelon
+  - muscle_strength_recovery
+  - joint_bone_mobility
+  - healthy_aging_longevity  # Reduces skin aging and improves appearance
+
+MATCLG:  # Matcha Collagen
+  - muscle_strength_recovery
+  - joint_bone_mobility
+  - healthy_aging_longevity  # Collagen + antioxidants for anti-aging
+
+# =============================================================================
+# WEIGHT MANAGEMENT & METABOLISM - Primary: Weight Loss
+# =============================================================================
+
+# GREEN TEA - Metabolism and thermogenesis
+WNTEASLIM:  # Slim Adaptogenic Green Tea
+  - weight_management_metabolism
+  # Note: Green tea EGCG for fat burning and metabolism boost
+
+# COFFEE - Thermogenesis and appetite suppression
+SLMESP2:  # Coffee Melts Slim Espresso
+  - weight_management_metabolism
+  # Note: Caffeine for thermogenesis and appetite control
+
+# LIVER DETOX - Metabolic support
+SLNULIV:  # Liver Detox Slow
+  - weight_management_metabolism
+  # Note: Liver health critical for metabolism and fat burning
+
+# =============================================================================
+# SLEEP, STRESS & MENTAL CALM - Primary: Sleep & Stress
+# =============================================================================
+
+# SLEEP PRODUCTS - Melatonin and sleep support
+WBNMSLP-1:  # Restful Sleep Melts 10mg
+  - sleep_stress_mental_calm
+  # Note: Melatonin for sleep onset and circadian regulation
+
+WBNMSLP5-1:  # Restful Sleep 5mg
+  - sleep_stress_mental_calm
+  # Note: Lower dose melatonin for gentle sleep support
+
+# CALM & RELAXATION - Stress and anxiety support
+WNMCALM:  # Calm & Relaxation
+  - sleep_stress_mental_calm
+  # Note: Calming botanicals for stress and anxiety reduction
+
+# ADAPTOGENIC TEA - Sleep support
+WNTEASLEEP:  # Sleep Adaptogenic Herbal Tea
+  - sleep_stress_mental_calm
+  # Note: Herbal blend for relaxation and sleep
+
+# =============================================================================
+# HORMONAL BALANCE - Primary: Hormone Regulation
+# =============================================================================
+
+# PCOS SUPPORT - Inositol and hormone balance
+SLNUPCOS:  # PCOS Balance Slow
+  - hormonal_balance
+  # Note: Targeted support for PCOS with inositol and other key nutrients
+
+# =============================================================================
+# SEXUAL WELLNESS & VITALITY - Primary: Libido, Performance, Fertility
+# =============================================================================
+
+# SHILAJIT - Testosterone, vitality, fertility
+SHILAJIT:  # Shilajit Resin
+  - sexual_wellness_vitality
+  # Note: Increases testosterone, improves sperm quality, enhances energy and stamina
+
+SHILAJIT10:  # Shilajit Resin 10gm
+  - sexual_wellness_vitality
+  # Note: Increases testosterone, improves sperm quality, enhances energy and stamina
+
+SHILAJITGOLD:  # Shilajit Gold
+  - sexual_wellness_vitality
+  # Note: Premium shilajit for testosterone, vitality, and male fertility
+
+SHILAJITGOLD10:  # Shilajit Gold 10gm
+  - sexual_wellness_vitality
+  # Note: Premium shilajit for testosterone, vitality, and male fertility
+
+# =============================================================================
+# HEALTHY AGING & LONGEVITY - Primary: Anti-aging, Cellular Health
+# =============================================================================
+
+# GLUTATHIONE - Master antioxidant for aging
+SFPRO:  # Glutathione Skin Fuel Pro+ Strawberry
+  - skin_health_radiance
+  - healthy_aging_longevity  # Master antioxidant for cellular health and oxidative stress
+
+SFPROVC:  # Glutathione Skin Fuel Pro+ Valencia Orange
+  - skin_health_radiance
+  - healthy_aging_longevity  # Master antioxidant for cellular health and oxidative stress
+
+WBNSF-2:  # Glutathione Skin Fuel Tablets
+  - skin_health_radiance
+  - healthy_aging_longevity  # Master antioxidant for cellular health and oxidative stress
+
+# =============================================================================
+# MULTI-DOMAIN UPDATES - Add Healthy Aging to Existing Products
+# =============================================================================
+
+# Update Omega-3 to add weight management (4-domain products!)
+# Omega-3: Immunity + Energy + Muscle + Weight
+# (Update inline in immunity section above)
 
 # =============================================================================
 # NOTES FOR DOMAIN ASSIGNMENT

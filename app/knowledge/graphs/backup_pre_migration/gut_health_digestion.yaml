@@ -1,0 +1,1727 @@
+# Gut Health & Digestion Knowledge Graph
+#
+# This graph defines the domain knowledge for nutraceutical product recommendations
+# focused on digestive health, microbiome balance, and gastrointestinal wellness.
+#
+# UPDATING THIS GRAPH:
+# 1. Add new nodes under the appropriate section (problems, attributes, etc.)
+# 2. Ensure all IDs are unique and use snake_case
+# 3. Add edges to connect new nodes to existing ones
+# 4. Run validation: python -m app.knowledge.validate gut_health_digestion
+# 5. Reload graph in development: reload_graph('gut_health_digestion')
+
+metadata:
+  domain: gut_health_digestion
+  version: 1.0.0
+  created_at: "2026-01-31"
+  description: "Knowledge graph for gut health & digestion nutraceutical recommendations"
+  display_name: "Gut Health & Digestion"
+  persona: "You are a gut health and digestive wellness specialist who helps users find science-backed nutraceutical supplements for improving digestion, nutrient absorption, and microbiome balance. You focus on probiotics, prebiotics, digestive enzymes, fibre, and gut-supportive nutrients that promote digestive comfort and overall gastrointestinal health. You consider dietary habits, lifestyle factors, and specific digestive concerns to provide personalized recommendations."
+  is_active: true
+  parent_domain: null
+
+nodes:
+  # ============================================================================
+  # PROBLEMS - Consumer digestive health concerns and wellness goals
+  # ============================================================================
+  problems:
+    - id: bloating
+      name: "bloating"
+      display_name: "Bloating & Gas"
+      synonyms:
+        - "bloated"
+        - "gas"
+        - "flatulence"
+        - "abdominal distension"
+        - "stomach bloating"
+        - "feeling full"
+        - "gassy"
+      severity_levels: [mild, moderate, severe]
+      description: "Uncomfortable swelling and gas accumulation in the digestive tract"
+
+    - id: constipation
+      name: "constipation"
+      display_name: "Constipation"
+      synonyms:
+        - "irregular bowel movements"
+        - "hard stools"
+        - "difficulty passing stools"
+        - "infrequent bowel movements"
+        - "sluggish digestion"
+      severity_levels: [mild, moderate, severe]
+      description: "Difficulty or infrequency in passing stools"
+
+    - id: acidity
+      name: "acidity"
+      display_name: "Acidity & Heartburn"
+      synonyms:
+        - "acid reflux"
+        - "heartburn"
+        - "GERD"
+        - "burning sensation"
+        - "sour stomach"
+        - "indigestion"
+      severity_levels: [mild, moderate, severe]
+      description: "Excess stomach acid causing burning sensations and discomfort"
+
+    - id: poor_digestion
+      name: "poor_digestion"
+      display_name: "Poor Digestion"
+      synonyms:
+        - "weak digestion"
+        - "slow digestion"
+        - "digestive discomfort"
+        - "heavy feeling after meals"
+        - "food sitting in stomach"
+      severity_levels: [mild, moderate, severe]
+      description: "Inefficient breakdown and processing of food"
+
+    - id: diarrhea
+      name: "diarrhea"
+      display_name: "Diarrhea & Loose Stools"
+      synonyms:
+        - "loose stools"
+        - "watery stools"
+        - "frequent bowel movements"
+        - "loose motions"
+      severity_levels: [mild, moderate, severe]
+      description: "Frequent loose or watery bowel movements"
+
+    - id: ibs
+      name: "ibs"
+      display_name: "Irritable Bowel Syndrome (IBS)"
+      synonyms:
+        - "IBS"
+        - "irritable bowel"
+        - "spastic colon"
+        - "IBS symptoms"
+      severity_levels: [mild, moderate, severe]
+      description: "Chronic digestive disorder with alternating constipation and diarrhea"
+
+    - id: poor_absorption
+      name: "poor_absorption"
+      display_name: "Poor Nutrient Absorption"
+      synonyms:
+        - "malabsorption"
+        - "nutrient deficiency"
+        - "weak absorption"
+        - "digestive inefficiency"
+      severity_levels: [mild, moderate, severe]
+      description: "Inability to properly absorb nutrients from food"
+
+    - id: dysbiosis
+      name: "dysbiosis"
+      display_name: "Gut Dysbiosis & Microbiome Imbalance"
+      synonyms:
+        - "gut imbalance"
+        - "bacterial imbalance"
+        - "microbiome disruption"
+        - "unhealthy gut flora"
+        - "bad bacteria overgrowth"
+      severity_levels: [mild, moderate, severe]
+      description: "Imbalance in gut bacteria affecting overall digestive health"
+
+    - id: leaky_gut
+      name: "leaky_gut"
+      display_name: "Leaky Gut Syndrome"
+      synonyms:
+        - "intestinal permeability"
+        - "leaky intestines"
+        - "gut barrier dysfunction"
+      severity_levels: [mild, moderate, severe]
+      description: "Compromised intestinal barrier allowing toxins to enter bloodstream"
+
+  # ============================================================================
+  # ATTRIBUTES - User characteristics that influence recommendations
+  # ============================================================================
+  attributes:
+    # Age Group - Affects digestive enzyme production
+    - id: age_group_18_25
+      category: age_group
+      value: "18-25"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    - id: age_group_26_35
+      category: age_group
+      value: "26-35"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    - id: age_group_36_45
+      category: age_group
+      value: "36-45"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    - id: age_group_46_plus
+      category: age_group
+      value: "46+"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    # Dietary Preference - Critical for gut health recommendations
+    - id: diet_vegetarian
+      category: diet
+      value: vegetarian
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    - id: diet_vegan
+      category: diet
+      value: vegan
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    - id: diet_pescatarian
+      category: diet
+      value: pescatarian
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    - id: diet_non_veg
+      category: diet
+      value: non_vegetarian
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    # Gender - Influences digestive patterns
+    - id: gender_female
+      category: gender
+      value: female
+      data_type: single_choice
+      elicitation_priority: 3
+      is_global: true
+
+    - id: gender_male
+      category: gender
+      value: male
+      data_type: single_choice
+      elicitation_priority: 3
+      is_global: true
+
+    # Digestive Patterns
+    - id: bowel_frequency_regular
+      category: bowel_frequency
+      value: regular
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    - id: bowel_frequency_irregular
+      category: bowel_frequency
+      value: irregular
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    - id: bowel_frequency_infrequent
+      category: bowel_frequency
+      value: infrequent
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    # Dietary Habits
+    - id: fiber_intake_low
+      category: fiber_intake
+      value: low
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    - id: fiber_intake_moderate
+      category: fiber_intake
+      value: moderate
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    - id: fiber_intake_high
+      category: fiber_intake
+      value: high
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    - id: water_intake_low
+      category: water_intake
+      value: low
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    - id: water_intake_adequate
+      category: water_intake
+      value: adequate
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    - id: water_intake_high
+      category: water_intake
+      value: high
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    # Lifestyle Factors
+    - id: lifestyle_high_stress
+      category: lifestyle
+      value: high_stress
+      data_type: single_choice
+      elicitation_priority: 6
+      is_global: false
+
+    - id: lifestyle_moderate_stress
+      category: lifestyle
+      value: moderate_stress
+      data_type: single_choice
+      elicitation_priority: 6
+      is_global: false
+
+    - id: lifestyle_low_stress
+      category: lifestyle
+      value: low_stress
+      data_type: single_choice
+      elicitation_priority: 6
+      is_global: false
+
+    - id: exercise_sedentary
+      category: exercise
+      value: sedentary
+      data_type: single_choice
+      elicitation_priority: 6
+      is_global: false
+
+    - id: exercise_moderate
+      category: exercise
+      value: moderate
+      data_type: single_choice
+      elicitation_priority: 6
+      is_global: false
+
+    - id: exercise_active
+      category: exercise
+      value: active
+      data_type: single_choice
+      elicitation_priority: 6
+      is_global: false
+
+    # Antibiotic History
+    - id: recent_antibiotic_use_yes
+      category: antibiotic_history
+      value: "yes"
+      data_type: boolean
+      elicitation_priority: 4
+      is_global: false
+
+    - id: recent_antibiotic_use_no
+      category: antibiotic_history
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 4
+      is_global: false
+
+    # ============================================================================
+    # SAFETY CONSTRAINTS - Global hard constraints (ALWAYS ask these first)
+    # ============================================================================
+
+    # Medical Constraints
+    - id: medical_constraint_pregnancy
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: medical_constraint_breastfeeding
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: medical_constraint_ibd
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: medical_constraint_crohns
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: medical_constraint_ulcerative_colitis
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: medical_constraint_diabetes
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    # Allergy Constraints
+    - id: allergy_constraint_dairy
+      category: allergies
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: allergy_constraint_gluten
+      category: allergies
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: allergy_constraint_soy
+      category: allergies
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+  # ============================================================================
+  # INGREDIENTS - Key actives for gut health & digestion
+  # ============================================================================
+  ingredients:
+    # PROBIOTICS - Live beneficial bacteria
+    - id: lactobacillus_acidophilus
+      name: "lactobacillus_acidophilus"
+      display_name: "Lactobacillus Acidophilus"
+      function: "beneficial_bacteria_gut_balance"
+      category: "probiotics"
+      strength_levels: ["1 billion CFU", "5 billion CFU", "10 billion CFU"]
+
+    - id: bifidobacterium_lactis
+      name: "bifidobacterium_lactis"
+      display_name: "Bifidobacterium Lactis"
+      function: "digestive_support_immunity"
+      category: "probiotics"
+      strength_levels: ["1 billion CFU", "5 billion CFU", "10 billion CFU"]
+
+    - id: lactobacillus_rhamnosus
+      name: "lactobacillus_rhamnosus"
+      display_name: "Lactobacillus Rhamnosus"
+      function: "gut_barrier_immune_support"
+      category: "probiotics"
+      strength_levels: ["1 billion CFU", "5 billion CFU", "10 billion CFU"]
+
+    - id: saccharomyces_boulardii
+      name: "saccharomyces_boulardii"
+      display_name: "Saccharomyces Boulardii"
+      function: "diarrhea_prevention_gut_health"
+      category: "probiotics"
+      strength_levels: ["250mg", "500mg"]
+
+    - id: multi_strain_probiotic
+      name: "multi_strain_probiotic"
+      display_name: "Multi-Strain Probiotic Complex"
+      function: "comprehensive_gut_microbiome_support"
+      category: "probiotics"
+      strength_levels: ["10 billion CFU", "25 billion CFU", "50 billion CFU"]
+
+    # PREBIOTICS - Food for beneficial bacteria
+    - id: inulin
+      name: "inulin"
+      display_name: "Inulin"
+      function: "prebiotic_fiber_gut_bacteria_food"
+      category: "prebiotics"
+      strength_levels: ["2g", "5g", "10g"]
+
+    - id: fos
+      name: "fos"
+      display_name: "FOS (Fructooligosaccharides)"
+      function: "prebiotic_bifidogenic_factor"
+      category: "prebiotics"
+      strength_levels: ["2g", "5g"]
+
+    - id: gos
+      name: "gos"
+      display_name: "GOS (Galactooligosaccharides)"
+      function: "prebiotic_gut_health"
+      category: "prebiotics"
+      strength_levels: ["2g", "5g"]
+
+    - id: resistant_starch
+      name: "resistant_starch"
+      display_name: "Resistant Starch"
+      function: "prebiotic_colon_health"
+      category: "prebiotics"
+      strength_levels: ["5g", "10g", "15g"]
+
+    # DIGESTIVE ENZYMES - Breakdown food components
+    - id: protease
+      name: "protease"
+      display_name: "Protease"
+      function: "protein_digestion"
+      category: "digestive_enzymes"
+      strength_levels: ["standard", "high_potency"]
+
+    - id: amylase
+      name: "amylase"
+      display_name: "Amylase"
+      function: "carbohydrate_digestion"
+      category: "digestive_enzymes"
+      strength_levels: ["standard", "high_potency"]
+
+    - id: lipase
+      name: "lipase"
+      display_name: "Lipase"
+      function: "fat_digestion"
+      category: "digestive_enzymes"
+      strength_levels: ["standard", "high_potency"]
+
+    - id: lactase
+      name: "lactase"
+      display_name: "Lactase"
+      function: "dairy_digestion"
+      category: "digestive_enzymes"
+      strength_levels: ["3000 FCC ALU", "9000 FCC ALU"]
+
+    - id: bromelain
+      name: "bromelain"
+      display_name: "Bromelain"
+      function: "protein_digestion_anti_inflammatory"
+      category: "digestive_enzymes"
+      strength_levels: ["500mg", "1000mg"]
+
+    - id: papain
+      name: "papain"
+      display_name: "Papain"
+      function: "protein_digestion"
+      category: "digestive_enzymes"
+      strength_levels: ["500mg", "1000mg"]
+
+    - id: full_spectrum_digestive_enzyme
+      name: "full_spectrum_digestive_enzyme"
+      display_name: "Full-Spectrum Digestive Enzyme Complex"
+      function: "comprehensive_food_breakdown"
+      category: "digestive_enzymes"
+      strength_levels: ["standard", "high_potency"]
+
+    # FIBER - Promotes regularity and gut health
+    - id: psyllium_husk
+      name: "psyllium_husk"
+      display_name: "Psyllium Husk"
+      function: "soluble_fiber_regularity"
+      category: "fiber"
+      strength_levels: ["5g", "10g", "15g"]
+
+    - id: wheat_dextrin
+      name: "wheat_dextrin"
+      display_name: "Wheat Dextrin"
+      function: "gentle_fiber_regularity"
+      category: "fiber"
+      strength_levels: ["5g", "10g"]
+
+    - id: acacia_fiber
+      name: "acacia_fiber"
+      display_name: "Acacia Fiber"
+      function: "prebiotic_soluble_fiber"
+      category: "fiber"
+      strength_levels: ["5g", "10g", "15g"]
+
+    - id: glucomannan
+      name: "glucomannan"
+      display_name: "Glucomannan (Konjac Root)"
+      function: "soluble_fiber_satiety"
+      category: "fiber"
+      strength_levels: ["1g", "2g", "3g"]
+
+    # AMINO ACIDS & GUT SUPPORT
+    - id: l_glutamine
+      name: "l_glutamine"
+      display_name: "L-Glutamine"
+      function: "gut_lining_repair_intestinal_health"
+      category: "amino_acids"
+      strength_levels: ["5g", "10g", "15g"]
+
+    - id: glycine
+      name: "glycine"
+      display_name: "Glycine"
+      function: "gut_lining_support_collagen_precursor"
+      category: "amino_acids"
+      strength_levels: ["3g", "5g"]
+
+    - id: collagen_peptides
+      name: "collagen_peptides"
+      display_name: "Collagen Peptides"
+      function: "gut_lining_integrity"
+      category: "amino_acids"
+      strength_levels: ["10g", "20g"]
+
+    # MINERALS - Critical for digestive function
+    - id: zinc_carnosine
+      name: "zinc_carnosine"
+      display_name: "Zinc-Carnosine"
+      function: "gut_lining_protection_healing"
+      category: "minerals"
+      strength_levels: ["37.5mg", "75mg"]
+
+    - id: zinc
+      name: "zinc"
+      display_name: "Zinc"
+      function: "immune_support_gut_health"
+      category: "minerals"
+      strength_levels: ["15mg", "25mg", "50mg"]
+
+    - id: magnesium_citrate
+      name: "magnesium_citrate"
+      display_name: "Magnesium Citrate"
+      function: "bowel_regularity_relaxation"
+      category: "minerals"
+      strength_levels: ["200mg", "400mg"]
+
+    - id: magnesium_oxide
+      name: "magnesium_oxide"
+      display_name: "Magnesium Oxide"
+      function: "constipation_relief"
+      category: "minerals"
+      strength_levels: ["250mg", "500mg"]
+
+    # BOTANICALS & HERBS
+    - id: ginger
+      name: "ginger"
+      display_name: "Ginger Extract"
+      function: "digestive_support_nausea_relief"
+      category: "beauty"
+      strength_levels: ["250mg", "500mg", "1000mg"]
+
+    - id: peppermint_oil
+      name: "peppermint_oil"
+      display_name: "Peppermint Oil (Enteric-Coated)"
+      function: "ibs_symptom_relief_digestive_comfort"
+      category: "beauty"
+      strength_levels: ["0.2ml", "0.4ml"]
+
+    - id: fennel
+      name: "fennel"
+      display_name: "Fennel Seed Extract"
+      function: "bloating_relief_digestive_support"
+      category: "beauty"
+      strength_levels: ["250mg", "500mg"]
+
+    - id: triphala
+      name: "triphala"
+      display_name: "Triphala"
+      function: "ayurvedic_digestive_tonic_regularity"
+      category: "beauty"
+      strength_levels: ["500mg", "1000mg"]
+
+    - id: aloe_vera
+      name: "aloe_vera"
+      display_name: "Aloe Vera Leaf Extract"
+      function: "gut_soothing_healing"
+      category: "beauty"
+      strength_levels: ["200mg", "400mg"]
+
+    - id: slippery_elm
+      name: "slippery_elm"
+      display_name: "Slippery Elm Bark"
+      function: "gut_lining_soothing"
+      category: "beauty"
+      strength_levels: ["400mg", "800mg"]
+
+    - id: marshmallow_root
+      name: "marshmallow_root"
+      display_name: "Marshmallow Root"
+      function: "mucilage_gut_protection"
+      category: "beauty"
+      strength_levels: ["500mg", "1000mg"]
+
+    - id: turmeric_curcumin
+      name: "turmeric_curcumin"
+      display_name: "Turmeric (Curcumin)"
+      function: "anti_inflammatory_gut_health"
+      category: "beauty"
+      strength_levels: ["500mg", "1000mg", "1500mg"]
+
+    # OTHER SUPPORTING NUTRIENTS
+    - id: betaine_hcl
+      name: "betaine_hcl"
+      display_name: "Betaine HCl"
+      function: "stomach_acid_support_digestion"
+      category: "digestive_support"
+      strength_levels: ["500mg", "1000mg"]
+
+    - id: apple_cider_vinegar
+      name: "apple_cider_vinegar"
+      display_name: "Apple Cider Vinegar"
+      function: "digestive_support_ph_balance"
+      category: "digestive_support"
+      strength_levels: ["500mg", "1000mg"]
+
+    - id: butyrate
+      name: "butyrate"
+      display_name: "Butyrate (Sodium/Calcium)"
+      function: "colon_cell_fuel_gut_barrier"
+      category: "digestive_support"
+      strength_levels: ["300mg", "600mg"]
+
+    - id: vitamin_d3
+      name: "vitamin_d3"
+      display_name: "Vitamin D3"
+      function: "immune_modulation_gut_health"
+      category: "vitamins"
+      strength_levels: ["1000 IU", "2000 IU", "5000 IU"]
+
+  # ============================================================================
+  # CONSTRAINTS - User limitations that exclude certain products
+  # ============================================================================
+  constraints:
+    - id: pregnancy
+      type: "medical"
+      value: "true"
+      severity: "hard"
+
+    - id: breastfeeding
+      type: "medical"
+      value: "true"
+      severity: "hard"
+
+    - id: ibd_condition
+      type: "medical"
+      value: "ibd"
+      severity: "hard"
+
+    - id: crohns_condition
+      type: "medical"
+      value: "crohns"
+      severity: "hard"
+
+    - id: ulcerative_colitis_condition
+      type: "medical"
+      value: "ulcerative_colitis"
+      severity: "hard"
+
+    - id: diabetes_condition
+      type: "medical"
+      value: "diabetes"
+      severity: "soft"
+
+    - id: allergy_dairy
+      type: "allergy"
+      value: "dairy"
+      severity: "hard"
+
+    - id: allergy_gluten
+      type: "allergy"
+      value: "gluten"
+      severity: "hard"
+
+    - id: allergy_soy
+      type: "allergy"
+      value: "soy"
+      severity: "hard"
+
+    - id: diet_vegan_constraint
+      type: "dietary"
+      value: "vegan"
+      severity: "hard"
+
+    - id: diet_vegetarian_constraint
+      type: "dietary"
+      value: "vegetarian"
+      severity: "hard"
+
+  # ============================================================================
+  # QUESTIONS - Templates for eliciting information
+  # ============================================================================
+  questions:
+    - id: q_primary_digestive_concern
+      text: "What is your primary digestive concern?"
+      response_type: "single_choice"
+      options:
+        - "Bloating and gas"
+        - "Constipation"
+        - "Acidity/heartburn"
+        - "Poor digestion"
+        - "Diarrhea/loose stools"
+        - "IBS symptoms"
+        - "Poor nutrient absorption"
+        - "Overall gut health"
+
+    - id: q_age_group
+      text: "What is your age group?"
+      response_type: "single_choice"
+      options:
+        - "18-25"
+        - "26-35"
+        - "36-45"
+        - "46+"
+
+    - id: q_gender
+      text: "What is your gender?"
+      response_type: "single_choice"
+      options:
+        - "Female"
+        - "Male"
+        - "Prefer not to say"
+
+    - id: q_diet
+      text: "What is your dietary preference?"
+      response_type: "single_choice"
+      options:
+        - "Vegetarian"
+        - "Vegan"
+        - "Pescatarian"
+        - "Non-vegetarian"
+
+    - id: q_bowel_frequency
+      text: "How would you describe your bowel movement frequency?"
+      response_type: "single_choice"
+      options:
+        - "Regular (daily)"
+        - "Irregular (every 2-3 days)"
+        - "Infrequent (less than 3 times/week)"
+
+    - id: q_fiber_intake
+      text: "How much fiber (fruits, vegetables, whole grains) do you consume daily?"
+      response_type: "single_choice"
+      options:
+        - "Low (limited fruits/vegetables)"
+        - "Moderate (some daily servings)"
+        - "High (plenty of plant foods)"
+
+    - id: q_water_intake
+      text: "How much water do you drink daily?"
+      response_type: "single_choice"
+      options:
+        - "Low (less than 4 glasses)"
+        - "Adequate (4-8 glasses)"
+        - "High (more than 8 glasses)"
+
+    - id: q_stress_level
+      text: "How would you describe your stress levels?"
+      response_type: "single_choice"
+      options:
+        - "High stress/demanding lifestyle"
+        - "Moderate stress"
+        - "Low stress/relaxed"
+
+    - id: q_exercise_level
+      text: "How active is your lifestyle?"
+      response_type: "single_choice"
+      options:
+        - "Sedentary (little to no exercise)"
+        - "Moderately active (2-3 times/week)"
+        - "Very active (4+ times/week)"
+
+    - id: q_recent_antibiotics
+      text: "Have you taken antibiotics in the last 3 months?"
+      response_type: "single_choice"
+      options:
+        - "Yes"
+        - "No"
+
+    # Safety Constraint Questions (asked first for all users)
+    - id: q_medical_constraints
+      text: "Do any of these medical conditions apply to you?"
+      response_type: "multi_choice"
+      options:
+        - "Pregnancy"
+        - "Breastfeeding"
+        - "Inflammatory Bowel Disease (IBD)"
+        - "Crohn's disease"
+        - "Ulcerative colitis"
+        - "Diabetes"
+        - "None of the above"
+      validation_rules:
+        allow_none: true
+
+    - id: q_allergies
+      text: "Do you have any of these allergies?"
+      response_type: "multi_choice"
+      options:
+        - "Dairy allergy"
+        - "Gluten allergy"
+        - "Soy allergy"
+        - "No allergies"
+      validation_rules:
+        allow_none: true
+
+# ============================================================================
+# EDGES - Relationships between nodes
+# ============================================================================
+edges:
+  # --------------------------------------------------------------------------
+  # PROBLEM → REQUIRES_KNOWING → ATTRIBUTE
+  # Defines which attributes are needed to recommend solutions for a problem
+  # --------------------------------------------------------------------------
+
+  # Bloating requires knowing diet and fiber intake
+  - source: bloating
+    target: diet_vegetarian
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Dietary patterns affect gas production and microbiome composition"
+
+  - source: bloating
+    target: fiber_intake_low
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: true
+      reason: "Fiber intake affects gas production and digestive patterns"
+
+  # Constipation requires knowing fiber, water, and exercise
+  - source: constipation
+    target: fiber_intake_low
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Low fiber is a primary cause of constipation"
+
+  - source: constipation
+    target: water_intake_low
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Adequate hydration is essential for bowel regularity"
+
+  - source: constipation
+    target: exercise_sedentary
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: true
+      reason: "Physical activity stimulates bowel movements"
+
+  # Acidity requires knowing diet and stress
+  - source: acidity
+    target: diet_vegan
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: true
+      reason: "Dietary choices affect stomach acid production"
+
+  - source: acidity
+    target: lifestyle_high_stress
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Stress is a major trigger for acid reflux"
+
+  # Poor Digestion requires knowing age and diet
+  - source: poor_digestion
+    target: age_group_46_plus
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Digestive enzyme production decreases with age"
+
+  - source: poor_digestion
+    target: diet_non_veg
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: true
+      reason: "Protein and fat intake affect enzyme requirements"
+
+  # Diarrhea requires knowing recent antibiotic use
+  - source: diarrhea
+    target: recent_antibiotic_use_yes
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Antibiotics disrupt gut microbiome causing diarrhea"
+
+  # IBS requires knowing stress and bowel patterns
+  - source: ibs
+    target: lifestyle_high_stress
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Stress is a major IBS trigger via gut-brain axis"
+
+  - source: ibs
+    target: bowel_frequency_irregular
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Bowel pattern helps determine IBS subtype"
+
+  # Dysbiosis requires knowing antibiotic history
+  - source: dysbiosis
+    target: recent_antibiotic_use_yes
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Antibiotics are a primary cause of microbiome disruption"
+
+  # Leaky Gut requires knowing stress and diet
+  - source: leaky_gut
+    target: lifestyle_high_stress
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Chronic stress increases intestinal permeability"
+
+  - source: leaky_gut
+    target: diet_vegan
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: true
+      reason: "Diet affects gut barrier integrity and inflammation"
+
+  # --------------------------------------------------------------------------
+  # ATTRIBUTE → ELICITS_QUESTION → QUESTION
+  # Maps attributes to questions that elicit them
+  # --------------------------------------------------------------------------
+
+  - source: age_group_18_25
+    target: q_age_group
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+
+  - source: gender_female
+    target: q_gender
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_not_known"
+      timing: "immediate"
+
+  - source: diet_vegan
+    target: q_diet
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+
+  - source: bowel_frequency_regular
+    target: q_bowel_frequency
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_digestive_concern"
+      timing: "immediate"
+
+  - source: fiber_intake_low
+    target: q_fiber_intake
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_constipation_or_bloating"
+      timing: "immediate"
+
+  - source: water_intake_low
+    target: q_water_intake
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_constipation"
+      timing: "immediate"
+
+  - source: lifestyle_high_stress
+    target: q_stress_level
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_digestive_concern"
+      timing: "immediate"
+
+  - source: exercise_sedentary
+    target: q_exercise_level
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_constipation"
+      timing: "immediate"
+
+  - source: recent_antibiotic_use_yes
+    target: q_recent_antibiotics
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_diarrhea_or_dysbiosis"
+      timing: "immediate"
+
+  # Global Safety Constraint Questions (asked FIRST for everyone)
+  - source: medical_constraint_pregnancy
+    target: q_medical_constraints
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+      is_safety_critical: true
+
+  - source: medical_constraint_breastfeeding
+    target: q_medical_constraints
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+      is_safety_critical: true
+
+  - source: medical_constraint_ibd
+    target: q_medical_constraints
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+      is_safety_critical: true
+
+  - source: allergy_constraint_dairy
+    target: q_allergies
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+      is_safety_critical: true
+
+  # --------------------------------------------------------------------------
+  # INGREDIENT → TREATS → PROBLEM
+  # Defines which ingredients are effective for which problems
+  # --------------------------------------------------------------------------
+
+  # PROBIOTICS for Gut Balance
+  - source: lactobacillus_acidophilus
+    target: bloating
+    relation: TREATS
+    properties:
+      mechanism: "Produces lactic acid to reduce gas-producing bacteria"
+      efficacy: 0.80
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: lactobacillus_acidophilus
+    target: diarrhea
+    relation: TREATS
+    properties:
+      mechanism: "Restores healthy gut flora balance"
+      efficacy: 0.85
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: bifidobacterium_lactis
+    target: constipation
+    relation: TREATS
+    properties:
+      mechanism: "Improves bowel movement frequency and stool consistency"
+      efficacy: 0.85
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: bifidobacterium_lactis
+    target: ibs
+    relation: TREATS
+    properties:
+      mechanism: "Reduces IBS symptoms through gut microbiome modulation"
+      efficacy: 0.75
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: lactobacillus_rhamnosus
+    target: leaky_gut
+    relation: TREATS
+    properties:
+      mechanism: "Strengthens tight junctions in intestinal barrier"
+      efficacy: 0.80
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: saccharomyces_boulardii
+    target: diarrhea
+    relation: TREATS
+    properties:
+      mechanism: "Beneficial yeast that prevents pathogenic bacteria colonization"
+      efficacy: 0.90
+      onset_time: "3-7 days"
+      evidence_level: "clinical_trial"
+
+  - source: multi_strain_probiotic
+    target: dysbiosis
+    relation: TREATS
+    properties:
+      mechanism: "Comprehensive microbiome restoration with multiple beneficial strains"
+      efficacy: 0.85
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: multi_strain_probiotic
+    target: ibs
+    relation: TREATS
+    properties:
+      mechanism: "Multi-strain approach addresses diverse IBS symptoms"
+      efficacy: 0.80
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  # PREBIOTICS for Gut Bacteria
+  - source: inulin
+    target: constipation
+    relation: TREATS
+    properties:
+      mechanism: "Soluble fiber increases stool bulk and feeds beneficial bacteria"
+      efficacy: 0.80
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: inulin
+    target: dysbiosis
+    relation: TREATS
+    properties:
+      mechanism: "Selectively feeds beneficial bacteria to restore balance"
+      efficacy: 0.85
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: fos
+    target: bloating
+    relation: TREATS
+    properties:
+      mechanism: "Promotes growth of beneficial bacteria that reduce gas production"
+      efficacy: 0.75
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: resistant_starch
+    target: leaky_gut
+    relation: TREATS
+    properties:
+      mechanism: "Produces butyrate that heals and strengthens gut lining"
+      efficacy: 0.80
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  # DIGESTIVE ENZYMES for Better Digestion
+  - source: full_spectrum_digestive_enzyme
+    target: poor_digestion
+    relation: TREATS
+    properties:
+      mechanism: "Comprehensive enzyme blend breaks down proteins, fats, and carbs"
+      efficacy: 0.90
+      onset_time: "immediate to 1 week"
+      evidence_level: "clinical_trial"
+
+  - source: full_spectrum_digestive_enzyme
+    target: bloating
+    relation: TREATS
+    properties:
+      mechanism: "Improves food breakdown reducing fermentation and gas"
+      efficacy: 0.85
+      onset_time: "immediate to 1 week"
+      evidence_level: "clinical_trial"
+
+  - source: full_spectrum_digestive_enzyme
+    target: poor_absorption
+    relation: TREATS
+    properties:
+      mechanism: "Better food breakdown improves nutrient bioavailability"
+      efficacy: 0.85
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: protease
+    target: poor_digestion
+    relation: TREATS
+    properties:
+      mechanism: "Breaks down protein into absorbable amino acids"
+      efficacy: 0.80
+      onset_time: "immediate"
+      evidence_level: "clinical_trial"
+
+  - source: lactase
+    target: bloating
+    relation: TREATS
+    properties:
+      mechanism: "Breaks down lactose preventing dairy-related gas and bloating"
+      efficacy: 0.95
+      onset_time: "immediate"
+      evidence_level: "clinical_trial"
+
+  - source: bromelain
+    target: poor_digestion
+    relation: TREATS
+    properties:
+      mechanism: "Pineapple enzyme aids protein digestion and reduces inflammation"
+      efficacy: 0.80
+      onset_time: "immediate to 1 week"
+      evidence_level: "clinical_trial"
+
+  # FIBER for Regularity
+  - source: psyllium_husk
+    target: constipation
+    relation: TREATS
+    properties:
+      mechanism: "Bulk-forming fiber increases stool weight and frequency"
+      efficacy: 0.90
+      onset_time: "1-3 days"
+      evidence_level: "clinical_trial"
+
+  - source: psyllium_husk
+    target: ibs
+    relation: TREATS
+    properties:
+      mechanism: "Soluble fiber regulates bowel movements in IBS"
+      efficacy: 0.80
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: acacia_fiber
+    target: bloating
+    relation: TREATS
+    properties:
+      mechanism: "Gentle prebiotic fiber that doesn't cause gas"
+      efficacy: 0.75
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: glucomannan
+    target: constipation
+    relation: TREATS
+    properties:
+      mechanism: "High water-holding capacity softens stool"
+      efficacy: 0.85
+      onset_time: "1-3 days"
+      evidence_level: "clinical_trial"
+
+  # L-GLUTAMINE for Gut Lining
+  - source: l_glutamine
+    target: leaky_gut
+    relation: TREATS
+    properties:
+      mechanism: "Primary fuel for intestinal cells, repairs gut barrier"
+      efficacy: 0.85
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: l_glutamine
+    target: poor_absorption
+    relation: TREATS
+    properties:
+      mechanism: "Heals intestinal villi improving nutrient absorption"
+      efficacy: 0.80
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: l_glutamine
+    target: ibs
+    relation: TREATS
+    properties:
+      mechanism: "Reduces intestinal permeability in IBS patients"
+      efficacy: 0.75
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  # ZINC for Gut Health
+  - source: zinc_carnosine
+    target: leaky_gut
+    relation: TREATS
+    properties:
+      mechanism: "Protects and heals gut lining, strengthens tight junctions"
+      efficacy: 0.85
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: zinc_carnosine
+    target: acidity
+    relation: TREATS
+    properties:
+      mechanism: "Protects stomach lining from acid damage"
+      efficacy: 0.80
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: zinc
+    target: diarrhea
+    relation: TREATS
+    properties:
+      mechanism: "Supports immune function and gut barrier integrity"
+      efficacy: 0.80
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  # MAGNESIUM for Constipation
+  - source: magnesium_citrate
+    target: constipation
+    relation: TREATS
+    properties:
+      mechanism: "Osmotic laxative draws water into intestines"
+      efficacy: 0.85
+      onset_time: "6-8 hours"
+      evidence_level: "clinical_trial"
+
+  - source: magnesium_oxide
+    target: constipation
+    relation: TREATS
+    properties:
+      mechanism: "Strong osmotic effect for occasional constipation relief"
+      efficacy: 0.90
+      onset_time: "6-8 hours"
+      evidence_level: "clinical_trial"
+
+  # BOTANICALS for Digestive Comfort
+  - source: ginger
+    target: bloating
+    relation: TREATS
+    properties:
+      mechanism: "Stimulates digestive motility and reduces gas"
+      efficacy: 0.80
+      onset_time: "immediate to 1 week"
+      evidence_level: "clinical_trial"
+
+  - source: ginger
+    target: poor_digestion
+    relation: TREATS
+    properties:
+      mechanism: "Enhances digestive enzyme activity and gastric emptying"
+      efficacy: 0.80
+      onset_time: "immediate to 1 week"
+      evidence_level: "clinical_trial"
+
+  - source: peppermint_oil
+    target: ibs
+    relation: TREATS
+    properties:
+      mechanism: "Relaxes intestinal smooth muscle reducing IBS symptoms"
+      efficacy: 0.85
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: peppermint_oil
+    target: bloating
+    relation: TREATS
+    properties:
+      mechanism: "Antispasmodic effect reduces gas and cramping"
+      efficacy: 0.80
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: fennel
+    target: bloating
+    relation: TREATS
+    properties:
+      mechanism: "Carminative herb that expels gas and reduces bloating"
+      efficacy: 0.75
+      onset_time: "immediate to 1 week"
+      evidence_level: "traditional_use"
+
+  - source: triphala
+    target: constipation
+    relation: TREATS
+    properties:
+      mechanism: "Ayurvedic formula promotes gentle bowel regularity"
+      efficacy: 0.80
+      onset_time: "1-2 weeks"
+      evidence_level: "traditional_use"
+
+  - source: aloe_vera
+    target: acidity
+    relation: TREATS
+    properties:
+      mechanism: "Soothes and heals inflamed digestive tract"
+      efficacy: 0.75
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: slippery_elm
+    target: leaky_gut
+    relation: TREATS
+    properties:
+      mechanism: "Forms protective mucilage coating on gut lining"
+      efficacy: 0.75
+      onset_time: "2-4 weeks"
+      evidence_level: "traditional_use"
+
+  - source: turmeric_curcumin
+    target: ibs
+    relation: TREATS
+    properties:
+      mechanism: "Reduces gut inflammation and modulates gut-brain axis"
+      efficacy: 0.75
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: turmeric_curcumin
+    target: leaky_gut
+    relation: TREATS
+    properties:
+      mechanism: "Anti-inflammatory properties reduce intestinal permeability"
+      efficacy: 0.80
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  # DIGESTIVE SUPPORT
+  - source: betaine_hcl
+    target: poor_digestion
+    relation: TREATS
+    properties:
+      mechanism: "Supplements low stomach acid for better protein digestion"
+      efficacy: 0.80
+      onset_time: "immediate"
+      evidence_level: "clinical_trial"
+
+  - source: betaine_hcl
+    target: bloating
+    relation: TREATS
+    properties:
+      mechanism: "Proper stomach acid prevents bacterial overgrowth and fermentation"
+      efficacy: 0.75
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: butyrate
+    target: leaky_gut
+    relation: TREATS
+    properties:
+      mechanism: "Primary fuel for colon cells, heals gut barrier"
+      efficacy: 0.85
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: butyrate
+    target: ibs
+    relation: TREATS
+    properties:
+      mechanism: "Reduces inflammation and supports healthy colon function"
+      efficacy: 0.75
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: vitamin_d3
+    target: ibs
+    relation: TREATS
+    properties:
+      mechanism: "Modulates gut immunity and inflammation"
+      efficacy: 0.70
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  # --------------------------------------------------------------------------
+  # INGREDIENT → RECOMMENDED_FOR → ATTRIBUTE
+  # Defines which ingredients work best for specific user attributes
+  # --------------------------------------------------------------------------
+
+  # Digestive Enzymes for Older Adults
+  - source: full_spectrum_digestive_enzyme
+    target: age_group_46_plus
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.90
+      evidence: "proven"
+
+  # Probiotics after Antibiotics
+  - source: multi_strain_probiotic
+    target: recent_antibiotic_use_yes
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 1.0
+      evidence: "proven"
+
+  - source: saccharomyces_boulardii
+    target: recent_antibiotic_use_yes
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.95
+      evidence: "proven"
+
+  # Fiber for Low Fiber Intake
+  - source: psyllium_husk
+    target: fiber_intake_low
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.90
+      evidence: "proven"
+
+  - source: inulin
+    target: fiber_intake_low
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.85
+      evidence: "proven"
+
+  # Magnesium for Sedentary Lifestyle
+  - source: magnesium_citrate
+    target: exercise_sedentary
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.80
+      evidence: "proven"
+
+  # Stress-Related Gut Support
+  - source: peppermint_oil
+    target: lifestyle_high_stress
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.85
+      evidence: "proven"
+
+  - source: l_glutamine
+    target: lifestyle_high_stress
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.85
+      evidence: "proven"
+
+  # --------------------------------------------------------------------------
+  # INGREDIENT → CONTRAINDICATED_FOR → CONSTRAINT
+  # Safety rules for ingredients
+  # --------------------------------------------------------------------------
+
+  # Probiotics with Dairy
+  - source: lactobacillus_acidophilus
+    target: allergy_dairy
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "Some strains may be cultured on dairy; choose dairy-free formulations"
+      severity: "caution"
+      alternative_ingredients:
+        - "vegan_probiotic_strains"
+
+  # High-dose Magnesium with Diabetes
+  - source: magnesium_oxide
+    target: diabetes_condition
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "May affect blood sugar; monitor levels closely"
+      severity: "caution"
+      alternative_ingredients:
+        - "magnesium_citrate"
+
+  # Fiber during IBD Flare
+  - source: psyllium_husk
+    target: ibd_condition
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "May worsen symptoms during active IBD flare"
+      severity: "caution"
+      alternative_ingredients:
+        - "l_glutamine"
+        - "butyrate"
+
+  # Betaine HCl with Acidity
+  - source: betaine_hcl
+    target: acidity
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "Contraindicated when excess acid is already present"
+      severity: "avoid"
+      alternative_ingredients:
+        - "digestive_enzymes_without_hcl"
+
+  # Peppermint Oil with GERD
+  - source: peppermint_oil
+    target: acidity
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "May relax lower esophageal sphincter worsening reflux"
+      severity: "caution"
+      alternative_ingredients:
+        - "ginger"
+        - "fennel"
+
+  # --------------------------------------------------------------------------
+  # PROBLEM → SIMILAR_TO → PROBLEM
+  # Semantic relationships between problems
+  # --------------------------------------------------------------------------
+
+  - source: bloating
+    target: poor_digestion
+    relation: SIMILAR_TO
+    properties:
+      similarity_score: 0.80
+      shared_symptoms:
+        - "digestive_discomfort"
+        - "gas_production"
+
+  - source: constipation
+    target: poor_digestion
+    relation: SIMILAR_TO
+    properties:
+      similarity_score: 0.75
+      shared_symptoms:
+        - "sluggish_digestion"
+        - "incomplete_breakdown"
+
+  - source: diarrhea
+    target: ibs
+    relation: SIMILAR_TO
+    properties:
+      similarity_score: 0.85
+      shared_symptoms:
+        - "bowel_irregularity"
+        - "digestive_distress"
+
+  # --------------------------------------------------------------------------
+  # PROBLEM → OFTEN_PAIRED_WITH → PROBLEM
+  # Problems that commonly occur together
+  # --------------------------------------------------------------------------
+
+  - source: bloating
+    target: poor_digestion
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.85
+      recommendation: "treat_together"
+
+  - source: constipation
+    target: bloating
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.80
+      recommendation: "treat_together"
+
+  - source: acidity
+    target: poor_digestion
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.75
+      recommendation: "treat_together"
+
+  - source: dysbiosis
+    target: bloating
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.85
+      recommendation: "treat_together"
+
+  - source: leaky_gut
+    target: poor_absorption
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.90
+      recommendation: "treat_together"
+
+  - source: ibs
+    target: dysbiosis
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.80
+      recommendation: "treat_together"
+
+  - source: poor_digestion
+    target: poor_absorption
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.75
+      recommendation: "treat_together"

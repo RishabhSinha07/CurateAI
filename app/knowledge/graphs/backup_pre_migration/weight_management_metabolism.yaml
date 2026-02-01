@@ -1,0 +1,928 @@
+# Weight Management & Metabolism Knowledge Graph
+#
+# This graph defines the domain knowledge for nutraceutical product recommendations
+# focused on healthy weight loss, fat burning, appetite control, and metabolic optimization.
+#
+# UPDATING THIS GRAPH:
+# 1. Add new nodes under the appropriate section (problems, attributes, etc.)
+# 2. Ensure all IDs are unique and use snake_case
+# 3. Add edges to connect new nodes to existing ones
+# 4. Run validation: python -m app.knowledge.validate weight_management_metabolism
+# 5. Reload graph in development: reload_graph('weight_management_metabolism')
+
+metadata:
+  domain: weight_management_metabolism
+  version: 1.0.0
+  created_at: "2026-01-31"
+  description: "Knowledge graph for weight management, fat loss, appetite control, and metabolic health"
+  display_name: "Weight Management & Metabolism"
+  persona: "You are a weight management and metabolism specialist who helps users achieve healthy weight loss, optimize metabolic function, and maintain sustainable results. You focus on evidence-based nutrition, appetite regulation, fat burning nutrients, and lifestyle factors. You emphasize safe, gradual weight loss and metabolic health over quick fixes."
+  is_active: true
+  parent_domain: null
+
+nodes:
+  # ============================================================================
+  # PROBLEMS - Weight management challenges
+  # ============================================================================
+  problems:
+    - id: difficulty_losing_weight
+      name: "difficulty_losing_weight"
+      display_name: "Difficulty Losing Weight"
+      synonyms:
+        - "can't lose weight"
+        - "weight loss plateau"
+        - "stuck at same weight"
+        - "not losing weight"
+        - "weight won't budge"
+      severity_levels: [mild, moderate, severe]
+      description: "Inability to lose weight despite diet and exercise efforts"
+
+    - id: slow_metabolism
+      name: "slow_metabolism"
+      display_name: "Slow Metabolism"
+      synonyms:
+        - "sluggish metabolism"
+        - "low metabolic rate"
+        - "slow fat burning"
+        - "metabolic slowdown"
+      severity_levels: [mild, moderate, severe]
+      description: "Reduced metabolic rate leading to weight gain or difficulty losing weight"
+
+    - id: excess_body_fat
+      name: "excess_body_fat"
+      display_name: "Excess Body Fat"
+      synonyms:
+        - "high body fat"
+        - "too much fat"
+        - "overweight"
+        - "obesity"
+      severity_levels: [mild, moderate, severe]
+      description: "Elevated body fat percentage above healthy ranges"
+
+    - id: uncontrolled_appetite
+      name: "uncontrolled_appetite"
+      display_name: "Uncontrolled Appetite & Cravings"
+      synonyms:
+        - "always hungry"
+        - "can't control cravings"
+        - "constant hunger"
+        - "food cravings"
+        - "overeating"
+      severity_levels: [mild, moderate, severe]
+      description: "Difficulty controlling appetite and food cravings"
+
+    - id: emotional_eating
+      name: "emotional_eating"
+      display_name: "Emotional Eating"
+      synonyms:
+        - "stress eating"
+        - "eating due to emotions"
+        - "comfort eating"
+        - "binge eating"
+      severity_levels: [mild, moderate, severe]
+      description: "Eating in response to emotions rather than hunger"
+
+    - id: stubborn_belly_fat
+      name: "stubborn_belly_fat"
+      display_name: "Stubborn Belly Fat"
+      synonyms:
+        - "belly fat"
+        - "abdominal fat"
+        - "visceral fat"
+        - "midsection fat"
+      severity_levels: [mild, moderate, severe]
+      description: "Excess fat accumulation in the abdominal area"
+
+    - id: blood_sugar_imbalance
+      name: "blood_sugar_imbalance"
+      display_name: "Blood Sugar Imbalance"
+      synonyms:
+        - "blood sugar spikes"
+        - "insulin resistance"
+        - "sugar crashes"
+        - "unstable blood sugar"
+      severity_levels: [mild, moderate, severe]
+      description: "Poor blood glucose control affecting weight and energy"
+
+    - id: low_energy_weight_loss
+      name: "low_energy_weight_loss"
+      display_name: "Low Energy During Weight Loss"
+      synonyms:
+        - "tired on diet"
+        - "no energy while dieting"
+        - "fatigue from calorie deficit"
+      severity_levels: [mild, moderate, severe]
+      description: "Reduced energy levels when trying to lose weight"
+
+    - id: post_weight_loss_regain
+      name: "post_weight_loss_regain"
+      display_name: "Weight Regain After Loss"
+      synonyms:
+        - "yo-yo dieting"
+        - "weight cycling"
+        - "regaining weight"
+        - "can't maintain weight loss"
+      severity_levels: [mild, moderate, severe]
+      description: "Difficulty maintaining weight loss and tendency to regain"
+
+  # ============================================================================
+  # ATTRIBUTES - User context for personalization
+  # ============================================================================
+  attributes:
+    # Weight and goals
+    - id: weight_goal
+      name: "weight_goal"
+      display_name: "Weight Loss Goal"
+      type: categorical
+      values:
+        - lose_5_10kg
+        - lose_10_20kg
+        - lose_20kg_plus
+        - maintain_weight
+        - body_recomposition
+      required: true
+      description: "Target weight loss goal"
+
+    - id: current_bmi
+      name: "current_bmi"
+      display_name: "Current BMI Category"
+      type: categorical
+      values:
+        - normal  # 18.5-24.9
+        - overweight  # 25-29.9
+        - obese_class1  # 30-34.9
+        - obese_class2_plus  # 35+
+      required: false
+      description: "Body Mass Index category"
+
+    - id: weight_loss_history
+      name: "weight_loss_history"
+      display_name: "Previous Weight Loss Attempts"
+      type: categorical
+      values:
+        - first_time
+        - tried_before_success
+        - tried_before_regained
+        - chronic_yo_yo
+      required: true
+      description: "History of weight loss attempts"
+
+    # Diet and eating patterns
+    - id: dietary_preference
+      name: "dietary_preference"
+      display_name: "Dietary Preference"
+      type: categorical
+      values:
+        - vegetarian
+        - vegan
+        - pescatarian
+        - non_veg
+        - no_preference
+      required: true
+      description: "Dietary restrictions or preferences"
+
+    - id: eating_pattern
+      name: "eating_pattern"
+      display_name: "Eating Pattern"
+      type: categorical
+      values:
+        - regular_meals
+        - intermittent_fasting
+        - low_carb
+        - keto
+        - variable
+      required: false
+      description: "Current dietary approach"
+
+    - id: meal_frequency
+      name: "meal_frequency"
+      display_name: "Meal Frequency"
+      type: categorical
+      values:
+        - 1_2_meals
+        - 3_meals
+        - 4_5_meals
+        - 6_plus_meals
+      required: false
+      description: "Number of meals/snacks daily"
+
+    - id: fiber_intake
+      name: "fiber_intake"
+      display_name: "Daily Fiber Intake"
+      type: categorical
+      values:
+        - very_low  # <15g
+        - low  # 15-20g
+        - moderate  # 20-25g
+        - adequate  # 25-30g
+        - high  # >30g
+      required: true
+      description: "Estimated daily fiber consumption"
+
+    # Activity and lifestyle
+    - id: activity_level
+      name: "activity_level"
+      display_name: "Physical Activity Level"
+      type: categorical
+      values:
+        - sedentary
+        - lightly_active
+        - moderately_active
+        - very_active
+      required: true
+      description: "Daily physical activity level"
+
+    - id: exercise_frequency
+      name: "exercise_frequency"
+      display_name: "Exercise Frequency"
+      type: categorical
+      values:
+        - none
+        - 1_2_days
+        - 3_4_days
+        - 5_plus_days
+      required: false
+      description: "Structured exercise sessions per week"
+
+    - id: sleep_quality
+      name: "sleep_quality"
+      display_name: "Sleep Quality"
+      type: categorical
+      values:
+        - poor
+        - fair
+        - good
+        - excellent
+      required: true
+      description: "Overall sleep quality"
+
+    - id: stress_level
+      name: "stress_level"
+      display_name: "Stress Level"
+      type: categorical
+      values:
+        - low
+        - moderate
+        - high
+        - very_high
+      required: true
+      description: "Current stress levels"
+
+    # Demographic
+    - id: age_group
+      name: "age_group"
+      display_name: "Age Group"
+      type: categorical
+      values:
+        - 18_25
+        - 26_35
+        - 36_45
+        - 46_plus
+      required: true
+      description: "Age range"
+
+    - id: gender
+      name: "gender"
+      display_name: "Gender"
+      type: categorical
+      values:
+        - female
+        - male
+        - other
+      required: true
+      description: "Gender"
+
+    - id: menopause_status
+      name: "menopause_status"
+      display_name: "Menopause Status"
+      type: categorical
+      values:
+        - premenopausal
+        - perimenopausal
+        - postmenopausal
+        - not_applicable
+      required: false
+      description: "Menopause status for women"
+
+  # ============================================================================
+  # INGREDIENTS - Weight management nutrients
+  # ============================================================================
+  ingredients:
+    # FIBER
+    - id: psyllium_husk_fiber
+      name: "psyllium_husk_fiber"
+      display_name: "Psyllium Husk Fiber"
+      function: "appetite_control_satiety_blood_sugar"
+      category: "fiber"
+      strength_levels: ["5g", "10g", "15g"]
+      description: "Soluble fiber that promotes satiety and stabilizes blood sugar"
+
+    - id: inulin_fiber
+      name: "inulin_fiber"
+      display_name: "Inulin Fiber"
+      function: "prebiotic_satiety_fat_loss"
+      category: "fiber"
+      strength_levels: ["5g", "8g", "10g"]
+      description: "Prebiotic fiber that supports gut health and appetite control"
+
+    - id: glucomannan
+      name: "glucomannan"
+      display_name: "Glucomannan (Konjac Fiber)"
+      function: "powerful_appetite_suppressant"
+      category: "fiber"
+      strength_levels: ["1g", "2g", "3g"]
+      description: "Highly viscous fiber that expands in stomach for satiety"
+
+    # THERMOGENICS & FAT BURNERS
+    - id: green_tea_extract
+      name: "green_tea_extract"
+      display_name: "Green Tea Extract (EGCG)"
+      function: "thermogenesis_fat_oxidation"
+      category: "thermogenic"
+      strength_levels: ["250mg", "500mg", "750mg"]
+      standardization: "50% EGCG"
+      description: "Catechins boost metabolism and fat burning"
+
+    - id: caffeine
+      name: "caffeine"
+      display_name: "Caffeine Anhydrous"
+      function: "thermogenesis_appetite_suppression_energy"
+      category: "thermogenic"
+      strength_levels: ["100mg", "200mg", "300mg"]
+      description: "Increases metabolic rate and energy expenditure"
+
+    - id: green_coffee_bean
+      name: "green_coffee_bean"
+      display_name: "Green Coffee Bean Extract"
+      function: "chlorogenic_acid_fat_loss"
+      category: "thermogenic"
+      strength_levels: ["400mg", "800mg"]
+      standardization: "45% chlorogenic acid"
+      description: "Chlorogenic acid reduces fat absorption and glucose"
+
+    - id: capsaicin
+      name: "capsaicin"
+      display_name: "Capsaicin (Cayenne Pepper)"
+      function: "thermogenesis_appetite_suppression"
+      category: "thermogenic"
+      strength_levels: ["50mg", "100mg"]
+      description: "Active compound in peppers that increases heat production"
+
+    # METABOLIC REGULATORS
+    - id: berberine
+      name: "berberine"
+      display_name: "Berberine"
+      function: "blood_sugar_insulin_sensitivity_fat_loss"
+      category: "metabolic_regulator"
+      strength_levels: ["500mg", "1000mg", "1500mg"]
+      description: "Activates AMPK to improve insulin sensitivity and fat burning"
+
+    - id: chromium_picolinate
+      name: "chromium_picolinate"
+      display_name: "Chromium Picolinate"
+      function: "blood_sugar_control_reduce_cravings"
+      category: "metabolic_regulator"
+      strength_levels: ["200mcg", "400mcg", "1000mcg"]
+      description: "Enhances insulin function and reduces carb cravings"
+
+    - id: alpha_lipoic_acid
+      name: "alpha_lipoic_acid"
+      display_name: "Alpha-Lipoic Acid (ALA)"
+      function: "glucose_metabolism_antioxidant"
+      category: "metabolic_regulator"
+      strength_levels: ["300mg", "600mg"]
+      description: "Improves glucose uptake and insulin sensitivity"
+
+    - id: cinnamon_extract
+      name: "cinnamon_extract"
+      display_name: "Cinnamon Extract"
+      function: "blood_sugar_insulin_sensitivity"
+      category: "metabolic_regulator"
+      strength_levels: ["250mg", "500mg"]
+      description: "Improves insulin sensitivity and glucose metabolism"
+
+    # FAT METABOLISM
+    - id: l_carnitine
+      name: "l_carnitine"
+      display_name: "L-Carnitine"
+      function: "fat_transport_energy_production"
+      category: "amino_acid"
+      strength_levels: ["500mg", "1000mg", "2000mg"]
+      description: "Transports fatty acids into mitochondria for energy"
+
+    - id: acetyl_l_carnitine
+      name: "acetyl_l_carnitine"
+      display_name: "Acetyl-L-Carnitine (ALCAR)"
+      function: "fat_metabolism_mental_energy"
+      category: "amino_acid"
+      strength_levels: ["500mg", "1000mg"]
+      description: "Fat burning with cognitive benefits"
+
+    - id: cla
+      name: "cla"
+      display_name: "CLA (Conjugated Linoleic Acid)"
+      function: "reduce_body_fat_preserve_muscle"
+      category: "fatty_acid"
+      strength_levels: ["1000mg", "2000mg", "3000mg"]
+      description: "Reduces body fat while preserving lean muscle"
+
+    - id: omega_3_weight_loss
+      name: "omega_3_weight_loss"
+      display_name: "Omega-3 (EPA/DHA)"
+      function: "reduce_inflammation_improve_insulin"
+      category: "fatty_acid"
+      strength_levels: ["1000mg", "2000mg", "3000mg"]
+      description: "Reduces inflammation and improves metabolic health"
+
+    # APPETITE CONTROL
+    - id: 5_htp
+      name: "5_htp"
+      display_name: "5-HTP (5-Hydroxytryptophan)"
+      function: "appetite_suppression_mood_serotonin"
+      category: "amino_acid"
+      strength_levels: ["50mg", "100mg", "200mg"]
+      description: "Increases serotonin to reduce appetite and cravings"
+
+    - id: garcinia_cambogia
+      name: "garcinia_cambogia"
+      display_name: "Garcinia Cambogia (HCA)"
+      function: "appetite_suppression_fat_production_inhibition"
+      category: "botanical"
+      strength_levels: ["500mg", "1000mg"]
+      standardization: "60% HCA"
+      description: "Hydroxycitric acid suppresses appetite and blocks fat synthesis"
+
+    - id: hoodia
+      name: "hoodia"
+      display_name: "Hoodia Gordonii"
+      function: "appetite_suppression"
+      category: "botanical"
+      strength_levels: ["400mg", "800mg"]
+      description: "Traditional appetite suppressant from South Africa"
+
+    # GUT HEALTH & METABOLISM
+    - id: probiotics_weight
+      name: "probiotics_weight"
+      display_name: "Weight Management Probiotics"
+      function: "gut_microbiome_metabolism"
+      category: "probiotics"
+      strength_levels: ["10B CFU", "25B CFU", "50B CFU"]
+      strains: ["Lactobacillus gasseri", "Lactobacillus rhamnosus"]
+      description: "Specific strains shown to support weight loss"
+
+    # APPLE CIDER VINEGAR
+    - id: apple_cider_vinegar
+      name: "apple_cider_vinegar"
+      display_name: "Apple Cider Vinegar"
+      function: "blood_sugar_satiety_fat_loss"
+      category: "botanical"
+      strength_levels: ["500mg", "1000mg", "1500mg"]
+      standardization: "5% acetic acid"
+      description: "Acetic acid improves insulin sensitivity and satiety"
+
+    # GREENS & ANTIOXIDANTS
+    - id: chlorophyll
+      name: "chlorophyll"
+      display_name: "Chlorophyll"
+      function: "detox_appetite_control"
+      category: "greens"
+      description: "Plant pigment that may reduce appetite and support detox"
+
+    - id: spirulina
+      name: "spirulina"
+      display_name: "Spirulina"
+      function: "protein_nutrient_density_satiety"
+      category: "greens"
+      strength_levels: ["500mg", "1000mg", "3000mg"]
+      description: "Nutrient-dense algae high in protein"
+
+    - id: matcha_green_tea
+      name: "matcha_green_tea"
+      display_name: "Matcha Green Tea"
+      function: "antioxidants_metabolism_energy"
+      category: "greens"
+      strength_levels: ["1g", "2g", "3g"]
+      description: "Concentrated green tea with EGCG and caffeine"
+
+    # VITAMINS & MINERALS
+    - id: vitamin_d_weight
+      name: "vitamin_d_weight"
+      display_name: "Vitamin D3"
+      function: "hormone_regulation_metabolism"
+      category: "vitamins"
+      strength_levels: ["1000IU", "2000IU", "5000IU"]
+      description: "Deficiency linked to obesity and metabolic issues"
+
+    - id: b_complex_metabolism
+      name: "b_complex_metabolism"
+      display_name: "B-Complex Vitamins"
+      function: "energy_metabolism_fat_carb_protein"
+      category: "vitamins"
+      description: "Essential for metabolizing fats, carbs, and proteins"
+
+    - id: magnesium_metabolism
+      name: "magnesium_metabolism"
+      display_name: "Magnesium"
+      function: "glucose_metabolism_insulin_sensitivity"
+      category: "minerals"
+      strength_levels: ["200mg", "400mg"]
+      description: "Supports glucose metabolism and insulin function"
+
+    - id: zinc_metabolism
+      name: "zinc_metabolism"
+      display_name: "Zinc"
+      function: "insulin_regulation_appetite"
+      category: "minerals"
+      strength_levels: ["15mg", "30mg"]
+      description: "Regulates insulin and leptin for appetite control"
+
+    # ADAPTOGENS
+    - id: ashwagandha_weight
+      name: "ashwagandha_weight"
+      display_name: "Ashwagandha"
+      function: "cortisol_reduction_stress_weight"
+      category: "adaptogens"
+      strength_levels: ["300mg", "600mg"]
+      description: "Reduces stress-related weight gain by lowering cortisol"
+
+    - id: rhodiola_weight
+      name: "rhodiola_weight"
+      display_name: "Rhodiola Rosea"
+      function: "stress_fatigue_metabolism"
+      category: "adaptogens"
+      strength_levels: ["250mg", "500mg"]
+      description: "Reduces stress eating and supports energy during calorie deficit"
+
+  # ============================================================================
+  # CONSTRAINTS - Safety and contraindications
+  # ============================================================================
+  constraints:
+    - id: pregnancy
+      name: "pregnancy"
+      display_name: "Pregnancy"
+      severity: high
+      description: "Currently pregnant"
+
+    - id: breastfeeding
+      name: "breastfeeding"
+      display_name: "Breastfeeding"
+      severity: moderate
+      description: "Currently breastfeeding"
+
+    - id: diabetes
+      name: "diabetes"
+      display_name: "Diabetes"
+      severity: high
+      description: "Type 1 or Type 2 diabetes"
+
+    - id: high_blood_pressure
+      name: "high_blood_pressure"
+      display_name: "High Blood Pressure"
+      severity: high
+      description: "Hypertension"
+
+    - id: heart_disease
+      name: "heart_disease"
+      display_name: "Heart Disease"
+      severity: high
+      description: "Cardiovascular disease"
+
+    - id: eating_disorder
+      name: "eating_disorder"
+      display_name: "Eating Disorder History"
+      severity: high
+      description: "History of anorexia, bulimia, or other eating disorders"
+
+    - id: thyroid_disorder
+      name: "thyroid_disorder"
+      display_name: "Thyroid Disorder"
+      severity: moderate
+      description: "Hypothyroidism or hyperthyroidism"
+
+    - id: caffeine_sensitivity
+      name: "caffeine_sensitivity"
+      display_name: "Caffeine Sensitivity"
+      severity: moderate
+      description: "Sensitivity or adverse reactions to caffeine"
+
+# ============================================================================
+# EDGES - Relationships between nodes
+# ============================================================================
+edges:
+  # PROBLEM → REQUIRES_KNOWING → ATTRIBUTE
+  problem_requires_attributes:
+    - from: difficulty_losing_weight
+      to: [weight_goal, activity_level, fiber_intake, sleep_quality, stress_level]
+      relationship: REQUIRES_KNOWING
+
+    - from: slow_metabolism
+      to: [age_group, activity_level, sleep_quality, eating_pattern]
+      relationship: REQUIRES_KNOWING
+
+    - from: uncontrolled_appetite
+      to: [eating_pattern, meal_frequency, stress_level, fiber_intake]
+      relationship: REQUIRES_KNOWING
+
+    - from: stubborn_belly_fat
+      to: [age_group, gender, stress_level, sleep_quality, menopause_status]
+      relationship: REQUIRES_KNOWING
+
+    - from: blood_sugar_imbalance
+      to: [dietary_preference, eating_pattern, fiber_intake, activity_level]
+      relationship: REQUIRES_KNOWING
+
+  # INGREDIENT → TREATS → PROBLEM
+  ingredient_treats_problem:
+    # Fiber for weight loss and appetite
+    - from: psyllium_husk_fiber
+      to: difficulty_losing_weight
+      relationship: TREATS
+      efficacy: 0.75
+      mechanism: "Increases satiety and reduces calorie intake"
+      evidence_level: "clinical_trial"
+      onset: "1-2 weeks"
+
+    - from: psyllium_husk_fiber
+      to: uncontrolled_appetite
+      relationship: TREATS
+      efficacy: 0.80
+      mechanism: "Expands in stomach creating fullness sensation"
+      evidence_level: "clinical_trial"
+      onset: "immediate to 1 week"
+
+    - from: glucomannan
+      to: uncontrolled_appetite
+      relationship: TREATS
+      efficacy: 0.85
+      mechanism: "Highly viscous fiber that promotes strong satiety"
+      evidence_level: "clinical_trial"
+      onset: "immediate"
+
+    - from: glucomannan
+      to: difficulty_losing_weight
+      relationship: TREATS
+      efficacy: 0.80
+      mechanism: "Reduces calorie absorption and increases satiety"
+      evidence_level: "clinical_trial"
+      onset: "2-4 weeks"
+
+    # Green tea and thermogenics
+    - from: green_tea_extract
+      to: difficulty_losing_weight
+      relationship: TREATS
+      efficacy: 0.75
+      mechanism: "EGCG increases thermogenesis and fat oxidation"
+      evidence_level: "meta_analysis"
+      onset: "4-8 weeks"
+
+    - from: green_tea_extract
+      to: slow_metabolism
+      relationship: TREATS
+      efficacy: 0.70
+      mechanism: "Catechins boost metabolic rate"
+      evidence_level: "clinical_trial"
+      onset: "2-4 weeks"
+
+    - from: caffeine
+      to: difficulty_losing_weight
+      relationship: TREATS
+      efficacy: 0.70
+      mechanism: "Increases energy expenditure and fat oxidation"
+      evidence_level: "meta_analysis"
+      onset: "1-2 weeks"
+
+    - from: green_coffee_bean
+      to: difficulty_losing_weight
+      relationship: TREATS
+      efficacy: 0.70
+      mechanism: "Chlorogenic acid reduces fat absorption"
+      evidence_level: "clinical_trial"
+      onset: "4-8 weeks"
+
+    # Berberine and metabolic regulators
+    - from: berberine
+      to: difficulty_losing_weight
+      relationship: TREATS
+      efficacy: 0.85
+      mechanism: "Activates AMPK improving insulin sensitivity and fat burning"
+      evidence_level: "clinical_trial"
+      onset: "4-12 weeks"
+
+    - from: berberine
+      to: blood_sugar_imbalance
+      relationship: TREATS
+      efficacy: 0.90
+      mechanism: "Improves glucose uptake and insulin sensitivity"
+      evidence_level: "meta_analysis"
+      onset: "2-4 weeks"
+
+    - from: chromium_picolinate
+      to: uncontrolled_appetite
+      relationship: TREATS
+      efficacy: 0.75
+      mechanism: "Reduces carbohydrate cravings by stabilizing blood sugar"
+      evidence_level: "clinical_trial"
+      onset: "1-4 weeks"
+
+    - from: chromium_picolinate
+      to: blood_sugar_imbalance
+      relationship: TREATS
+      efficacy: 0.75
+      mechanism: "Enhances insulin function for glucose control"
+      evidence_level: "clinical_trial"
+      onset: "2-4 weeks"
+
+    - from: cinnamon_extract
+      to: blood_sugar_imbalance
+      relationship: TREATS
+      efficacy: 0.70
+      mechanism: "Improves insulin sensitivity"
+      evidence_level: "clinical_trial"
+      onset: "2-4 weeks"
+
+    # L-Carnitine for fat metabolism
+    - from: l_carnitine
+      to: difficulty_losing_weight
+      relationship: TREATS
+      efficacy: 0.70
+      mechanism: "Transports fatty acids for oxidation and energy"
+      evidence_level: "clinical_trial"
+      onset: "4-8 weeks"
+
+    - from: l_carnitine
+      to: low_energy_weight_loss
+      relationship: TREATS
+      efficacy: 0.75
+      mechanism: "Improves energy production from fat metabolism"
+      evidence_level: "clinical_trial"
+      onset: "2-4 weeks"
+
+    # Apple Cider Vinegar
+    - from: apple_cider_vinegar
+      to: difficulty_losing_weight
+      relationship: TREATS
+      efficacy: 0.70
+      mechanism: "Acetic acid improves insulin sensitivity and satiety"
+      evidence_level: "clinical_trial"
+      onset: "4-8 weeks"
+
+    - from: apple_cider_vinegar
+      to: blood_sugar_imbalance
+      relationship: TREATS
+      efficacy: 0.75
+      mechanism: "Reduces post-meal glucose spikes"
+      evidence_level: "clinical_trial"
+      onset: "1-2 weeks"
+
+    # Garcinia Cambogia
+    - from: garcinia_cambogia
+      to: uncontrolled_appetite
+      relationship: TREATS
+      efficacy: 0.70
+      mechanism: "HCA increases serotonin for appetite suppression"
+      evidence_level: "clinical_trial"
+      onset: "1-2 weeks"
+
+    - from: garcinia_cambogia
+      to: difficulty_losing_weight
+      relationship: TREATS
+      efficacy: 0.65
+      mechanism: "Inhibits citrate lyase enzyme blocking fat synthesis"
+      evidence_level: "clinical_trial"
+      onset: "4-8 weeks"
+
+    # Omega-3
+    - from: omega_3_weight_loss
+      to: difficulty_losing_weight
+      relationship: TREATS
+      efficacy: 0.70
+      mechanism: "Reduces inflammation improving metabolic health"
+      evidence_level: "clinical_trial"
+      onset: "4-8 weeks"
+
+    # Probiotics
+    - from: probiotics_weight
+      to: difficulty_losing_weight
+      relationship: TREATS
+      efficacy: 0.70
+      mechanism: "Specific strains improve gut microbiome for weight regulation"
+      evidence_level: "clinical_trial"
+      onset: "8-12 weeks"
+
+    # Ashwagandha for stress-related weight
+    - from: ashwagandha_weight
+      to: emotional_eating
+      relationship: TREATS
+      efficacy: 0.80
+      mechanism: "Reduces cortisol and stress-induced eating"
+      evidence_level: "clinical_trial"
+      onset: "4-8 weeks"
+
+    - from: ashwagandha_weight
+      to: stubborn_belly_fat
+      relationship: TREATS
+      efficacy: 0.75
+      mechanism: "Lowers cortisol reducing visceral fat accumulation"
+      evidence_level: "clinical_trial"
+      onset: "8-12 weeks"
+
+    # Vitamin D
+    - from: vitamin_d_weight
+      to: difficulty_losing_weight
+      relationship: TREATS
+      efficacy: 0.70
+      mechanism: "Deficiency correction improves metabolic function"
+      evidence_level: "clinical_trial"
+      onset: "8-12 weeks"
+
+  # INGREDIENT → RECOMMENDED_FOR → ATTRIBUTE
+  ingredient_recommended_for_attribute:
+    - from: fiber
+      to: [fiber_intake:very_low, fiber_intake:low, eating_pattern:regular_meals]
+      relationship: RECOMMENDED_FOR
+
+    - from: green_tea_extract
+      to: [activity_level:lightly_active, activity_level:moderately_active, age_group:26_35, age_group:36_45]
+      relationship: RECOMMENDED_FOR
+
+    - from: berberine
+      to: [blood_sugar_imbalance, eating_pattern:high_carb, age_group:36_45, age_group:46_plus]
+      relationship: RECOMMENDED_FOR
+
+    - from: l_carnitine
+      to: [activity_level:moderately_active, activity_level:very_active, age_group:36_45, age_group:46_plus]
+      relationship: RECOMMENDED_FOR
+
+    - from: ashwagandha_weight
+      to: [stress_level:high, stress_level:very_high, emotional_eating]
+      relationship: RECOMMENDED_FOR
+
+  # INGREDIENT → CONTRAINDICATED_FOR → CONSTRAINT
+  ingredient_contraindications:
+    - from: caffeine
+      to: pregnancy
+      relationship: CONTRAINDICATED_FOR
+      severity: caution
+
+    - from: caffeine
+      to: high_blood_pressure
+      relationship: CONTRAINDICATED_FOR
+      severity: caution
+
+    - from: caffeine
+      to: heart_disease
+      relationship: CONTRAINDICATED_FOR
+      severity: caution
+
+    - from: green_tea_extract
+      to: pregnancy
+      relationship: CONTRAINDICATED_FOR
+      severity: caution
+
+    - from: berberine
+      to: pregnancy
+      relationship: CONTRAINDICATED_FOR
+      severity: avoid
+
+    - from: berberine
+      to: diabetes
+      relationship: CONTRAINDICATED_FOR
+      severity: caution  # Can lower blood sugar, monitor closely
+
+    - from: garcinia_cambogia
+      to: diabetes
+      relationship: CONTRAINDICATED_FOR
+      severity: caution
+
+    - from: 5_htp
+      to: pregnancy
+      relationship: CONTRAINDICATED_FOR
+      severity: avoid
+
+  # PROBLEM → SIMILAR_TO → PROBLEM
+  problem_similarities:
+    - from: difficulty_losing_weight
+      to: slow_metabolism
+      relationship: SIMILAR_TO
+
+    - from: uncontrolled_appetite
+      to: emotional_eating
+      relationship: SIMILAR_TO
+
+  # PROBLEM → OFTEN_PAIRED_WITH → PROBLEM
+  problem_co_occurrence:
+    - from: difficulty_losing_weight
+      to: slow_metabolism
+      relationship: OFTEN_PAIRED_WITH
+
+    - from: uncontrolled_appetite
+      to: blood_sugar_imbalance
+      relationship: OFTEN_PAIRED_WITH
+
+    - from: emotional_eating
+      to: stubborn_belly_fat
+      relationship: OFTEN_PAIRED_WITH
+
+    - from: slow_metabolism
+      to: low_energy_weight_loss
+      relationship: OFTEN_PAIRED_WITH

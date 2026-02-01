@@ -1,0 +1,1536 @@
+# Immunity & Recovery Knowledge Graph
+#
+# This graph defines the domain knowledge for nutraceutical product recommendations
+# focused on immune system support, illness prevention, and faster recovery.
+#
+# UPDATING THIS GRAPH:
+# 1. Add new nodes under the appropriate section (problems, attributes, etc.)
+# 2. Ensure all IDs are unique and use snake_case
+# 3. Add edges to connect new nodes to existing ones
+# 4. Run validation: python -m app.knowledge.validate immunity_recovery
+# 5. Reload graph in development: reload_graph('immunity_recovery')
+
+metadata:
+  domain: immunity_recovery
+  version: 1.0.0
+  created_at: "2026-01-31"
+  description: "Knowledge graph for immunity & recovery nutraceutical recommendations"
+  display_name: "Immunity & Recovery"
+  persona: "You are an immune health and wellness specialist who helps users find science-backed nutraceutical supplements for strengthening immunity, preventing illness, and supporting faster recovery. You focus on vitamins, minerals, antioxidants, and botanical extracts that support immune function. You consider lifestyle factors, seasonal patterns, and health history to provide personalized recommendations."
+  is_active: true
+  parent_domain: null
+
+nodes:
+  # ============================================================================
+  # PROBLEMS - Consumer immune health concerns and wellness goals
+  # ============================================================================
+  problems:
+    - id: frequent_illness
+      name: "frequent_illness"
+      display_name: "Frequent Illness & Infections"
+      synonyms:
+        - "getting sick often"
+        - "frequent colds"
+        - "frequent flu"
+        - "always sick"
+        - "catch everything"
+        - "weak immunity"
+        - "frequent infections"
+      severity_levels: [mild, moderate, severe]
+      description: "Recurring infections, colds, or flu more than 3-4 times per year"
+
+    - id: low_resistance
+      name: "low_resistance"
+      display_name: "Low Immune Resistance"
+      synonyms:
+        - "weak immune system"
+        - "poor immunity"
+        - "low immunity"
+        - "susceptible to illness"
+        - "easily infected"
+        - "compromised immunity"
+      severity_levels: [mild, moderate, severe]
+      description: "Reduced ability to fight off infections and pathogens"
+
+    - id: slow_recovery
+      name: "slow_recovery"
+      display_name: "Slow Recovery from Illness"
+      synonyms:
+        - "slow healing"
+        - "prolonged illness"
+        - "long recovery time"
+        - "takes long to recover"
+        - "illness lasts long"
+      severity_levels: [mild, moderate, severe]
+      description: "Extended time to recover from infections or illness"
+
+    - id: seasonal_susceptibility
+      name: "seasonal_susceptibility"
+      display_name: "Seasonal Illness Susceptibility"
+      synonyms:
+        - "winter illness"
+        - "seasonal flu"
+        - "cold season sickness"
+        - "weather change illness"
+        - "monsoon infections"
+      severity_levels: [mild, moderate, severe]
+      description: "Increased susceptibility to illness during specific seasons"
+
+    - id: post_illness_weakness
+      name: "post_illness_weakness"
+      display_name: "Post-Illness Fatigue & Weakness"
+      synonyms:
+        - "recovery fatigue"
+        - "weakness after illness"
+        - "post-infection fatigue"
+        - "tired after being sick"
+        - "no energy after illness"
+      severity_levels: [mild, moderate, severe]
+      description: "Persistent fatigue and weakness after recovering from illness"
+
+    - id: chronic_inflammation
+      name: "chronic_inflammation"
+      display_name: "Chronic Inflammation"
+      synonyms:
+        - "ongoing inflammation"
+        - "persistent inflammation"
+        - "systemic inflammation"
+        - "inflammatory response"
+      severity_levels: [mild, moderate, severe]
+      description: "Long-term inflammatory state affecting immune function"
+
+    - id: oxidative_stress
+      name: "oxidative_stress"
+      display_name: "Oxidative Stress & Free Radical Damage"
+      synonyms:
+        - "free radical damage"
+        - "oxidation"
+        - "cellular stress"
+        - "oxidative damage"
+      severity_levels: [mild, moderate, severe]
+      description: "Excess free radicals overwhelming antioxidant defenses"
+
+    - id: respiratory_infections
+      name: "respiratory_infections"
+      display_name: "Frequent Respiratory Infections"
+      synonyms:
+        - "chest infections"
+        - "respiratory illness"
+        - "lung infections"
+        - "throat infections"
+        - "sinus infections"
+        - "bronchitis"
+      severity_levels: [mild, moderate, severe]
+      description: "Recurring infections of the respiratory tract"
+
+    - id: low_energy_immunity
+      name: "low_energy_immunity"
+      display_name: "Low Energy & Immune Fatigue"
+      synonyms:
+        - "immune exhaustion"
+        - "tired immune system"
+        - "immune fatigue"
+        - "no energy to fight illness"
+      severity_levels: [mild, moderate, severe]
+      description: "Depleted energy affecting immune system function"
+
+  # ============================================================================
+  # ATTRIBUTES - User characteristics that influence recommendations
+  # ============================================================================
+  attributes:
+    # Age Group - Affects immune function
+    - id: age_group_18_25
+      category: age_group
+      value: "18-25"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    - id: age_group_26_35
+      category: age_group
+      value: "26-35"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    - id: age_group_36_45
+      category: age_group
+      value: "36-45"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    - id: age_group_46_plus
+      category: age_group
+      value: "46+"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    # Dietary Preference
+    - id: diet_vegetarian
+      category: diet
+      value: vegetarian
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    - id: diet_vegan
+      category: diet
+      value: vegan
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    - id: diet_pescatarian
+      category: diet
+      value: pescatarian
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    - id: diet_non_veg
+      category: diet
+      value: non_vegetarian
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    # Gender
+    - id: gender_female
+      category: gender
+      value: female
+      data_type: single_choice
+      elicitation_priority: 3
+      is_global: true
+
+    - id: gender_male
+      category: gender
+      value: male
+      data_type: single_choice
+      elicitation_priority: 3
+      is_global: true
+
+    # Lifestyle Factors
+    - id: lifestyle_high_stress
+      category: lifestyle
+      value: high_stress
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    - id: lifestyle_moderate_stress
+      category: lifestyle
+      value: moderate_stress
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    - id: lifestyle_low_stress
+      category: lifestyle
+      value: low_stress
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    # Sleep Quality
+    - id: sleep_poor
+      category: sleep_quality
+      value: poor
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    - id: sleep_adequate
+      category: sleep_quality
+      value: adequate
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    - id: sleep_excellent
+      category: sleep_quality
+      value: excellent
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    # Exercise Level
+    - id: exercise_sedentary
+      category: exercise
+      value: sedentary
+      data_type: single_choice
+      elicitation_priority: 6
+      is_global: false
+
+    - id: exercise_moderate
+      category: exercise
+      value: moderate
+      data_type: single_choice
+      elicitation_priority: 6
+      is_global: false
+
+    - id: exercise_intense
+      category: exercise
+      value: intense
+      data_type: single_choice
+      elicitation_priority: 6
+      is_global: false
+
+    # Sun Exposure (for Vitamin D)
+    - id: sun_exposure_minimal
+      category: sun_exposure
+      value: minimal
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    - id: sun_exposure_moderate
+      category: sun_exposure
+      value: moderate
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    - id: sun_exposure_high
+      category: sun_exposure
+      value: high
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    # Recent Illness
+    - id: recent_illness_yes
+      category: recent_illness
+      value: "yes"
+      data_type: boolean
+      elicitation_priority: 4
+      is_global: false
+
+    - id: recent_illness_no
+      category: recent_illness
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 4
+      is_global: false
+
+    # Season (for seasonal recommendations)
+    - id: season_winter
+      category: season
+      value: winter
+      data_type: single_choice
+      elicitation_priority: 7
+      is_global: false
+
+    - id: season_monsoon
+      category: season
+      value: monsoon
+      data_type: single_choice
+      elicitation_priority: 7
+      is_global: false
+
+    - id: season_summer
+      category: season
+      value: summer
+      data_type: single_choice
+      elicitation_priority: 7
+      is_global: false
+
+    # ============================================================================
+    # SAFETY CONSTRAINTS - Global hard constraints (ALWAYS ask these first)
+    # ============================================================================
+
+    # Medical Constraints
+    - id: medical_constraint_pregnancy
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: medical_constraint_breastfeeding
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: medical_constraint_autoimmune
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: medical_constraint_diabetes
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: medical_constraint_blood_thinners
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    # Allergy Constraints
+    - id: allergy_constraint_citrus
+      category: allergies
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: allergy_constraint_mushrooms
+      category: allergies
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+  # ============================================================================
+  # INGREDIENTS - Key actives for immunity & recovery
+  # ============================================================================
+  ingredients:
+    # VITAMIN C - Immune powerhouse
+    - id: vitamin_c
+      name: "vitamin_c"
+      display_name: "Vitamin C (Ascorbic Acid)"
+      function: "immune_support_antioxidant"
+      category: "vitamins"
+      strength_levels: ["500mg", "1000mg", "2000mg"]
+
+    - id: vitamin_c_liposomal
+      name: "vitamin_c_liposomal"
+      display_name: "Liposomal Vitamin C"
+      function: "enhanced_absorption_immune_support"
+      category: "vitamins"
+      strength_levels: ["500mg", "1000mg"]
+
+    - id: vitamin_c_buffered
+      name: "vitamin_c_buffered"
+      display_name: "Buffered Vitamin C (Gentle)"
+      function: "gentle_immune_support"
+      category: "vitamins"
+      strength_levels: ["500mg", "1000mg"]
+
+    # ZINC - Immune mineral
+    - id: zinc
+      name: "zinc"
+      display_name: "Zinc"
+      function: "immune_cell_function_infection_defense"
+      category: "minerals"
+      strength_levels: ["15mg", "25mg", "50mg"]
+
+    - id: zinc_picolinate
+      name: "zinc_picolinate"
+      display_name: "Zinc Picolinate"
+      function: "enhanced_absorption_immune_support"
+      category: "minerals"
+      strength_levels: ["15mg", "25mg"]
+
+    # VITAMIN D - Immune modulator
+    - id: vitamin_d3
+      name: "vitamin_d3"
+      display_name: "Vitamin D3 (Cholecalciferol)"
+      function: "immune_modulation_infection_prevention"
+      category: "vitamins"
+      strength_levels: ["1000 IU", "2000 IU", "5000 IU"]
+
+    # ELDERBERRY - Antiviral botanical
+    - id: elderberry
+      name: "elderberry"
+      display_name: "Elderberry Extract"
+      function: "antiviral_immune_support"
+      category: "botanicals"
+      strength_levels: ["500mg", "1000mg"]
+
+    # CURCUMIN/TURMERIC - Anti-inflammatory
+    - id: curcumin
+      name: "curcumin"
+      display_name: "Curcumin (Turmeric Extract)"
+      function: "anti_inflammatory_immune_modulation"
+      category: "botanicals"
+      strength_levels: ["500mg", "1000mg", "1500mg"]
+
+    - id: curcumin_liposomal
+      name: "curcumin_liposomal"
+      display_name: "Liposomal Curcumin"
+      function: "enhanced_absorption_anti_inflammatory"
+      category: "botanicals"
+      strength_levels: ["500mg", "1000mg"]
+
+    # MUSHROOMS - Immune modulators
+    - id: reishi_mushroom
+      name: "reishi_mushroom"
+      display_name: "Reishi Mushroom"
+      function: "immune_modulation_stress_adaptation"
+      category: "botanicals"
+      strength_levels: ["500mg", "1000mg"]
+
+    - id: shiitake_mushroom
+      name: "shiitake_mushroom"
+      display_name: "Shiitake Mushroom"
+      function: "immune_cell_activation"
+      category: "botanicals"
+      strength_levels: ["500mg", "1000mg"]
+
+    - id: maitake_mushroom
+      name: "maitake_mushroom"
+      display_name: "Maitake Mushroom"
+      function: "immune_enhancement_beta_glucans"
+      category: "botanicals"
+      strength_levels: ["500mg", "1000mg"]
+
+    - id: turkey_tail_mushroom
+      name: "turkey_tail_mushroom"
+      display_name: "Turkey Tail Mushroom"
+      function: "immune_support_gut_health"
+      category: "botanicals"
+      strength_levels: ["500mg", "1000mg"]
+
+    - id: mushroom_complex
+      name: "mushroom_complex"
+      display_name: "Multi-Mushroom Complex"
+      function: "comprehensive_immune_support"
+      category: "botanicals"
+      strength_levels: ["1000mg", "2000mg"]
+
+    # OTHER VITAMINS
+    - id: vitamin_a
+      name: "vitamin_a"
+      display_name: "Vitamin A (Beta-Carotene)"
+      function: "mucosal_immunity_barrier_function"
+      category: "vitamins"
+      strength_levels: ["2500 IU", "5000 IU", "10000 IU"]
+
+    - id: vitamin_e
+      name: "vitamin_e"
+      display_name: "Vitamin E (Tocopherol)"
+      function: "antioxidant_immune_support"
+      category: "vitamins"
+      strength_levels: ["200 IU", "400 IU", "800 IU"]
+
+    - id: vitamin_b_complex
+      name: "vitamin_b_complex"
+      display_name: "B-Complex Vitamins"
+      function: "energy_immune_cell_production"
+      category: "vitamins"
+      strength_levels: ["standard", "high_potency"]
+
+    - id: vitamin_b6
+      name: "vitamin_b6"
+      display_name: "Vitamin B6 (Pyridoxine)"
+      function: "immune_cell_function_antibody_production"
+      category: "vitamins"
+      strength_levels: ["25mg", "50mg", "100mg"]
+
+    - id: folate
+      name: "folate"
+      display_name: "Folate (Vitamin B9)"
+      function: "immune_cell_division_dna_synthesis"
+      category: "vitamins"
+      strength_levels: ["400mcg", "800mcg", "1000mcg"]
+
+    # MINERALS
+    - id: selenium
+      name: "selenium"
+      display_name: "Selenium"
+      function: "antioxidant_immune_function"
+      category: "minerals"
+      strength_levels: ["55mcg", "100mcg", "200mcg"]
+
+    - id: iron
+      name: "iron"
+      display_name: "Iron"
+      function: "immune_cell_proliferation"
+      category: "minerals"
+      strength_levels: ["14mg", "18mg", "27mg"]
+
+    - id: copper
+      name: "copper"
+      display_name: "Copper"
+      function: "immune_cell_maturation"
+      category: "minerals"
+      strength_levels: ["1mg", "2mg"]
+
+    # ANTIOXIDANTS
+    - id: glutathione
+      name: "glutathione"
+      display_name: "Glutathione"
+      function: "master_antioxidant_immune_support"
+      category: "antioxidants"
+      strength_levels: ["250mg", "500mg", "1000mg"]
+
+    - id: quercetin
+      name: "quercetin"
+      display_name: "Quercetin"
+      function: "antiviral_anti_inflammatory"
+      category: "antioxidants"
+      strength_levels: ["250mg", "500mg", "1000mg"]
+
+    - id: resveratrol
+      name: "resveratrol"
+      display_name: "Resveratrol"
+      function: "anti_inflammatory_immune_modulation"
+      category: "antioxidants"
+      strength_levels: ["100mg", "250mg", "500mg"]
+
+    - id: coq10
+      name: "coq10"
+      display_name: "Coenzyme Q10 (CoQ10)"
+      function: "cellular_energy_antioxidant"
+      category: "antioxidants"
+      strength_levels: ["100mg", "200mg", "300mg"]
+
+    # BOTANICALS & HERBS
+    - id: echinacea
+      name: "echinacea"
+      display_name: "Echinacea"
+      function: "immune_stimulation_cold_prevention"
+      category: "botanicals"
+      strength_levels: ["250mg", "500mg"]
+
+    - id: astragalus
+      name: "astragalus"
+      display_name: "Astragalus Root"
+      function: "immune_enhancement_adaptogen"
+      category: "botanicals"
+      strength_levels: ["500mg", "1000mg"]
+
+    - id: ginger
+      name: "ginger"
+      display_name: "Ginger Extract"
+      function: "anti_inflammatory_immune_support"
+      category: "botanicals"
+      strength_levels: ["250mg", "500mg", "1000mg"]
+
+    - id: garlic
+      name: "garlic"
+      display_name: "Garlic Extract (Allicin)"
+      function: "antimicrobial_immune_support"
+      category: "botanicals"
+      strength_levels: ["500mg", "1000mg"]
+
+    - id: andrographis
+      name: "andrographis"
+      display_name: "Andrographis"
+      function: "immune_support_respiratory_health"
+      category: "botanicals"
+      strength_levels: ["200mg", "400mg"]
+
+    - id: tulsi
+      name: "tulsi"
+      display_name: "Tulsi (Holy Basil)"
+      function: "adaptogen_immune_support"
+      category: "botanicals"
+      strength_levels: ["300mg", "500mg"]
+
+    - id: ashwagandha
+      name: "ashwagandha"
+      display_name: "Ashwagandha"
+      function: "stress_reduction_immune_support"
+      category: "botanicals"
+      strength_levels: ["300mg", "500mg", "600mg"]
+
+    # PROBIOTICS (immune-gut connection)
+    - id: lactobacillus_rhamnosus
+      name: "lactobacillus_rhamnosus"
+      display_name: "Lactobacillus Rhamnosus GG"
+      function: "gut_immunity_respiratory_health"
+      category: "probiotics"
+      strength_levels: ["5 billion CFU", "10 billion CFU"]
+
+    - id: bifidobacterium_lactis
+      name: "bifidobacterium_lactis"
+      display_name: "Bifidobacterium Lactis"
+      function: "immune_modulation_gut_health"
+      category: "probiotics"
+      strength_levels: ["5 billion CFU", "10 billion CFU"]
+
+    # OMEGA-3
+    - id: omega_3
+      name: "omega_3"
+      display_name: "Omega-3 Fatty Acids"
+      function: "anti_inflammatory_immune_regulation"
+      category: "essential_fatty_acids"
+      strength_levels: ["500mg", "1000mg", "2000mg"]
+
+  # ============================================================================
+  # CONSTRAINTS - User limitations that exclude certain products
+  # ============================================================================
+  constraints:
+    - id: pregnancy
+      type: "medical"
+      value: "true"
+      severity: "hard"
+
+    - id: breastfeeding
+      type: "medical"
+      value: "true"
+      severity: "hard"
+
+    - id: autoimmune_condition
+      type: "medical"
+      value: "autoimmune"
+      severity: "hard"
+
+    - id: diabetes_condition
+      type: "medical"
+      value: "diabetes"
+      severity: "soft"
+
+    - id: blood_thinners_medication
+      type: "medical"
+      value: "blood_thinners"
+      severity: "hard"
+
+    - id: allergy_citrus
+      type: "allergy"
+      value: "citrus"
+      severity: "hard"
+
+    - id: allergy_mushrooms
+      type: "allergy"
+      value: "mushrooms"
+      severity: "hard"
+
+    - id: diet_vegan_constraint
+      type: "dietary"
+      value: "vegan"
+      severity: "hard"
+
+    - id: diet_vegetarian_constraint
+      type: "dietary"
+      value: "vegetarian"
+      severity: "hard"
+
+  # ============================================================================
+  # QUESTIONS - Templates for eliciting information
+  # ============================================================================
+  questions:
+    - id: q_primary_immune_concern
+      text: "What is your primary immunity concern?"
+      response_type: "single_choice"
+      options:
+        - "Getting sick frequently"
+        - "Low immune resistance"
+        - "Slow recovery from illness"
+        - "Seasonal illness susceptibility"
+        - "Post-illness fatigue"
+        - "Respiratory infections"
+        - "Overall immune support"
+
+    - id: q_age_group
+      text: "What is your age group?"
+      response_type: "single_choice"
+      options:
+        - "18-25"
+        - "26-35"
+        - "36-45"
+        - "46+"
+
+    - id: q_gender
+      text: "What is your gender?"
+      response_type: "single_choice"
+      options:
+        - "Female"
+        - "Male"
+        - "Prefer not to say"
+
+    - id: q_diet
+      text: "What is your dietary preference?"
+      response_type: "single_choice"
+      options:
+        - "Vegetarian"
+        - "Vegan"
+        - "Pescatarian"
+        - "Non-vegetarian"
+
+    - id: q_stress_level
+      text: "How would you describe your stress levels?"
+      response_type: "single_choice"
+      options:
+        - "High stress/demanding lifestyle"
+        - "Moderate stress"
+        - "Low stress/relaxed"
+
+    - id: q_sleep_quality
+      text: "How would you describe your sleep quality?"
+      response_type: "single_choice"
+      options:
+        - "Poor (less than 6 hours or restless)"
+        - "Adequate (6-7 hours)"
+        - "Excellent (7-8+ hours, restful)"
+
+    - id: q_exercise_level
+      text: "How active is your lifestyle?"
+      response_type: "single_choice"
+      options:
+        - "Sedentary (little to no exercise)"
+        - "Moderately active (2-3 times/week)"
+        - "Very active (4+ times/week, intense)"
+
+    - id: q_sun_exposure
+      text: "How much daily sun exposure do you get?"
+      response_type: "single_choice"
+      options:
+        - "Minimal (mostly indoors)"
+        - "Moderate (1-2 hours outdoors)"
+        - "High (3+ hours outdoors)"
+
+    - id: q_recent_illness
+      text: "Have you been ill in the last month?"
+      response_type: "single_choice"
+      options:
+        - "Yes, recovering now"
+        - "Yes, recently recovered"
+        - "No"
+
+    - id: q_season
+      text: "What season is it currently?"
+      response_type: "single_choice"
+      options:
+        - "Winter (cold, flu season)"
+        - "Monsoon (rainy, infection season)"
+        - "Summer"
+        - "Other/Not relevant"
+
+    # Safety Constraint Questions (asked first for all users)
+    - id: q_medical_constraints
+      text: "Do any of these medical conditions apply to you?"
+      response_type: "multi_choice"
+      options:
+        - "Pregnancy"
+        - "Breastfeeding"
+        - "Autoimmune condition"
+        - "Diabetes"
+        - "Taking blood thinners"
+        - "None of the above"
+      validation_rules:
+        allow_none: true
+
+    - id: q_allergies
+      text: "Do you have any of these allergies?"
+      response_type: "multi_choice"
+      options:
+        - "Citrus allergy"
+        - "Mushroom allergy"
+        - "No allergies"
+      validation_rules:
+        allow_none: true
+
+# ============================================================================
+# EDGES - Relationships between nodes
+# ============================================================================
+edges:
+  # --------------------------------------------------------------------------
+  # PROBLEM → REQUIRES_KNOWING → ATTRIBUTE
+  # Defines which attributes are needed to recommend solutions for a problem
+  # --------------------------------------------------------------------------
+
+  # Frequent Illness requires knowing lifestyle factors
+  - source: frequent_illness
+    target: lifestyle_high_stress
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Chronic stress significantly weakens immune function"
+
+  - source: frequent_illness
+    target: sleep_poor
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Poor sleep impairs immune cell function and antibody production"
+
+  - source: frequent_illness
+    target: sun_exposure_minimal
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: true
+      reason: "Vitamin D deficiency from low sun exposure increases infection risk"
+
+  # Low Resistance requires knowing age and diet
+  - source: low_resistance
+    target: age_group_46_plus
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Immune function naturally declines with age"
+
+  - source: low_resistance
+    target: diet_vegan
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: true
+      reason: "Plant-based diets may need supplementation for immune nutrients"
+
+  # Slow Recovery requires knowing recent illness
+  - source: slow_recovery
+    target: recent_illness_yes
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Current recovery status determines supplement urgency and dosage"
+
+  - source: slow_recovery
+    target: sleep_poor
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Sleep is critical for recovery and immune restoration"
+
+  # Seasonal Susceptibility requires knowing season
+  - source: seasonal_susceptibility
+    target: season_winter
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Season determines specific immune challenges and supplement needs"
+
+  # Post-Illness Weakness requires knowing exercise level
+  - source: post_illness_weakness
+    target: exercise_sedentary
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: true
+      reason: "Activity level affects recovery speed and energy restoration"
+
+  # Respiratory Infections require knowing season and stress
+  - source: respiratory_infections
+    target: season_winter
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Winter increases respiratory infection risk"
+
+  - source: respiratory_infections
+    target: lifestyle_high_stress
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: true
+      reason: "Stress impairs respiratory immune defenses"
+
+  # --------------------------------------------------------------------------
+  # ATTRIBUTE → ELICITS_QUESTION → QUESTION
+  # Maps attributes to questions that elicit them
+  # --------------------------------------------------------------------------
+
+  - source: age_group_18_25
+    target: q_age_group
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+
+  - source: gender_female
+    target: q_gender
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_not_known"
+      timing: "immediate"
+
+  - source: diet_vegan
+    target: q_diet
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+
+  - source: lifestyle_high_stress
+    target: q_stress_level
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_immune_concern"
+      timing: "immediate"
+
+  - source: sleep_poor
+    target: q_sleep_quality
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_frequent_illness"
+      timing: "immediate"
+
+  - source: exercise_sedentary
+    target: q_exercise_level
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_recovery_concern"
+      timing: "immediate"
+
+  - source: sun_exposure_minimal
+    target: q_sun_exposure
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_frequent_illness"
+      timing: "immediate"
+
+  - source: recent_illness_yes
+    target: q_recent_illness
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_recovery_concern"
+      timing: "immediate"
+
+  - source: season_winter
+    target: q_season
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_seasonal_concern"
+      timing: "immediate"
+
+  # Global Safety Constraint Questions (asked FIRST for everyone)
+  - source: medical_constraint_pregnancy
+    target: q_medical_constraints
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+      is_safety_critical: true
+
+  - source: medical_constraint_autoimmune
+    target: q_medical_constraints
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+      is_safety_critical: true
+
+  - source: allergy_constraint_citrus
+    target: q_allergies
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+      is_safety_critical: true
+
+  # --------------------------------------------------------------------------
+  # INGREDIENT → TREATS → PROBLEM
+  # Defines which ingredients are effective for which problems
+  # --------------------------------------------------------------------------
+
+  # VITAMIN C for General Immunity
+  - source: vitamin_c
+    target: frequent_illness
+    relation: TREATS
+    properties:
+      mechanism: "Supports immune cell function, antibody production, and interferon response"
+      efficacy: 0.85
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: vitamin_c
+    target: slow_recovery
+    relation: TREATS
+    properties:
+      mechanism: "Accelerates immune response and tissue repair"
+      efficacy: 0.80
+      onset_time: "3-7 days"
+      evidence_level: "clinical_trial"
+
+  - source: vitamin_c
+    target: respiratory_infections
+    relation: TREATS
+    properties:
+      mechanism: "Reduces duration and severity of respiratory infections"
+      efficacy: 0.75
+      onset_time: "1-3 days"
+      evidence_level: "clinical_trial"
+
+  - source: vitamin_c_liposomal
+    target: low_resistance
+    relation: TREATS
+    properties:
+      mechanism: "Enhanced absorption provides superior immune support"
+      efficacy: 0.90
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  # ZINC for Immune Function
+  - source: zinc
+    target: frequent_illness
+    relation: TREATS
+    properties:
+      mechanism: "Essential for immune cell development and function"
+      efficacy: 0.85
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: zinc
+    target: slow_recovery
+    relation: TREATS
+    properties:
+      mechanism: "Reduces infection duration and speeds recovery"
+      efficacy: 0.80
+      onset_time: "3-7 days"
+      evidence_level: "clinical_trial"
+
+  - source: zinc
+    target: respiratory_infections
+    relation: TREATS
+    properties:
+      mechanism: "Inhibits viral replication in respiratory tract"
+      efficacy: 0.85
+      onset_time: "1-3 days"
+      evidence_level: "clinical_trial"
+
+  # VITAMIN D for Immune Modulation
+  - source: vitamin_d3
+    target: frequent_illness
+    relation: TREATS
+    properties:
+      mechanism: "Modulates innate and adaptive immune responses"
+      efficacy: 0.85
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: vitamin_d3
+    target: low_resistance
+    relation: TREATS
+    properties:
+      mechanism: "Corrects deficiency that impairs immune function"
+      efficacy: 0.90
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: vitamin_d3
+    target: respiratory_infections
+    relation: TREATS
+    properties:
+      mechanism: "Reduces risk and severity of respiratory infections"
+      efficacy: 0.80
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  # ELDERBERRY for Antiviral Support
+  - source: elderberry
+    target: frequent_illness
+    relation: TREATS
+    properties:
+      mechanism: "Antiviral properties reduce infection frequency"
+      efficacy: 0.80
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: elderberry
+    target: slow_recovery
+    relation: TREATS
+    properties:
+      mechanism: "Reduces flu and cold duration by 2-4 days"
+      efficacy: 0.85
+      onset_time: "2-4 days"
+      evidence_level: "clinical_trial"
+
+  - source: elderberry
+    target: respiratory_infections
+    relation: TREATS
+    properties:
+      mechanism: "Targets respiratory viruses and reduces symptoms"
+      efficacy: 0.85
+      onset_time: "1-3 days"
+      evidence_level: "clinical_trial"
+
+  # CURCUMIN for Inflammation
+  - source: curcumin
+    target: chronic_inflammation
+    relation: TREATS
+    properties:
+      mechanism: "Powerful anti-inflammatory reduces chronic immune activation"
+      efficacy: 0.85
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: curcumin
+    target: post_illness_weakness
+    relation: TREATS
+    properties:
+      mechanism: "Reduces inflammatory fatigue and supports recovery"
+      efficacy: 0.75
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: curcumin
+    target: low_resistance
+    relation: TREATS
+    properties:
+      mechanism: "Modulates immune response and reduces inflammation"
+      efficacy: 0.80
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  # MUSHROOMS for Immune Modulation
+  - source: mushroom_complex
+    target: low_resistance
+    relation: TREATS
+    properties:
+      mechanism: "Beta-glucans activate immune cells and enhance response"
+      efficacy: 0.85
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: mushroom_complex
+    target: frequent_illness
+    relation: TREATS
+    properties:
+      mechanism: "Comprehensive immune support from multiple mushroom species"
+      efficacy: 0.80
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: reishi_mushroom
+    target: chronic_inflammation
+    relation: TREATS
+    properties:
+      mechanism: "Adaptogenic properties reduce stress-induced inflammation"
+      efficacy: 0.80
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: turkey_tail_mushroom
+    target: low_resistance
+    relation: TREATS
+    properties:
+      mechanism: "PSK and PSP compounds enhance immune function"
+      efficacy: 0.85
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  # ECHINACEA for Infection Prevention
+  - source: echinacea
+    target: seasonal_susceptibility
+    relation: TREATS
+    properties:
+      mechanism: "Immune stimulation reduces infection incidence"
+      efficacy: 0.75
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: echinacea
+    target: frequent_illness
+    relation: TREATS
+    properties:
+      mechanism: "Activates immune cells to prevent infections"
+      efficacy: 0.75
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  # ASTRAGALUS for Immune Enhancement
+  - source: astragalus
+    target: low_resistance
+    relation: TREATS
+    properties:
+      mechanism: "Adaptogenic immune enhancement and stress reduction"
+      efficacy: 0.80
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: astragalus
+    target: post_illness_weakness
+    relation: TREATS
+    properties:
+      mechanism: "Supports energy restoration and immune recovery"
+      efficacy: 0.75
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  # QUERCETIN for Antiviral
+  - source: quercetin
+    target: respiratory_infections
+    relation: TREATS
+    properties:
+      mechanism: "Antiviral and anti-inflammatory for respiratory health"
+      efficacy: 0.80
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: quercetin
+    target: seasonal_susceptibility
+    relation: TREATS
+    properties:
+      mechanism: "Reduces seasonal allergy and infection symptoms"
+      efficacy: 0.75
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  # ASHWAGANDHA for Stress-Related Immunity
+  - source: ashwagandha
+    target: low_resistance
+    relation: TREATS
+    properties:
+      mechanism: "Reduces stress hormones that suppress immunity"
+      efficacy: 0.80
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: ashwagandha
+    target: post_illness_weakness
+    relation: TREATS
+    properties:
+      mechanism: "Adaptogen that restores energy and immune balance"
+      efficacy: 0.75
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  # PROBIOTICS for Gut-Immune Connection
+  - source: lactobacillus_rhamnosus
+    target: frequent_illness
+    relation: TREATS
+    properties:
+      mechanism: "70% of immune system in gut; probiotics enhance immunity"
+      efficacy: 0.80
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: lactobacillus_rhamnosus
+    target: respiratory_infections
+    relation: TREATS
+    properties:
+      mechanism: "Reduces respiratory infection frequency and duration"
+      efficacy: 0.75
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  # SELENIUM for Antioxidant Defense
+  - source: selenium
+    target: oxidative_stress
+    relation: TREATS
+    properties:
+      mechanism: "Essential antioxidant enzyme cofactor"
+      efficacy: 0.80
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: selenium
+    target: low_resistance
+    relation: TREATS
+    properties:
+      mechanism: "Supports immune cell function and antioxidant defense"
+      efficacy: 0.75
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  # GLUTATHIONE for Master Antioxidant
+  - source: glutathione
+    target: oxidative_stress
+    relation: TREATS
+    properties:
+      mechanism: "Master antioxidant that regenerates other antioxidants"
+      efficacy: 0.90
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: glutathione
+    target: post_illness_weakness
+    relation: TREATS
+    properties:
+      mechanism: "Reduces oxidative fatigue and supports cellular recovery"
+      efficacy: 0.80
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  # --------------------------------------------------------------------------
+  # INGREDIENT → RECOMMENDED_FOR → ATTRIBUTE
+  # Defines which ingredients work best for specific user attributes
+  # --------------------------------------------------------------------------
+
+  # Vitamin D for Low Sun Exposure
+  - source: vitamin_d3
+    target: sun_exposure_minimal
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 1.0
+      evidence: "proven"
+
+  # Higher doses for older adults
+  - source: vitamin_c
+    target: age_group_46_plus
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.90
+      evidence: "proven"
+
+  - source: zinc
+    target: age_group_46_plus
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.90
+      evidence: "proven"
+
+  # Ashwagandha for High Stress
+  - source: ashwagandha
+    target: lifestyle_high_stress
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.95
+      evidence: "proven"
+
+  # Vitamin B Complex for Poor Sleep
+  - source: vitamin_b_complex
+    target: sleep_poor
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.85
+      evidence: "proven"
+
+  # Elderberry for Winter Season
+  - source: elderberry
+    target: season_winter
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.95
+      evidence: "proven"
+
+  # Probiotics for Vegans
+  - source: lactobacillus_rhamnosus
+    target: diet_vegan
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.85
+      evidence: "proven"
+
+  # --------------------------------------------------------------------------
+  # INGREDIENT → CONTRAINDICATED_FOR → CONSTRAINT
+  # Safety rules for ingredients
+  # --------------------------------------------------------------------------
+
+  # High-dose Vitamin A during Pregnancy
+  - source: vitamin_a
+    target: pregnancy
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "High doses may cause birth defects"
+      severity: "avoid"
+      alternative_ingredients:
+        - "vitamin_c"
+        - "zinc"
+
+  # Echinacea with Autoimmune Conditions
+  - source: echinacea
+    target: autoimmune_condition
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "May overstimulate immune system in autoimmune conditions"
+      severity: "avoid"
+      alternative_ingredients:
+        - "vitamin_d3"
+        - "mushroom_complex"
+
+  # Mushrooms with Mushroom Allergy
+  - source: mushroom_complex
+    target: allergy_mushrooms
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "Allergic reaction risk"
+      severity: "avoid"
+      alternative_ingredients:
+        - "astragalus"
+        - "elderberry"
+
+  # Vitamin C (Citrus) with Citrus Allergy
+  - source: vitamin_c
+    target: allergy_citrus
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "If derived from citrus sources; use non-citrus vitamin C"
+      severity: "caution"
+      alternative_ingredients:
+        - "vitamin_c_buffered"
+
+  # Garlic/Ginger with Blood Thinners
+  - source: garlic
+    target: blood_thinners_medication
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "May increase bleeding risk"
+      severity: "caution"
+      alternative_ingredients:
+        - "vitamin_c"
+        - "zinc"
+
+  - source: ginger
+    target: blood_thinners_medication
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "May increase bleeding risk"
+      severity: "caution"
+      alternative_ingredients:
+        - "elderberry"
+        - "vitamin_d3"
+
+  # --------------------------------------------------------------------------
+  # PROBLEM → SIMILAR_TO → PROBLEM
+  # Semantic relationships between problems
+  # --------------------------------------------------------------------------
+
+  - source: frequent_illness
+    target: low_resistance
+    relation: SIMILAR_TO
+    properties:
+      similarity_score: 0.90
+      shared_symptoms:
+        - "weak_immunity"
+        - "infection_susceptibility"
+
+  - source: slow_recovery
+    target: post_illness_weakness
+    relation: SIMILAR_TO
+    properties:
+      similarity_score: 0.85
+      shared_symptoms:
+        - "prolonged_symptoms"
+        - "fatigue"
+
+  # --------------------------------------------------------------------------
+  # PROBLEM → OFTEN_PAIRED_WITH → PROBLEM
+  # Problems that commonly occur together
+  # --------------------------------------------------------------------------
+
+  - source: frequent_illness
+    target: low_resistance
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.95
+      recommendation: "treat_together"
+
+  - source: slow_recovery
+    target: post_illness_weakness
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.85
+      recommendation: "treat_together"
+
+  - source: chronic_inflammation
+    target: oxidative_stress
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.90
+      recommendation: "treat_together"
+
+  - source: frequent_illness
+    target: respiratory_infections
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.80
+      recommendation: "treat_together"
+
+  - source: low_energy_immunity
+    target: post_illness_weakness
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.85
+      recommendation: "treat_together"

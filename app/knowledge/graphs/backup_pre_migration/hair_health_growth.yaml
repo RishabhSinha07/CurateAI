@@ -1,0 +1,1372 @@
+# Hair Health & Growth Knowledge Graph
+#
+# This graph defines the domain knowledge for nutraceutical product recommendations
+# focused on hair health, hair fall reduction, growth, and thickness improvement.
+#
+# UPDATING THIS GRAPH:
+# 1. Add new nodes under the appropriate section (problems, attributes, etc.)
+# 2. Ensure all IDs are unique and use snake_case
+# 3. Add edges to connect new nodes to existing ones
+# 4. Run validation: python -m app.knowledge.validate hair_health_growth
+# 5. Reload graph in development: reload_graph('hair_health_growth')
+
+metadata:
+  domain: hair_health_growth
+  version: 1.0.0
+  created_at: "2026-01-31"
+  description: "Knowledge graph for hair health & growth nutraceutical recommendations"
+  display_name: "Hair Health & Growth"
+  persona: "You are a hair health and nutrition specialist who helps users find science-backed nutraceutical supplements for reducing hair fall, improving hair growth, and increasing hair thickness. You focus on biotin, keratin, zinc, iron, collagen, and amino acids that support hair health from within. You consider dietary preferences, age, gender, and specific hair concerns to provide personalized recommendations."
+  is_active: true
+  parent_domain: null
+
+nodes:
+  # ============================================================================
+  # PROBLEMS - Consumer hair health concerns and wellness goals
+  # ============================================================================
+  problems:
+    - id: hair_thinning
+      name: "hair_thinning"
+      display_name: "Hair Thinning"
+      synonyms:
+        - "thin hair"
+        - "fine hair"
+        - "lack of volume"
+        - "hair density loss"
+        - "sparse hair"
+        - "thinning hair"
+      severity_levels: [mild, moderate, severe]
+      description: "Progressive reduction in hair density and thickness"
+
+    - id: hair_fall
+      name: "hair_fall"
+      display_name: "Excessive Hair Fall"
+      synonyms:
+        - "hair loss"
+        - "hair shedding"
+        - "falling hair"
+        - "excessive shedding"
+        - "hair dropping"
+        - "losing hair"
+      severity_levels: [mild, moderate, severe]
+      description: "Abnormal amount of daily hair shedding"
+
+    - id: hair_breakage
+      name: "hair_breakage"
+      display_name: "Hair Breakage"
+      synonyms:
+        - "brittle hair"
+        - "breaking hair"
+        - "damaged hair"
+        - "fragile hair"
+        - "weak hair strands"
+        - "split ends"
+      severity_levels: [mild, moderate, severe]
+      description: "Hair strands breaking before reaching full length"
+
+    - id: slow_growth
+      name: "slow_growth"
+      display_name: "Slow Hair Growth"
+      synonyms:
+        - "stunted growth"
+        - "hair won't grow"
+        - "growth plateau"
+        - "slow growing hair"
+        - "hair not growing"
+      severity_levels: [mild, moderate, severe]
+      description: "Hair growing slower than normal rate (< 0.5 inch/month)"
+
+    - id: lack_of_thickness
+      name: "lack_of_thickness"
+      display_name: "Lack of Hair Thickness"
+      synonyms:
+        - "thin strands"
+        - "fine texture"
+        - "no volume"
+        - "flat hair"
+        - "limp hair"
+      severity_levels: [mild, moderate, severe]
+      description: "Individual hair strands lacking diameter and body"
+
+    - id: nutrient_deficiency
+      name: "nutrient_deficiency"
+      display_name: "Nutritional Deficiencies Affecting Hair"
+      synonyms:
+        - "vitamin deficiency"
+        - "mineral deficiency"
+        - "iron deficiency"
+        - "biotin deficiency"
+        - "protein deficiency"
+        - "nutritional gaps"
+      severity_levels: [mild, moderate, severe]
+      description: "Lack of essential nutrients required for healthy hair growth"
+
+    - id: premature_greying
+      name: "premature_greying"
+      display_name: "Premature Greying"
+      synonyms:
+        - "early grey hair"
+        - "premature white hair"
+        - "young grey hair"
+        - "grey before 30"
+      severity_levels: [mild, moderate, severe]
+      description: "Grey hair appearing before age 30-35"
+
+    - id: dull_hair
+      name: "dull_hair"
+      display_name: "Dull & Lifeless Hair"
+      synonyms:
+        - "no shine"
+        - "lackluster hair"
+        - "matte hair"
+        - "dry appearance"
+        - "faded hair"
+      severity_levels: [mild, moderate, severe]
+      description: "Hair lacking natural shine and vitality"
+
+  # ============================================================================
+  # ATTRIBUTES - User characteristics that influence recommendations
+  # ============================================================================
+  attributes:
+    # Age Group - Critical for hair loss severity
+    - id: age_group_18_25
+      category: age_group
+      value: "18-25"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    - id: age_group_26_35
+      category: age_group
+      value: "26-35"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    - id: age_group_36_45
+      category: age_group
+      value: "36-45"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    - id: age_group_46_plus
+      category: age_group
+      value: "46+"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    # Dietary Preference - Critical for ingredient selection
+    - id: diet_vegetarian
+      category: diet
+      value: vegetarian
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    - id: diet_vegan
+      category: diet
+      value: vegan
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    - id: diet_pescatarian
+      category: diet
+      value: pescatarian
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    - id: diet_non_veg
+      category: diet
+      value: non_vegetarian
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    # Gender - Influences recommendations
+    - id: gender_female
+      category: gender
+      value: female
+      data_type: single_choice
+      elicitation_priority: 3
+      is_global: true
+
+    - id: gender_male
+      category: gender
+      value: male
+      data_type: single_choice
+      elicitation_priority: 3
+      is_global: true
+
+    # Hair Type
+    - id: hair_type_straight
+      category: hair_type
+      value: straight
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    - id: hair_type_wavy
+      category: hair_type
+      value: wavy
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    - id: hair_type_curly
+      category: hair_type
+      value: curly
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    - id: hair_type_coily
+      category: hair_type
+      value: coily
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    # Scalp Condition
+    - id: scalp_dry
+      category: scalp_condition
+      value: dry
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    - id: scalp_oily
+      category: scalp_condition
+      value: oily
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    - id: scalp_normal
+      category: scalp_condition
+      value: normal
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    - id: scalp_sensitive
+      category: scalp_condition
+      value: sensitive
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    # Lifestyle Factors
+    - id: lifestyle_high_stress
+      category: lifestyle
+      value: high_stress
+      data_type: single_choice
+      elicitation_priority: 6
+      is_global: false
+
+    - id: lifestyle_moderate_stress
+      category: lifestyle
+      value: moderate_stress
+      data_type: single_choice
+      elicitation_priority: 6
+      is_global: false
+
+    - id: lifestyle_low_stress
+      category: lifestyle
+      value: low_stress
+      data_type: single_choice
+      elicitation_priority: 6
+      is_global: false
+
+    # ============================================================================
+    # SAFETY CONSTRAINTS - Global hard constraints (ALWAYS ask these first)
+    # ============================================================================
+
+    # Medical Constraints
+    - id: medical_constraint_pregnancy
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: medical_constraint_breastfeeding
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: medical_constraint_thyroid
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: medical_constraint_pcos
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    # Allergy Constraints
+    - id: allergy_constraint_soy
+      category: allergies
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: allergy_constraint_gluten
+      category: allergies
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+  # ============================================================================
+  # INGREDIENTS - Key actives for hair health & growth
+  # ============================================================================
+  ingredients:
+    # BIOTIN - Vitamin B7 for keratin production
+    - id: biotin
+      name: "biotin"
+      display_name: "Biotin (Vitamin B7)"
+      function: "keratin_production_hair_growth"
+      category: "vitamins"
+      strength_levels: ["2500mcg", "5000mcg", "10000mcg"]
+
+    # KERATIN - Structural protein
+    - id: keratin_peptides
+      name: "keratin_peptides"
+      display_name: "Keratin Peptides"
+      function: "hair_structure_strength"
+      category: "protein"
+      strength_levels: ["500mg", "1000mg", "1500mg"]
+
+    - id: hydrolyzed_keratin
+      name: "hydrolyzed_keratin"
+      display_name: "Hydrolyzed Keratin"
+      function: "hair_repair_fortification"
+      category: "protein"
+      strength_levels: ["500mg", "1000mg"]
+
+    # COLLAGEN - Types I & III for hair structure
+    - id: collagen_type_1_3_marine
+      name: "collagen_type_1_3_marine"
+      display_name: "Marine Collagen (Type I & III)"
+      function: "hair_follicle_support_growth"
+      category: "protein"
+      strength_levels: ["5g", "10g", "15g"]
+
+    - id: collagen_type_1_3_bovine
+      name: "collagen_type_1_3_bovine"
+      display_name: "Bovine Collagen (Type I & III)"
+      function: "hair_follicle_support_growth"
+      category: "protein"
+      strength_levels: ["5g", "10g", "15g"]
+
+    - id: vegan_collagen_builder
+      name: "vegan_collagen_builder"
+      display_name: "Vegan Collagen Builder"
+      function: "collagen_synthesis_support"
+      category: "protein"
+      strength_levels: ["standard"]
+
+    # ZINC - Essential mineral for hair growth
+    - id: zinc
+      name: "zinc"
+      display_name: "Zinc"
+      function: "hair_follicle_health_growth"
+      category: "minerals"
+      strength_levels: ["15mg", "25mg", "50mg"]
+
+    # IRON - Critical for oxygen transport to hair follicles
+    - id: iron_ferrous
+      name: "iron_ferrous"
+      display_name: "Iron (Ferrous Sulfate)"
+      function: "oxygen_transport_hair_growth"
+      category: "minerals"
+      strength_levels: ["14mg", "18mg", "27mg"]
+
+    - id: iron_chelated
+      name: "iron_chelated"
+      display_name: "Iron (Chelated)"
+      function: "gentle_iron_supplement"
+      category: "minerals"
+      strength_levels: ["15mg", "25mg"]
+
+    # AMINO ACIDS - Building blocks for hair protein
+    - id: l_cysteine
+      name: "l_cysteine"
+      display_name: "L-Cysteine"
+      function: "keratin_building_block"
+      category: "protein"
+      strength_levels: ["500mg", "1000mg"]
+
+    - id: l_methionine
+      name: "l_methionine"
+      display_name: "L-Methionine"
+      function: "sulfur_amino_acid_hair_growth"
+      category: "protein"
+      strength_levels: ["500mg", "1000mg"]
+
+    - id: l_lysine
+      name: "l_lysine"
+      display_name: "L-Lysine"
+      function: "iron_absorption_hair_growth"
+      category: "protein"
+      strength_levels: ["500mg", "1000mg", "1500mg"]
+
+    # VITAMIN C - Collagen synthesis and iron absorption
+    - id: vitamin_c
+      name: "vitamin_c"
+      display_name: "Vitamin C (Ascorbic Acid)"
+      function: "collagen_synthesis_iron_absorption"
+      category: "vitamins"
+      strength_levels: ["500mg", "1000mg", "2000mg"]
+
+    # VITAMIN D - Hair follicle cycling
+    - id: vitamin_d3
+      name: "vitamin_d3"
+      display_name: "Vitamin D3 (Cholecalciferol)"
+      function: "hair_follicle_cycling"
+      category: "vitamins"
+      strength_levels: ["1000 IU", "2000 IU", "5000 IU"]
+
+    # VITAMIN E - Antioxidant for scalp health
+    - id: vitamin_e
+      name: "vitamin_e"
+      display_name: "Vitamin E (Tocopherol)"
+      function: "scalp_circulation_antioxidant"
+      category: "vitamins"
+      strength_levels: ["200 IU", "400 IU", "800 IU"]
+
+    # B-COMPLEX VITAMINS
+    - id: vitamin_b_complex
+      name: "vitamin_b_complex"
+      display_name: "B-Complex Vitamins"
+      function: "energy_metabolism_hair_health"
+      category: "vitamins"
+      strength_levels: ["standard", "high_potency"]
+
+    - id: niacin
+      name: "niacin"
+      display_name: "Niacin (Vitamin B3)"
+      function: "scalp_circulation"
+      category: "vitamins"
+      strength_levels: ["50mg", "100mg", "500mg"]
+
+    - id: folate
+      name: "folate"
+      display_name: "Folate (Vitamin B9)"
+      function: "cell_division_hair_growth"
+      category: "vitamins"
+      strength_levels: ["400mcg", "800mcg", "1000mcg"]
+
+    # MINERALS
+    - id: selenium
+      name: "selenium"
+      display_name: "Selenium"
+      function: "antioxidant_thyroid_support"
+      category: "minerals"
+      strength_levels: ["55mcg", "100mcg", "200mcg"]
+
+    - id: silica
+      name: "silica"
+      display_name: "Silica (Bamboo Extract)"
+      function: "hair_strength_thickness"
+      category: "minerals"
+      strength_levels: ["standard"]
+
+    - id: copper
+      name: "copper"
+      display_name: "Copper"
+      function: "melanin_production_hair_color"
+      category: "minerals"
+      strength_levels: ["1mg", "2mg"]
+
+    # BOTANICALS & EXTRACTS
+    - id: saw_palmetto
+      name: "saw_palmetto"
+      display_name: "Saw Palmetto Extract"
+      function: "dht_blocker_hair_loss"
+      category: "beauty"
+      strength_levels: ["160mg", "320mg"]
+
+    - id: bhringraj
+      name: "bhringraj"
+      display_name: "Bhringraj (Eclipta Alba)"
+      function: "ayurvedic_hair_growth"
+      category: "beauty"
+      strength_levels: ["250mg", "500mg"]
+
+    - id: amla
+      name: "amla"
+      display_name: "Amla (Indian Gooseberry)"
+      function: "vitamin_c_source_hair_health"
+      category: "beauty"
+      strength_levels: ["250mg", "500mg", "1000mg"]
+
+    - id: horsetail_extract
+      name: "horsetail_extract"
+      display_name: "Horsetail Extract"
+      function: "silica_source_hair_strength"
+      category: "beauty"
+      strength_levels: ["250mg", "500mg"]
+
+    # OMEGA-3 FATTY ACIDS
+    - id: omega_3
+      name: "omega_3"
+      display_name: "Omega-3 Fatty Acids"
+      function: "scalp_health_inflammation"
+      category: "beauty"
+      strength_levels: ["500mg", "1000mg", "2000mg"]
+
+  # ============================================================================
+  # CONSTRAINTS - User limitations that exclude certain products
+  # ============================================================================
+  constraints:
+    - id: pregnancy
+      type: "medical"
+      value: "true"
+      severity: "hard"
+
+    - id: breastfeeding
+      type: "medical"
+      value: "true"
+      severity: "hard"
+
+    - id: thyroid_condition
+      type: "medical"
+      value: "thyroid"
+      severity: "hard"
+
+    - id: pcos_condition
+      type: "medical"
+      value: "pcos"
+      severity: "soft"
+
+    - id: allergy_soy
+      type: "allergy"
+      value: "soy"
+      severity: "hard"
+
+    - id: allergy_gluten
+      type: "allergy"
+      value: "gluten"
+      severity: "hard"
+
+    - id: diet_vegan_constraint
+      type: "dietary"
+      value: "vegan"
+      severity: "hard"
+
+    - id: diet_vegetarian_constraint
+      type: "dietary"
+      value: "vegetarian"
+      severity: "hard"
+
+  # ============================================================================
+  # QUESTIONS - Templates for eliciting information
+  # ============================================================================
+  questions:
+    - id: q_primary_hair_concern
+      text: "What is your primary hair concern?"
+      response_type: "single_choice"
+      options:
+        - "Excessive hair fall/shedding"
+        - "Hair thinning/lack of density"
+        - "Hair breakage/brittleness"
+        - "Slow hair growth"
+        - "Lack of thickness/volume"
+        - "Dull, lifeless hair"
+        - "Premature greying"
+        - "Overall hair health"
+
+    - id: q_age_group
+      text: "What is your age group?"
+      response_type: "single_choice"
+      options:
+        - "18-25"
+        - "26-35"
+        - "36-45"
+        - "46+"
+
+    - id: q_gender
+      text: "What is your gender?"
+      response_type: "single_choice"
+      options:
+        - "Female"
+        - "Male"
+        - "Prefer not to say"
+
+    - id: q_diet
+      text: "What is your dietary preference?"
+      response_type: "single_choice"
+      options:
+        - "Vegetarian"
+        - "Vegan"
+        - "Pescatarian"
+        - "Non-vegetarian"
+
+    - id: q_hair_type
+      text: "What is your hair type?"
+      response_type: "single_choice"
+      options:
+        - "Straight"
+        - "Wavy"
+        - "Curly"
+        - "Coily/Kinky"
+
+    - id: q_scalp_condition
+      text: "How would you describe your scalp condition?"
+      response_type: "single_choice"
+      options:
+        - "Dry/Flaky"
+        - "Oily/Greasy"
+        - "Normal/Balanced"
+        - "Sensitive/Irritated"
+
+    - id: q_stress_level
+      text: "How would you describe your stress levels?"
+      response_type: "single_choice"
+      options:
+        - "High stress/demanding lifestyle"
+        - "Moderate stress"
+        - "Low stress/relaxed"
+
+    # Safety Constraint Questions (asked first for all users)
+    - id: q_medical_constraints
+      text: "Do any of these medical conditions apply to you?"
+      response_type: "multi_choice"
+      options:
+        - "Pregnancy"
+        - "Breastfeeding"
+        - "Thyroid condition"
+        - "PCOS"
+        - "None of the above"
+      validation_rules:
+        allow_none: true
+
+    - id: q_allergies
+      text: "Do you have any of these allergies?"
+      response_type: "multi_choice"
+      options:
+        - "Soy allergy"
+        - "Gluten allergy"
+        - "No allergies"
+      validation_rules:
+        allow_none: true
+
+# ============================================================================
+# EDGES - Relationships between nodes
+# ============================================================================
+edges:
+  # --------------------------------------------------------------------------
+  # PROBLEM → REQUIRES_KNOWING → ATTRIBUTE
+  # Defines which attributes are needed to recommend solutions for a problem
+  # --------------------------------------------------------------------------
+
+  # Hair Thinning requires knowing age and gender
+  - source: hair_thinning
+    target: age_group_26_35
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Age determines hair loss pattern and appropriate intervention"
+
+  - source: hair_thinning
+    target: gender_female
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Gender affects hair loss patterns and hormonal factors"
+
+  # Hair Fall requires knowing diet and stress
+  - source: hair_fall
+    target: diet_vegetarian
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Dietary preference determines nutrient availability (iron, protein)"
+
+  - source: hair_fall
+    target: lifestyle_high_stress
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: true
+      reason: "Stress is a major contributor to telogen effluvium"
+
+  # Hair Breakage
+  - source: hair_breakage
+    target: hair_type_curly
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: true
+      reason: "Hair type affects breakage patterns and protein needs"
+
+  - source: hair_breakage
+    target: diet_vegan
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Plant-based diets may need additional protein and amino acids"
+
+  # Slow Growth
+  - source: slow_growth
+    target: age_group_18_25
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Age affects growth rate and nutritional needs"
+
+  # Nutrient Deficiency
+  - source: nutrient_deficiency
+    target: diet_vegan
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Plant-based diets require specific nutrient supplementation"
+
+  - source: nutrient_deficiency
+    target: gender_female
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Women have higher iron needs due to menstruation"
+
+  # --------------------------------------------------------------------------
+  # ATTRIBUTE → ELICITS_QUESTION → QUESTION
+  # Maps attributes to questions that elicit them
+  # --------------------------------------------------------------------------
+
+  - source: age_group_18_25
+    target: q_age_group
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+
+  - source: gender_female
+    target: q_gender
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+
+  - source: diet_vegan
+    target: q_diet
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+
+  - source: hair_type_straight
+    target: q_hair_type
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_breakage_concern"
+      timing: "immediate"
+
+  - source: scalp_dry
+    target: q_scalp_condition
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_not_known"
+      timing: "immediate"
+
+  - source: lifestyle_high_stress
+    target: q_stress_level
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_hair_fall_concern"
+      timing: "immediate"
+
+  # Global Safety Constraint Questions (asked FIRST for everyone)
+  - source: medical_constraint_pregnancy
+    target: q_medical_constraints
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+      is_safety_critical: true
+
+  - source: medical_constraint_breastfeeding
+    target: q_medical_constraints
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+      is_safety_critical: true
+
+  - source: medical_constraint_thyroid
+    target: q_medical_constraints
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+      is_safety_critical: true
+
+  - source: allergy_constraint_soy
+    target: q_allergies
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+      is_safety_critical: true
+
+  # --------------------------------------------------------------------------
+  # INGREDIENT → TREATS → PROBLEM
+  # Defines which ingredients are effective for which problems
+  # --------------------------------------------------------------------------
+
+  # BIOTIN for Hair Growth and Thickness
+  - source: biotin
+    target: hair_thinning
+    relation: TREATS
+    properties:
+      mechanism: "Essential cofactor for keratin synthesis and hair follicle health"
+      efficacy: 0.85
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: biotin
+    target: hair_breakage
+    relation: TREATS
+    properties:
+      mechanism: "Strengthens hair structure through improved keratin production"
+      efficacy: 0.80
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: biotin
+    target: slow_growth
+    relation: TREATS
+    properties:
+      mechanism: "Supports cellular energy metabolism for active hair growth"
+      efficacy: 0.75
+      onset_time: "12-16 weeks"
+      evidence_level: "clinical_trial"
+
+  # KERATIN for Hair Structure
+  - source: keratin_peptides
+    target: hair_breakage
+    relation: TREATS
+    properties:
+      mechanism: "Provides bioavailable keratin building blocks to repair damaged hair"
+      efficacy: 0.90
+      onset_time: "6-10 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: keratin_peptides
+    target: lack_of_thickness
+    relation: TREATS
+    properties:
+      mechanism: "Increases hair shaft diameter and strength"
+      efficacy: 0.85
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: hydrolyzed_keratin
+    target: hair_breakage
+    relation: TREATS
+    properties:
+      mechanism: "Penetrates hair shaft to fortify from within"
+      efficacy: 0.88
+      onset_time: "6-10 weeks"
+      evidence_level: "clinical_trial"
+
+  # COLLAGEN for Hair Follicle Support
+  - source: collagen_type_1_3_marine
+    target: hair_thinning
+    relation: TREATS
+    properties:
+      mechanism: "Provides amino acids to support hair follicle structure and scalp health"
+      efficacy: 0.80
+      onset_time: "12-16 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: collagen_type_1_3_marine
+    target: slow_growth
+    relation: TREATS
+    properties:
+      mechanism: "Supports dermal papilla cells in hair follicles for improved growth"
+      efficacy: 0.75
+      onset_time: "12-16 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: vegan_collagen_builder
+    target: hair_thinning
+    relation: TREATS
+    properties:
+      mechanism: "Provides amino acids and cofactors to support natural collagen synthesis"
+      efficacy: 0.70
+      onset_time: "12-16 weeks"
+      evidence_level: "anecdotal"
+
+  # ZINC for Hair Growth
+  - source: zinc
+    target: hair_fall
+    relation: TREATS
+    properties:
+      mechanism: "Essential for hair follicle health and protein synthesis"
+      efficacy: 0.85
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: zinc
+    target: slow_growth
+    relation: TREATS
+    properties:
+      mechanism: "Critical cofactor for DNA synthesis and cell division in hair follicles"
+      efficacy: 0.80
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  # IRON for Hair Growth
+  - source: iron_ferrous
+    target: hair_fall
+    relation: TREATS
+    properties:
+      mechanism: "Corrects iron deficiency anemia, a major cause of hair loss"
+      efficacy: 0.90
+      onset_time: "12-16 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: iron_ferrous
+    target: hair_thinning
+    relation: TREATS
+    properties:
+      mechanism: "Improves oxygen delivery to hair follicles for optimal growth"
+      efficacy: 0.85
+      onset_time: "12-16 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: iron_chelated
+    target: hair_fall
+    relation: TREATS
+    properties:
+      mechanism: "Gentle iron supplementation with better absorption and fewer side effects"
+      efficacy: 0.88
+      onset_time: "12-16 weeks"
+      evidence_level: "clinical_trial"
+
+  # AMINO ACIDS for Protein Synthesis
+  - source: l_cysteine
+    target: hair_breakage
+    relation: TREATS
+    properties:
+      mechanism: "Primary amino acid in keratin, strengthens disulfide bonds"
+      efficacy: 0.85
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: l_cysteine
+    target: lack_of_thickness
+    relation: TREATS
+    properties:
+      mechanism: "Builds hair protein structure for thicker strands"
+      efficacy: 0.80
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: l_methionine
+    target: hair_fall
+    relation: TREATS
+    properties:
+      mechanism: "Sulfur-containing amino acid critical for hair growth"
+      efficacy: 0.75
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: l_lysine
+    target: hair_fall
+    relation: TREATS
+    properties:
+      mechanism: "Enhances iron absorption and supports collagen cross-linking"
+      efficacy: 0.80
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  # VITAMIN C for Collagen and Iron
+  - source: vitamin_c
+    target: hair_fall
+    relation: TREATS
+    properties:
+      mechanism: "Enhances iron absorption and supports collagen synthesis"
+      efficacy: 0.85
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: vitamin_c
+    target: nutrient_deficiency
+    relation: TREATS
+    properties:
+      mechanism: "Powerful antioxidant that protects hair follicles from oxidative stress"
+      efficacy: 0.80
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  # VITAMIN D for Follicle Cycling
+  - source: vitamin_d3
+    target: hair_fall
+    relation: TREATS
+    properties:
+      mechanism: "Regulates hair follicle cycling and keratinocyte proliferation"
+      efficacy: 0.80
+      onset_time: "12-16 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: vitamin_d3
+    target: slow_growth
+    relation: TREATS
+    properties:
+      mechanism: "Stimulates hair follicle stem cells for new hair growth"
+      efficacy: 0.75
+      onset_time: "12-16 weeks"
+      evidence_level: "clinical_trial"
+
+  # VITAMIN E for Scalp Health
+  - source: vitamin_e
+    target: dull_hair
+    relation: TREATS
+    properties:
+      mechanism: "Improves scalp circulation and provides antioxidant protection"
+      efficacy: 0.75
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: vitamin_e
+    target: hair_fall
+    relation: TREATS
+    properties:
+      mechanism: "Reduces oxidative stress on scalp and hair follicles"
+      efficacy: 0.70
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  # B-COMPLEX VITAMINS
+  - source: vitamin_b_complex
+    target: slow_growth
+    relation: TREATS
+    properties:
+      mechanism: "Supports cellular energy production and red blood cell formation"
+      efficacy: 0.80
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: niacin
+    target: dull_hair
+    relation: TREATS
+    properties:
+      mechanism: "Improves blood flow to scalp for nutrient delivery"
+      efficacy: 0.70
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: folate
+    target: slow_growth
+    relation: TREATS
+    properties:
+      mechanism: "Critical for DNA synthesis and cell division in hair follicles"
+      efficacy: 0.75
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  # MINERALS
+  - source: selenium
+    target: hair_fall
+    relation: TREATS
+    properties:
+      mechanism: "Antioxidant that supports thyroid function (linked to hair health)"
+      efficacy: 0.70
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: silica
+    target: lack_of_thickness
+    relation: TREATS
+    properties:
+      mechanism: "Strengthens hair strands and improves collagen formation"
+      efficacy: 0.75
+      onset_time: "8-12 weeks"
+      evidence_level: "anecdotal"
+
+  - source: copper
+    target: premature_greying
+    relation: TREATS
+    properties:
+      mechanism: "Essential for melanin production and hair pigmentation"
+      efficacy: 0.65
+      onset_time: "12-16 weeks"
+      evidence_level: "anecdotal"
+
+  # BOTANICALS
+  - source: saw_palmetto
+    target: hair_thinning
+    relation: TREATS
+    properties:
+      mechanism: "Blocks DHT conversion, reducing androgenic hair loss"
+      efficacy: 0.75
+      onset_time: "12-16 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: bhringraj
+    target: hair_fall
+    relation: TREATS
+    properties:
+      mechanism: "Traditional Ayurvedic herb that promotes hair growth"
+      efficacy: 0.70
+      onset_time: "8-12 weeks"
+      evidence_level: "anecdotal"
+
+  - source: amla
+    target: dull_hair
+    relation: TREATS
+    properties:
+      mechanism: "Rich in vitamin C and antioxidants for hair vitality"
+      efficacy: 0.75
+      onset_time: "8-12 weeks"
+      evidence_level: "anecdotal"
+
+  - source: horsetail_extract
+    target: lack_of_thickness
+    relation: TREATS
+    properties:
+      mechanism: "Natural source of silica for hair strength"
+      efficacy: 0.70
+      onset_time: "8-12 weeks"
+      evidence_level: "anecdotal"
+
+  # OMEGA-3
+  - source: omega_3
+    target: dull_hair
+    relation: TREATS
+    properties:
+      mechanism: "Nourishes hair follicles and reduces scalp inflammation"
+      efficacy: 0.75
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: omega_3
+    target: hair_breakage
+    relation: TREATS
+    properties:
+      mechanism: "Improves hair elasticity and scalp health"
+      efficacy: 0.70
+      onset_time: "8-12 weeks"
+      evidence_level: "clinical_trial"
+
+  # --------------------------------------------------------------------------
+  # INGREDIENT → RECOMMENDED_FOR → ATTRIBUTE
+  # Defines which ingredients work best for specific user attributes
+  # --------------------------------------------------------------------------
+
+  # Marine Collagen for Non-Veg/Pescatarian
+  - source: collagen_type_1_3_marine
+    target: diet_pescatarian
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 1.0
+      evidence: "proven"
+
+  - source: collagen_type_1_3_marine
+    target: diet_non_veg
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.95
+      evidence: "proven"
+
+  # Vegan Collagen Builder for Vegan/Vegetarian
+  - source: vegan_collagen_builder
+    target: diet_vegan
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 1.0
+      evidence: "proven"
+
+  - source: vegan_collagen_builder
+    target: diet_vegetarian
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.90
+      evidence: "proven"
+
+  # Iron for Women (higher needs)
+  - source: iron_ferrous
+    target: gender_female
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.95
+      evidence: "proven"
+
+  - source: iron_chelated
+    target: gender_female
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.90
+      evidence: "proven"
+
+  # Biotin for All Genders
+  - source: biotin
+    target: gender_female
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.90
+      evidence: "proven"
+
+  - source: biotin
+    target: gender_male
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.90
+      evidence: "proven"
+
+  # Saw Palmetto for Men (DHT blocker)
+  - source: saw_palmetto
+    target: gender_male
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.90
+      evidence: "proven"
+
+  # --------------------------------------------------------------------------
+  # INGREDIENT → CONTRAINDICATED_FOR → CONSTRAINT
+  # Safety rules for ingredients
+  # --------------------------------------------------------------------------
+
+  # Marine Collagen contraindications
+  - source: collagen_type_1_3_marine
+    target: diet_vegan_constraint
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "Animal-derived, not suitable for vegans"
+      severity: "avoid"
+      alternative_ingredients:
+        - "vegan_collagen_builder"
+
+  - source: collagen_type_1_3_marine
+    target: diet_vegetarian_constraint
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "Animal-derived, not suitable for vegetarians"
+      severity: "avoid"
+      alternative_ingredients:
+        - "vegan_collagen_builder"
+
+  # Bovine Collagen contraindications
+  - source: collagen_type_1_3_bovine
+    target: diet_vegan_constraint
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "Animal-derived, not suitable for vegans"
+      severity: "avoid"
+      alternative_ingredients:
+        - "vegan_collagen_builder"
+
+  - source: collagen_type_1_3_bovine
+    target: diet_vegetarian_constraint
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "Animal-derived, not suitable for vegetarians"
+      severity: "avoid"
+      alternative_ingredients:
+        - "vegan_collagen_builder"
+
+  # High-dose Biotin during pregnancy
+  - source: biotin
+    target: pregnancy
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "May interfere with lab tests; consult healthcare provider"
+      severity: "caution"
+      alternative_ingredients:
+        - "prenatal_vitamins"
+
+  # Iron precautions
+  - source: iron_ferrous
+    target: thyroid_condition
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "May interfere with thyroid medication absorption"
+      severity: "caution"
+      alternative_ingredients:
+        - "iron_chelated"
+
+  # --------------------------------------------------------------------------
+  # PROBLEM → SIMILAR_TO → PROBLEM
+  # Semantic relationships between problems
+  # --------------------------------------------------------------------------
+
+  - source: hair_thinning
+    target: lack_of_thickness
+    relation: SIMILAR_TO
+    properties:
+      similarity_score: 0.85
+      shared_symptoms:
+        - "reduced_volume"
+        - "fine_strands"
+
+  - source: hair_fall
+    target: hair_thinning
+    relation: SIMILAR_TO
+    properties:
+      similarity_score: 0.80
+      shared_symptoms:
+        - "hair_loss"
+        - "reduced_density"
+
+  # --------------------------------------------------------------------------
+  # PROBLEM → OFTEN_PAIRED_WITH → PROBLEM
+  # Problems that commonly occur together
+  # --------------------------------------------------------------------------
+
+  - source: hair_fall
+    target: hair_thinning
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.90
+      recommendation: "treat_together"
+
+  - source: hair_breakage
+    target: lack_of_thickness
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.80
+      recommendation: "treat_together"
+
+  - source: slow_growth
+    target: hair_thinning
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.75
+      recommendation: "treat_together"
+
+  - source: dull_hair
+    target: hair_breakage
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.70
+      recommendation: "treat_together"
+
+  - source: nutrient_deficiency
+    target: hair_fall
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.85
+      recommendation: "treat_together"

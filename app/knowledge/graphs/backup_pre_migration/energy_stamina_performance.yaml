@@ -1,0 +1,1496 @@
+# Energy, Stamina & Performance Knowledge Graph
+#
+# This graph defines the domain knowledge for nutraceutical product recommendations
+# focused on increasing energy, reducing fatigue, and enhancing physical/mental performance.
+#
+# UPDATING THIS GRAPH:
+# 1. Add new nodes under the appropriate section (problems, attributes, etc.)
+# 2. Ensure all IDs are unique and use snake_case
+# 3. Add edges to connect new nodes to existing ones
+# 4. Run validation: python -m app.knowledge.validate energy_stamina_performance
+# 5. Reload graph in development: reload_graph('energy_stamina_performance')
+
+metadata:
+  domain: energy_stamina_performance
+  version: 1.0.0
+  created_at: "2026-01-31"
+  description: "Knowledge graph for energy, stamina & performance nutraceutical recommendations"
+  display_name: "Energy, Stamina & Performance"
+  persona: "You are an energy and performance nutrition specialist who helps users find science-backed nutraceutical supplements for increasing energy levels, reducing fatigue, and enhancing physical and mental performance. You focus on protein, amino acids, minerals, adaptogens, and performance-enhancing nutrients. You consider activity levels, fitness goals, dietary patterns, and lifestyle factors to provide personalized recommendations."
+  is_active: true
+  parent_domain: null
+
+nodes:
+  # ============================================================================
+  # PROBLEMS - Consumer energy and performance concerns
+  # ============================================================================
+  problems:
+    - id: chronic_fatigue
+      name: "chronic_fatigue"
+      display_name: "Chronic Fatigue & Low Energy"
+      synonyms:
+        - "always tired"
+        - "constant fatigue"
+        - "no energy"
+        - "exhausted"
+        - "chronic tiredness"
+        - "low energy levels"
+        - "feeling drained"
+      severity_levels: [mild, moderate, severe]
+      description: "Persistent lack of energy and feeling of tiredness throughout the day"
+
+    - id: afternoon_slump
+      name: "afternoon_slump"
+      display_name: "Afternoon Energy Crash"
+      synonyms:
+        - "post-lunch fatigue"
+        - "afternoon crash"
+        - "energy dip"
+        - "midday tiredness"
+        - "2pm slump"
+      severity_levels: [mild, moderate, severe]
+      description: "Significant energy drop in the afternoon, typically after lunch"
+
+    - id: low_stamina
+      name: "low_stamina"
+      display_name: "Low Physical Stamina & Endurance"
+      synonyms:
+        - "poor endurance"
+        - "get tired quickly"
+        - "can't keep up"
+        - "low endurance"
+        - "poor stamina"
+        - "tired during exercise"
+      severity_levels: [mild, moderate, severe]
+      description: "Inability to sustain physical activity for extended periods"
+
+    - id: muscle_fatigue
+      name: "muscle_fatigue"
+      display_name: "Muscle Fatigue & Weakness"
+      synonyms:
+        - "weak muscles"
+        - "muscle exhaustion"
+        - "tired muscles"
+        - "muscle weakness"
+        - "heavy legs"
+      severity_levels: [mild, moderate, severe]
+      description: "Rapid onset of muscle tiredness during physical activity"
+
+    - id: slow_recovery
+      name: "slow_recovery"
+      display_name: "Slow Post-Exercise Recovery"
+      synonyms:
+        - "delayed recovery"
+        - "sore for days"
+        - "slow muscle recovery"
+        - "prolonged fatigue after workout"
+        - "DOMS"
+      severity_levels: [mild, moderate, severe]
+      description: "Extended time needed to recover after physical exertion"
+
+    - id: mental_fatigue
+      name: "mental_fatigue"
+      display_name: "Mental Fatigue & Brain Fog"
+      synonyms:
+        - "brain fog"
+        - "mental exhaustion"
+        - "can't focus"
+        - "cognitive fatigue"
+        - "mental tiredness"
+        - "poor concentration"
+      severity_levels: [mild, moderate, severe]
+      description: "Reduced mental clarity, focus, and cognitive performance"
+
+    - id: poor_workout_performance
+      name: "poor_workout_performance"
+      display_name: "Poor Workout Performance"
+      synonyms:
+        - "weak workouts"
+        - "can't lift as much"
+        - "plateau"
+        - "no strength gains"
+        - "declining performance"
+      severity_levels: [mild, moderate, severe]
+      description: "Inability to perform at desired level during exercise or training"
+
+    - id: inadequate_protein_intake
+      name: "inadequate_protein_intake"
+      display_name: "Inadequate Protein Intake"
+      synonyms:
+        - "not enough protein"
+        - "protein deficiency"
+        - "low protein diet"
+        - "insufficient protein"
+      severity_levels: [mild, moderate, severe]
+      description: "Insufficient dietary protein for activity level and goals"
+
+    - id: low_motivation_energy
+      name: "low_motivation_energy"
+      display_name: "Low Motivation & Drive"
+      synonyms:
+        - "no motivation"
+        - "lack of drive"
+        - "can't get started"
+        - "low willpower"
+        - "unmotivated"
+      severity_levels: [mild, moderate, severe]
+      description: "Lack of mental energy and motivation to initiate activities"
+
+  # ============================================================================
+  # ATTRIBUTES - User characteristics that influence recommendations
+  # ============================================================================
+  attributes:
+    # Age Group
+    - id: age_group_18_25
+      category: age_group
+      value: "18-25"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    - id: age_group_26_35
+      category: age_group
+      value: "26-35"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    - id: age_group_36_45
+      category: age_group
+      value: "36-45"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    - id: age_group_46_plus
+      category: age_group
+      value: "46+"
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: true
+
+    # Dietary Preference - Critical for protein type
+    - id: diet_vegetarian
+      category: diet
+      value: vegetarian
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    - id: diet_vegan
+      category: diet
+      value: vegan
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    - id: diet_pescatarian
+      category: diet
+      value: pescatarian
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    - id: diet_non_veg
+      category: diet
+      value: non_vegetarian
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: true
+
+    # Gender
+    - id: gender_female
+      category: gender
+      value: female
+      data_type: single_choice
+      elicitation_priority: 3
+      is_global: true
+
+    - id: gender_male
+      category: gender
+      value: male
+      data_type: single_choice
+      elicitation_priority: 3
+      is_global: true
+
+    # Activity Level - Critical for energy/performance needs
+    - id: activity_sedentary
+      category: activity_level
+      value: sedentary
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: false
+
+    - id: activity_lightly_active
+      category: activity_level
+      value: lightly_active
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: false
+
+    - id: activity_moderately_active
+      category: activity_level
+      value: moderately_active
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: false
+
+    - id: activity_very_active
+      category: activity_level
+      value: very_active
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: false
+
+    - id: activity_athlete
+      category: activity_level
+      value: athlete
+      data_type: single_choice
+      elicitation_priority: 1
+      is_global: false
+
+    # Fitness Goal
+    - id: goal_general_fitness
+      category: fitness_goal
+      value: general_fitness
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: false
+
+    - id: goal_weight_loss
+      category: fitness_goal
+      value: weight_loss
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: false
+
+    - id: goal_muscle_building
+      category: fitness_goal
+      value: muscle_building
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: false
+
+    - id: goal_endurance
+      category: fitness_goal
+      value: endurance
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: false
+
+    - id: goal_strength
+      category: fitness_goal
+      value: strength
+      data_type: single_choice
+      elicitation_priority: 2
+      is_global: false
+
+    # Sleep Quality
+    - id: sleep_poor
+      category: sleep_quality
+      value: poor
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    - id: sleep_adequate
+      category: sleep_quality
+      value: adequate
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    - id: sleep_excellent
+      category: sleep_quality
+      value: excellent
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    # Stress Level
+    - id: stress_high
+      category: stress_level
+      value: high
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    - id: stress_moderate
+      category: stress_level
+      value: moderate
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    - id: stress_low
+      category: stress_level
+      value: low
+      data_type: single_choice
+      elicitation_priority: 4
+      is_global: false
+
+    # Meal Timing
+    - id: meal_timing_regular
+      category: meal_timing
+      value: regular
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    - id: meal_timing_irregular
+      category: meal_timing
+      value: irregular
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    - id: meal_timing_skip_meals
+      category: meal_timing
+      value: skip_meals
+      data_type: single_choice
+      elicitation_priority: 5
+      is_global: false
+
+    # ============================================================================
+    # SAFETY CONSTRAINTS - Global hard constraints
+    # ============================================================================
+
+    # Medical Constraints
+    - id: medical_constraint_pregnancy
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: medical_constraint_breastfeeding
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: medical_constraint_kidney_disease
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: medical_constraint_liver_disease
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: medical_constraint_heart_condition
+      category: medical_constraints
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    # Allergy Constraints
+    - id: allergy_constraint_dairy
+      category: allergies
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: allergy_constraint_soy
+      category: allergies
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+    - id: allergy_constraint_gluten
+      category: allergies
+      value: "no"
+      data_type: boolean
+      elicitation_priority: 1
+      is_global: true
+
+  # ============================================================================
+  # INGREDIENTS - Key actives for energy, stamina & performance
+  # ============================================================================
+  ingredients:
+    # PROTEIN - Building blocks
+    - id: whey_protein_isolate
+      name: "whey_protein_isolate"
+      display_name: "Whey Protein Isolate"
+      function: "fast_absorbing_muscle_recovery"
+      category: "protein"
+      strength_levels: ["20g", "25g", "30g"]
+
+    - id: whey_protein_concentrate
+      name: "whey_protein_concentrate"
+      display_name: "Whey Protein Concentrate"
+      function: "muscle_building_recovery"
+      category: "protein"
+      strength_levels: ["20g", "24g", "27g"]
+
+    - id: vegan_protein
+      name: "vegan_protein"
+      display_name: "Vegan Protein (Pea/Rice/Hemp)"
+      function: "plant_based_muscle_support"
+      category: "protein"
+      strength_levels: ["20g", "22g", "25g"]
+
+    - id: collagen_protein
+      name: "collagen_protein"
+      display_name: "Collagen Protein"
+      function: "joint_support_recovery"
+      category: "protein"
+      strength_levels: ["10g", "15g", "20g"]
+
+    # AMINO ACIDS - Performance & Recovery
+    - id: bcaa
+      name: "bcaa"
+      display_name: "BCAA (Branched-Chain Amino Acids)"
+      function: "muscle_recovery_prevent_breakdown"
+      category: "amino_acids"
+      strength_levels: ["5g", "7g", "10g"]
+
+    - id: leucine
+      name: "leucine"
+      display_name: "Leucine"
+      function: "muscle_protein_synthesis"
+      category: "amino_acids"
+      strength_levels: ["3g", "5g"]
+
+    - id: beta_alanine
+      name: "beta_alanine"
+      display_name: "Beta-Alanine"
+      function: "endurance_buffering_lactic_acid"
+      category: "amino_acids"
+      strength_levels: ["2g", "3.2g", "5g"]
+
+    - id: l_carnitine
+      name: "l_carnitine"
+      display_name: "L-Carnitine"
+      function: "fat_metabolism_energy_production"
+      category: "amino_acids"
+      strength_levels: ["500mg", "1000mg", "2000mg"]
+
+    - id: l_glutamine
+      name: "l_glutamine"
+      display_name: "L-Glutamine"
+      function: "recovery_immune_support"
+      category: "amino_acids"
+      strength_levels: ["5g", "10g"]
+
+    - id: citrulline
+      name: "citrulline"
+      display_name: "L-Citrulline"
+      function: "nitric_oxide_pump_endurance"
+      category: "amino_acids"
+      strength_levels: ["3g", "6g", "8g"]
+
+    # CREATINE - Strength & Power
+    - id: creatine_monohydrate
+      name: "creatine_monohydrate"
+      display_name: "Creatine Monohydrate"
+      function: "strength_power_muscle_energy"
+      category: "performance"
+      strength_levels: ["3g", "5g"]
+
+    # MINERALS - Energy Production
+    - id: iron
+      name: "iron"
+      display_name: "Iron"
+      function: "oxygen_transport_energy_production"
+      category: "minerals"
+      strength_levels: ["14mg", "18mg", "27mg"]
+
+    - id: magnesium
+      name: "magnesium"
+      display_name: "Magnesium"
+      function: "energy_production_muscle_function"
+      category: "minerals"
+      strength_levels: ["200mg", "400mg", "600mg"]
+
+    - id: zinc
+      name: "zinc"
+      display_name: "Zinc"
+      function: "testosterone_recovery"
+      category: "minerals"
+      strength_levels: ["15mg", "25mg", "50mg"]
+
+    - id: potassium
+      name: "potassium"
+      display_name: "Potassium"
+      function: "electrolyte_muscle_function"
+      category: "minerals"
+      strength_levels: ["99mg", "200mg"]
+
+    - id: sodium
+      name: "sodium"
+      display_name: "Sodium (Electrolyte)"
+      function: "hydration_muscle_contraction"
+      category: "minerals"
+      strength_levels: ["standard"]
+
+    - id: calcium
+      name: "calcium"
+      display_name: "Calcium"
+      function: "muscle_contraction_bone_health"
+      category: "minerals"
+      strength_levels: ["200mg", "500mg", "1000mg"]
+
+    # VITAMINS - Energy Metabolism
+    - id: vitamin_b_complex
+      name: "vitamin_b_complex"
+      display_name: "B-Complex Vitamins"
+      function: "energy_metabolism_red_blood_cells"
+      category: "vitamins"
+      strength_levels: ["standard", "high_potency"]
+
+    - id: vitamin_b12
+      name: "vitamin_b12"
+      display_name: "Vitamin B12 (Methylcobalamin)"
+      function: "energy_production_nerve_function"
+      category: "vitamins"
+      strength_levels: ["500mcg", "1000mcg", "2500mcg"]
+
+    - id: vitamin_b6
+      name: "vitamin_b6"
+      display_name: "Vitamin B6 (Pyridoxine)"
+      function: "protein_metabolism_energy"
+      category: "vitamins"
+      strength_levels: ["25mg", "50mg", "100mg"]
+
+    - id: vitamin_d3
+      name: "vitamin_d3"
+      display_name: "Vitamin D3"
+      function: "muscle_function_testosterone"
+      category: "vitamins"
+      strength_levels: ["1000 IU", "2000 IU", "5000 IU"]
+
+    - id: vitamin_c
+      name: "vitamin_c"
+      display_name: "Vitamin C"
+      function: "recovery_collagen_antioxidant"
+      category: "vitamins"
+      strength_levels: ["500mg", "1000mg", "2000mg"]
+
+    # ADAPTOGENS - Stress & Endurance
+    - id: ashwagandha
+      name: "ashwagandha"
+      display_name: "Ashwagandha"
+      function: "stress_reduction_strength_endurance"
+      category: "adaptogens"
+      strength_levels: ["300mg", "500mg", "600mg"]
+
+    - id: rhodiola_rosea
+      name: "rhodiola_rosea"
+      display_name: "Rhodiola Rosea"
+      function: "mental_physical_stamina_fatigue_reduction"
+      category: "adaptogens"
+      strength_levels: ["200mg", "400mg"]
+
+    - id: cordyceps
+      name: "cordyceps"
+      display_name: "Cordyceps Mushroom"
+      function: "energy_endurance_oxygen_utilization"
+      category: "adaptogens"
+      strength_levels: ["500mg", "1000mg"]
+
+    - id: ginseng
+      name: "ginseng"
+      display_name: "Panax Ginseng"
+      function: "energy_cognitive_performance"
+      category: "adaptogens"
+      strength_levels: ["200mg", "400mg"]
+
+    - id: maca
+      name: "maca"
+      display_name: "Maca Root"
+      function: "stamina_energy_hormonal_balance"
+      category: "adaptogens"
+      strength_levels: ["1000mg", "2000mg", "3000mg"]
+
+    # OMEGA FATTY ACIDS - Inflammation & Recovery
+    - id: omega_3
+      name: "omega_3"
+      display_name: "Omega-3 Fatty Acids (EPA/DHA)"
+      function: "anti_inflammatory_recovery_joint_health"
+      category: "essential_fatty_acids"
+      strength_levels: ["500mg", "1000mg", "2000mg"]
+
+    # OTHER PERFORMANCE ENHANCERS
+    - id: caffeine
+      name: "caffeine"
+      display_name: "Caffeine (Natural)"
+      function: "alertness_performance_fat_burning"
+      category: "stimulants"
+      strength_levels: ["50mg", "100mg", "200mg"]
+
+    - id: coq10
+      name: "coq10"
+      display_name: "Coenzyme Q10"
+      function: "cellular_energy_production"
+      category: "antioxidants"
+      strength_levels: ["100mg", "200mg", "300mg"]
+
+    - id: beetroot
+      name: "beetroot"
+      display_name: "Beetroot Extract"
+      function: "nitric_oxide_endurance_blood_flow"
+      category: "performance"
+      strength_levels: ["500mg", "1000mg"]
+
+    - id: electrolyte_blend
+      name: "electrolyte_blend"
+      display_name: "Electrolyte Complex"
+      function: "hydration_muscle_function"
+      category: "minerals"
+      strength_levels: ["standard"]
+
+  # ============================================================================
+  # CONSTRAINTS - User limitations that exclude certain products
+  # ============================================================================
+  constraints:
+    - id: pregnancy
+      type: "medical"
+      value: "true"
+      severity: "hard"
+
+    - id: breastfeeding
+      type: "medical"
+      value: "true"
+      severity: "hard"
+
+    - id: kidney_disease
+      type: "medical"
+      value: "kidney"
+      severity: "hard"
+
+    - id: liver_disease
+      type: "medical"
+      value: "liver"
+      severity: "hard"
+
+    - id: heart_condition
+      type: "medical"
+      value: "heart"
+      severity: "soft"
+
+    - id: allergy_dairy
+      type: "allergy"
+      value: "dairy"
+      severity: "hard"
+
+    - id: allergy_soy
+      type: "allergy"
+      value: "soy"
+      severity: "hard"
+
+    - id: allergy_gluten
+      type: "allergy"
+      value: "gluten"
+      severity: "hard"
+
+    - id: diet_vegan_constraint
+      type: "dietary"
+      value: "vegan"
+      severity: "hard"
+
+    - id: diet_vegetarian_constraint
+      type: "dietary"
+      value: "vegetarian"
+      severity: "hard"
+
+  # ============================================================================
+  # QUESTIONS - Templates for eliciting information
+  # ============================================================================
+  questions:
+    - id: q_primary_energy_concern
+      text: "What is your primary energy or performance concern?"
+      response_type: "single_choice"
+      options:
+        - "Chronic fatigue/low energy"
+        - "Afternoon energy crash"
+        - "Low stamina/endurance"
+        - "Muscle fatigue"
+        - "Slow recovery after workouts"
+        - "Mental fatigue/brain fog"
+        - "Poor workout performance"
+        - "General energy boost"
+
+    - id: q_activity_level
+      text: "How would you describe your activity level?"
+      response_type: "single_choice"
+      options:
+        - "Sedentary (desk job, little exercise)"
+        - "Lightly active (1-2 workouts/week)"
+        - "Moderately active (3-4 workouts/week)"
+        - "Very active (5-6 workouts/week)"
+        - "Athlete (training daily, competitive)"
+
+    - id: q_fitness_goal
+      text: "What is your primary fitness goal?"
+      response_type: "single_choice"
+      options:
+        - "General fitness/health"
+        - "Weight loss/fat loss"
+        - "Muscle building/gain"
+        - "Endurance/stamina"
+        - "Strength/power"
+
+    - id: q_age_group
+      text: "What is your age group?"
+      response_type: "single_choice"
+      options:
+        - "18-25"
+        - "26-35"
+        - "36-45"
+        - "46+"
+
+    - id: q_gender
+      text: "What is your gender?"
+      response_type: "single_choice"
+      options:
+        - "Female"
+        - "Male"
+        - "Prefer not to say"
+
+    - id: q_diet
+      text: "What is your dietary preference?"
+      response_type: "single_choice"
+      options:
+        - "Vegetarian"
+        - "Vegan"
+        - "Pescatarian"
+        - "Non-vegetarian"
+
+    - id: q_sleep_quality
+      text: "How would you describe your sleep quality?"
+      response_type: "single_choice"
+      options:
+        - "Poor (less than 6 hours or restless)"
+        - "Adequate (6-7 hours)"
+        - "Excellent (7-8+ hours, restful)"
+
+    - id: q_stress_level
+      text: "How would you describe your stress levels?"
+      response_type: "single_choice"
+      options:
+        - "High stress/demanding lifestyle"
+        - "Moderate stress"
+        - "Low stress/relaxed"
+
+    - id: q_meal_timing
+      text: "How would you describe your eating pattern?"
+      response_type: "single_choice"
+      options:
+        - "Regular meals (3+ meals daily)"
+        - "Irregular timing"
+        - "Skip meals often"
+
+    # Safety Constraint Questions
+    - id: q_medical_constraints
+      text: "Do any of these medical conditions apply to you?"
+      response_type: "multi_choice"
+      options:
+        - "Pregnancy"
+        - "Breastfeeding"
+        - "Kidney disease"
+        - "Liver disease"
+        - "Heart condition"
+        - "None of the above"
+      validation_rules:
+        allow_none: true
+
+    - id: q_allergies
+      text: "Do you have any of these allergies?"
+      response_type: "multi_choice"
+      options:
+        - "Dairy allergy"
+        - "Soy allergy"
+        - "Gluten allergy"
+        - "No allergies"
+      validation_rules:
+        allow_none: true
+
+# ============================================================================
+# EDGES - Relationships between nodes
+# ============================================================================
+edges:
+  # --------------------------------------------------------------------------
+  # PROBLEM → REQUIRES_KNOWING → ATTRIBUTE
+  # --------------------------------------------------------------------------
+
+  # Chronic Fatigue
+  - source: chronic_fatigue
+    target: sleep_poor
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Poor sleep is a primary cause of chronic fatigue"
+
+  - source: chronic_fatigue
+    target: activity_sedentary
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Activity level determines if fatigue is from overexertion or inactivity"
+
+  - source: chronic_fatigue
+    target: meal_timing_skip_meals
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: true
+      reason: "Irregular eating patterns contribute to energy crashes"
+
+  # Low Stamina
+  - source: low_stamina
+    target: activity_very_active
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Current activity level determines baseline and supplement needs"
+
+  - source: low_stamina
+    target: goal_endurance
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Fitness goal determines type of stamina support needed"
+
+  # Muscle Fatigue
+  - source: muscle_fatigue
+    target: activity_moderately_active
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Training intensity affects muscle fatigue and recovery needs"
+
+  - source: muscle_fatigue
+    target: goal_muscle_building
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: true
+      reason: "Muscle building goals require specific recovery support"
+
+  # Slow Recovery
+  - source: slow_recovery
+    target: activity_very_active
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Higher activity requires more recovery support"
+
+  - source: slow_recovery
+    target: sleep_poor
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Sleep is critical for muscle recovery"
+
+  # Poor Workout Performance
+  - source: poor_workout_performance
+    target: goal_strength
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Specific goal determines performance enhancement strategy"
+
+  - source: poor_workout_performance
+    target: activity_very_active
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Training frequency affects supplement recommendations"
+
+  # Inadequate Protein
+  - source: inadequate_protein_intake
+    target: diet_vegan
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Dietary preference determines protein source options"
+
+  - source: inadequate_protein_intake
+    target: goal_muscle_building
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Protein needs vary significantly by fitness goal"
+
+  # --------------------------------------------------------------------------
+  # ATTRIBUTE → ELICITS_QUESTION → QUESTION
+  # --------------------------------------------------------------------------
+
+  - source: activity_sedentary
+    target: q_activity_level
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+
+  - source: goal_general_fitness
+    target: q_fitness_goal
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_active"
+      timing: "immediate"
+
+  - source: age_group_18_25
+    target: q_age_group
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+
+  - source: gender_female
+    target: q_gender
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_not_known"
+      timing: "immediate"
+
+  - source: diet_vegan
+    target: q_diet
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+
+  - source: sleep_poor
+    target: q_sleep_quality
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_fatigue_concern"
+      timing: "immediate"
+
+  - source: stress_high
+    target: q_stress_level
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_fatigue_concern"
+      timing: "immediate"
+
+  - source: meal_timing_skip_meals
+    target: q_meal_timing
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "if_energy_crash"
+      timing: "immediate"
+
+  # Safety Questions
+  - source: medical_constraint_pregnancy
+    target: q_medical_constraints
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+      is_safety_critical: true
+
+  - source: allergy_constraint_dairy
+    target: q_allergies
+    relation: ELICITS_QUESTION
+    properties:
+      condition: "always"
+      timing: "immediate"
+      is_safety_critical: true
+
+  # --------------------------------------------------------------------------
+  # INGREDIENT → TREATS → PROBLEM
+  # --------------------------------------------------------------------------
+
+  # PROTEIN for Recovery & Building
+  - source: whey_protein_isolate
+    target: slow_recovery
+    relation: TREATS
+    properties:
+      mechanism: "Fast-absorbing protein accelerates muscle repair and recovery"
+      efficacy: 0.90
+      onset_time: "immediately post-workout"
+      evidence_level: "clinical_trial"
+
+  - source: whey_protein_isolate
+    target: inadequate_protein_intake
+    relation: TREATS
+    properties:
+      mechanism: "High-quality complete protein source with all essential amino acids"
+      efficacy: 0.95
+      onset_time: "immediate"
+      evidence_level: "clinical_trial"
+
+  - source: whey_protein_isolate
+    target: poor_workout_performance
+    relation: TREATS
+    properties:
+      mechanism: "Supports muscle protein synthesis for strength and performance gains"
+      efficacy: 0.85
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: vegan_protein
+    target: inadequate_protein_intake
+    relation: TREATS
+    properties:
+      mechanism: "Plant-based protein blend provides complete amino acid profile"
+      efficacy: 0.85
+      onset_time: "immediate"
+      evidence_level: "clinical_trial"
+
+  - source: vegan_protein
+    target: slow_recovery
+    relation: TREATS
+    properties:
+      mechanism: "Supports muscle recovery with plant-based amino acids"
+      efficacy: 0.80
+      onset_time: "post-workout"
+      evidence_level: "clinical_trial"
+
+  # BCAA for Recovery & Fatigue
+  - source: bcaa
+    target: muscle_fatigue
+    relation: TREATS
+    properties:
+      mechanism: "Prevents muscle protein breakdown and reduces exercise-induced fatigue"
+      efficacy: 0.85
+      onset_time: "during/post-workout"
+      evidence_level: "clinical_trial"
+
+  - source: bcaa
+    target: slow_recovery
+    relation: TREATS
+    properties:
+      mechanism: "Reduces muscle soreness and accelerates recovery"
+      efficacy: 0.80
+      onset_time: "24-48 hours"
+      evidence_level: "clinical_trial"
+
+  # CREATINE for Strength & Power
+  - source: creatine_monohydrate
+    target: poor_workout_performance
+    relation: TREATS
+    properties:
+      mechanism: "Increases phosphocreatine stores for explosive power and strength"
+      efficacy: 0.95
+      onset_time: "1-2 weeks (loading), 4 weeks (maintenance)"
+      evidence_level: "clinical_trial"
+
+  - source: creatine_monohydrate
+    target: muscle_fatigue
+    relation: TREATS
+    properties:
+      mechanism: "Improves ATP regeneration for sustained muscle energy"
+      efficacy: 0.85
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  # IRON for Energy
+  - source: iron
+    target: chronic_fatigue
+    relation: TREATS
+    properties:
+      mechanism: "Corrects iron deficiency anemia, primary cause of fatigue"
+      efficacy: 0.90
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: iron
+    target: low_stamina
+    relation: TREATS
+    properties:
+      mechanism: "Improves oxygen transport to muscles for endurance"
+      efficacy: 0.85
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  # MAGNESIUM for Energy Production
+  - source: magnesium
+    target: chronic_fatigue
+    relation: TREATS
+    properties:
+      mechanism: "Essential cofactor for 300+ enzymatic reactions in energy production"
+      efficacy: 0.80
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: magnesium
+    target: muscle_fatigue
+    relation: TREATS
+    properties:
+      mechanism: "Supports muscle function and reduces cramping"
+      efficacy: 0.80
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: magnesium
+    target: afternoon_slump
+    relation: TREATS
+    properties:
+      mechanism: "Stabilizes blood sugar and energy metabolism"
+      efficacy: 0.75
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  # B VITAMINS for Energy Metabolism
+  - source: vitamin_b_complex
+    target: chronic_fatigue
+    relation: TREATS
+    properties:
+      mechanism: "Essential for converting food into cellular energy (ATP)"
+      efficacy: 0.85
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: vitamin_b_complex
+    target: mental_fatigue
+    relation: TREATS
+    properties:
+      mechanism: "Supports neurotransmitter production and brain energy"
+      efficacy: 0.80
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: vitamin_b12
+    target: chronic_fatigue
+    relation: TREATS
+    properties:
+      mechanism: "Critical for red blood cell production and oxygen transport"
+      efficacy: 0.85
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  # ADAPTOGENS for Stamina & Stress
+  - source: ashwagandha
+    target: chronic_fatigue
+    relation: TREATS
+    properties:
+      mechanism: "Reduces cortisol and stress-induced fatigue"
+      efficacy: 0.80
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: ashwagandha
+    target: poor_workout_performance
+    relation: TREATS
+    properties:
+      mechanism: "Increases muscle strength, VO2 max, and endurance"
+      efficacy: 0.80
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: rhodiola_rosea
+    target: chronic_fatigue
+    relation: TREATS
+    properties:
+      mechanism: "Combats physical and mental fatigue through adaptogenic action"
+      efficacy: 0.85
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: rhodiola_rosea
+    target: mental_fatigue
+    relation: TREATS
+    properties:
+      mechanism: "Improves cognitive function and reduces mental exhaustion"
+      efficacy: 0.80
+      onset_time: "1-2 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: rhodiola_rosea
+    target: low_stamina
+    relation: TREATS
+    properties:
+      mechanism: "Enhances physical stamina and endurance capacity"
+      efficacy: 0.80
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: cordyceps
+    target: low_stamina
+    relation: TREATS
+    properties:
+      mechanism: "Increases oxygen utilization and ATP production"
+      efficacy: 0.85
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: cordyceps
+    target: chronic_fatigue
+    relation: TREATS
+    properties:
+      mechanism: "Boosts cellular energy production and reduces fatigue"
+      efficacy: 0.80
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  # OMEGA-3 for Recovery
+  - source: omega_3
+    target: slow_recovery
+    relation: TREATS
+    properties:
+      mechanism: "Reduces inflammation and muscle soreness post-exercise"
+      efficacy: 0.80
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: omega_3
+    target: muscle_fatigue
+    relation: TREATS
+    properties:
+      mechanism: "Anti-inflammatory properties support muscle recovery"
+      efficacy: 0.75
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  # BETA-ALANINE for Endurance
+  - source: beta_alanine
+    target: low_stamina
+    relation: TREATS
+    properties:
+      mechanism: "Buffers lactic acid for improved endurance and delayed fatigue"
+      efficacy: 0.85
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: beta_alanine
+    target: muscle_fatigue
+    relation: TREATS
+    properties:
+      mechanism: "Increases muscle carnosine to delay fatigue onset"
+      efficacy: 0.80
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  # L-CARNITINE for Fat Metabolism
+  - source: l_carnitine
+    target: chronic_fatigue
+    relation: TREATS
+    properties:
+      mechanism: "Transports fatty acids into mitochondria for energy production"
+      efficacy: 0.75
+      onset_time: "2-4 weeks"
+      evidence_level: "clinical_trial"
+
+  - source: l_carnitine
+    target: low_stamina
+    relation: TREATS
+    properties:
+      mechanism: "Improves fat oxidation and endurance performance"
+      efficacy: 0.75
+      onset_time: "4-8 weeks"
+      evidence_level: "clinical_trial"
+
+  # --------------------------------------------------------------------------
+  # INGREDIENT → RECOMMENDED_FOR → ATTRIBUTE
+  # --------------------------------------------------------------------------
+
+  # Whey Protein for Non-Veg
+  - source: whey_protein_isolate
+    target: diet_non_veg
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 1.0
+      evidence: "proven"
+
+  - source: whey_protein_isolate
+    target: goal_muscle_building
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.95
+      evidence: "proven"
+
+  # Vegan Protein for Vegan/Vegetarian
+  - source: vegan_protein
+    target: diet_vegan
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 1.0
+      evidence: "proven"
+
+  - source: vegan_protein
+    target: diet_vegetarian
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.90
+      evidence: "proven"
+
+  # Creatine for Strength Goals
+  - source: creatine_monohydrate
+    target: goal_strength
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.95
+      evidence: "proven"
+
+  - source: creatine_monohydrate
+    target: goal_muscle_building
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.90
+      evidence: "proven"
+
+  # Iron for Females
+  - source: iron
+    target: gender_female
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.95
+      evidence: "proven"
+
+  # Ashwagandha for High Stress
+  - source: ashwagandha
+    target: stress_high
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.95
+      evidence: "proven"
+
+  # B Vitamins for Poor Sleep
+  - source: vitamin_b_complex
+    target: sleep_poor
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.85
+      evidence: "proven"
+
+  # Adaptogens for Athletes
+  - source: rhodiola_rosea
+    target: activity_athlete
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.90
+      evidence: "proven"
+
+  - source: cordyceps
+    target: activity_very_active
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.85
+      evidence: "proven"
+
+  # --------------------------------------------------------------------------
+  # INGREDIENT → CONTRAINDICATED_FOR → CONSTRAINT
+  # --------------------------------------------------------------------------
+
+  # Whey Protein with Dairy Allergy
+  - source: whey_protein_isolate
+    target: allergy_dairy
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "Derived from milk, may cause allergic reactions"
+      severity: "avoid"
+      alternative_ingredients:
+        - "vegan_protein"
+
+  - source: whey_protein_concentrate
+    target: allergy_dairy
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "Contains lactose and milk proteins"
+      severity: "avoid"
+      alternative_ingredients:
+        - "vegan_protein"
+
+  # High Protein with Kidney Disease
+  - source: whey_protein_isolate
+    target: kidney_disease
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "High protein intake may strain kidneys"
+      severity: "avoid"
+      alternative_ingredients: []
+
+  - source: creatine_monohydrate
+    target: kidney_disease
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "May affect kidney function"
+      severity: "avoid"
+      alternative_ingredients:
+        - "beta_alanine"
+
+  # Ashwagandha during Pregnancy
+  - source: ashwagandha
+    target: pregnancy
+    relation: CONTRAINDICATED_FOR
+    properties:
+      reason: "May cause hormonal effects; safety not established"
+      severity: "avoid"
+      alternative_ingredients:
+        - "magnesium"
+        - "vitamin_b_complex"
+
+  # --------------------------------------------------------------------------
+  # PROBLEM → SIMILAR_TO → PROBLEM
+  # --------------------------------------------------------------------------
+
+  - source: chronic_fatigue
+    target: afternoon_slump
+    relation: SIMILAR_TO
+    properties:
+      similarity_score: 0.80
+      shared_symptoms:
+        - "low_energy"
+        - "tiredness"
+
+  - source: muscle_fatigue
+    target: low_stamina
+    relation: SIMILAR_TO
+    properties:
+      similarity_score: 0.85
+      shared_symptoms:
+        - "exercise_limitation"
+        - "endurance_issues"
+
+  # --------------------------------------------------------------------------
+  # PROBLEM → OFTEN_PAIRED_WITH → PROBLEM
+  # --------------------------------------------------------------------------
+
+  - source: chronic_fatigue
+    target: mental_fatigue
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.85
+      recommendation: "treat_together"
+
+  - source: low_stamina
+    target: muscle_fatigue
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.90
+      recommendation: "treat_together"
+
+  - source: poor_workout_performance
+    target: slow_recovery
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.85
+      recommendation: "treat_together"
+
+  - source: chronic_fatigue
+    target: low_motivation_energy
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.80
+      recommendation: "treat_together"
+
+  - source: inadequate_protein_intake
+    target: slow_recovery
+    relation: OFTEN_PAIRED_WITH
+    properties:
+      co_occurrence: 0.85
+      recommendation: "treat_together"
