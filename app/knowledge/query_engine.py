@@ -82,8 +82,9 @@ class GraphQueryEngine:
             attr_data = attr_edge['attribute_data']
 
             # Get question for this attribute category
-            # We need to find the question node for the attribute's category
-            question = graph.get_question_for_attribute(attr_id, context)
+            # Pass problem_id in context for better dynamic question generation
+            question_context = {**context, 'problem_id': problem_id}
+            question = graph.get_question_for_attribute(attr_id, question_context)
 
             if question:
                 questions.append({
@@ -95,9 +96,9 @@ class GraphQueryEngine:
                     'question': question
                 })
             else:
-                # No question template found, log warning
+                # Question generation failed (both predefined and dynamic)
                 logger.warning(
-                    f"No question found for attribute '{attr_id}' "
+                    f"Could not get or generate question for attribute '{attr_id}' "
                     f"(category: {attr_data.get('category')}) in domain '{domain}'"
                 )
 

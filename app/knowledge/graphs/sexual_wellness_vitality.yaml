@@ -339,21 +339,21 @@ nodes:
     - 300-500mg
   constraints:
   - id: blood_pressure_medication_interaction
-    type: interaction
+    type: medical
     value: blood pressure medication interaction
-    severity: high
+    severity: hard
   - id: pregnancy_unsafe_sexual
-    type: contraindication
+    type: medical
     value: pregnancy unsafe sexual
-    severity: critical
+    severity: hard
   - id: hormone_sensitive_cancer_risk
-    type: contraindication
+    type: medical
     value: hormone sensitive cancer risk
-    severity: high
+    severity: hard
   - id: antidepressant_interaction
-    type: interaction
+    type: medical
     value: antidepressant interaction
-    severity: moderate
+    severity: soft
   questions: []
   products: []
   domains: []
@@ -693,27 +693,27 @@ edges:
     reason: Many medications affect erectile function
 - source: l_arginine
   target: pycnogenol
-  relation: SYNERGISTIC_WITH
+  relation: OFTEN_PAIRED_WITH
   properties:
     mechanism: Combination more effective for ED than either alone
 - source: l_citrulline
   target: beetroot_extract
-  relation: SYNERGISTIC_WITH
+  relation: OFTEN_PAIRED_WITH
   properties:
     mechanism: Both boost nitric oxide via different pathways
 - source: zinc_sexual
   target: magnesium_sexual
-  relation: SYNERGISTIC_WITH
+  relation: OFTEN_PAIRED_WITH
   properties:
     mechanism: Both support testosterone production
 - source: coq10_sexual
   target: selenium_sexual
-  relation: SYNERGISTIC_WITH
+  relation: OFTEN_PAIRED_WITH
   properties:
     mechanism: Antioxidant synergy for sperm protection
 - source: maca_sexual
   target: ashwagandha_sexual
-  relation: SYNERGISTIC_WITH
+  relation: OFTEN_PAIRED_WITH
   properties:
     mechanism: Complementary adaptogenic effects on libido and stress
 - source: l_arginine

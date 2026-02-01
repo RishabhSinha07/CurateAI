@@ -363,17 +363,17 @@ nodes:
     - 200-600mg
   constraints:
   - id: blood_thinner_interaction_aging
-    type: interaction
+    type: medical
     value: blood thinner interaction aging
-    severity: high
+    severity: hard
   - id: chemotherapy_interaction
-    type: interaction
+    type: medical
     value: chemotherapy interaction
-    severity: critical
+    severity: hard
   - id: autoimmune_caution
-    type: contraindication
+    type: medical
     value: autoimmune caution
-    severity: moderate
+    severity: soft
   questions: []
   products: []
   domains: []
@@ -756,32 +756,32 @@ edges:
     reason: Dosing and approach varies by optimization level
 - source: nmn
   target: resveratrol
-  relation: SYNERGISTIC_WITH
+  relation: OFTEN_PAIRED_WITH
   properties:
     mechanism: NMN provides NAD+ substrate, resveratrol activates sirtuins that use NAD+
 - source: coq10_aging
   target: pqq
-  relation: SYNERGISTIC_WITH
+  relation: OFTEN_PAIRED_WITH
   properties:
     mechanism: CoQ10 optimizes existing mitochondria, PQQ creates new ones
 - source: glutathione_aging
   target: nac_aging
-  relation: SYNERGISTIC_WITH
+  relation: OFTEN_PAIRED_WITH
   properties:
     mechanism: NAC replenishes glutathione stores
 - source: quercetin
   target: fisetin
-  relation: SYNERGISTIC_WITH
+  relation: OFTEN_PAIRED_WITH
   properties:
     mechanism: Complementary senolytic effects
 - source: vitamin_c_aging
   target: vitamin_e_aging
-  relation: SYNERGISTIC_WITH
+  relation: OFTEN_PAIRED_WITH
   properties:
     mechanism: Vitamin C regenerates vitamin E
 - source: vitamin_d_aging
   target: vitamin_k2_aging
-  relation: SYNERGISTIC_WITH
+  relation: OFTEN_PAIRED_WITH
   properties:
     mechanism: Work together for bone health and calcium metabolism
 - source: resveratrol

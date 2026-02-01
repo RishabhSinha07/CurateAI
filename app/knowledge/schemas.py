@@ -155,6 +155,20 @@ class IngredientNode(BaseModel):
     category: str = Field(..., description="Category (e.g., 'active', 'carrier')")
     strength_levels: List[str] = Field(default_factory=list, description="Available strengths")
 
+    # Optional fields for additional ingredient details
+    description: Optional[str] = Field(default=None, description="Detailed description of ingredient")
+    standardization: Optional[str] = Field(default=None, description="Standardization percentage or method")
+    ratio: Optional[str] = Field(default=None, description="Ratio for combination ingredients")
+    components: Optional[List[str]] = Field(default=None, description="Component ingredients in a blend")
+    absorption: Optional[str] = Field(default=None, description="Absorption characteristics")
+    absorption_speed: Optional[str] = Field(default=None, description="Speed of absorption")
+    bioavailability: Optional[str] = Field(default=None, description="Bioavailability information")
+    enhanced_absorption: Optional[str] = Field(default=None, description="Absorption enhancement method")
+    loading_phase: Optional[str] = Field(default=None, description="Loading phase dosing")
+    maintenance: Optional[str] = Field(default=None, description="Maintenance dosing")
+    type_profile: Optional[str] = Field(default=None, description="Type or profile information")
+    strains: Optional[List[str]] = Field(default=None, description="Bacterial strains for probiotics")
+
     class Config:
         extra = "forbid"
 
@@ -173,6 +187,11 @@ class ConstraintNode(BaseModel):
     type: ConstraintType = Field(..., description="Constraint type")
     value: str = Field(..., description="Constraint value")
     severity: Severity = Field(..., description="Severity level")
+
+    # Optional fields for backward compatibility
+    name: Optional[str] = Field(default=None, description="Canonical name (legacy)")
+    display_name: Optional[str] = Field(default=None, description="User-facing name (legacy)")
+    description: Optional[str] = Field(default=None, description="Detailed description (legacy)")
 
     class Config:
         extra = "forbid"

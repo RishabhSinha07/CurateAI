@@ -313,21 +313,21 @@ nodes:
     - 100-300mg
   constraints:
   - id: pregnancy_contraindication
-    type: contraindication
+    type: medical
     value: pregnancy contraindication
-    severity: critical
+    severity: hard
   - id: breastfeeding_caution
-    type: contraindication
+    type: medical
     value: breastfeeding caution
-    severity: moderate
+    severity: soft
   - id: hormone_sensitive_conditions
-    type: contraindication
+    type: medical
     value: hormone sensitive conditions
-    severity: high
+    severity: hard
   - id: thyroid_medication_interaction
-    type: interaction
+    type: medical
     value: thyroid medication interaction
-    severity: moderate
+    severity: soft
   questions: []
   products: []
   domains: []
@@ -627,22 +627,22 @@ edges:
     reason: Need to know if on thyroid medication for safety
 - source: myo_inositol
   target: d_chiro_inositol
-  relation: SYNERGISTIC_WITH
+  relation: OFTEN_PAIRED_WITH
   properties:
     mechanism: 40:1 ratio optimizes insulin sensitivity in PCOS
 - source: magnesium_hormonal
   target: vitamin_b6_hormonal
-  relation: SYNERGISTIC_WITH
+  relation: OFTEN_PAIRED_WITH
   properties:
     mechanism: Work together to reduce PMS symptoms
 - source: selenium
   target: iodine
-  relation: SYNERGISTIC_WITH
+  relation: OFTEN_PAIRED_WITH
   properties:
     mechanism: Selenium protects thyroid from iodine-induced damage
 - source: zinc_hormonal
   target: vitamin_d_hormonal
-  relation: SYNERGISTIC_WITH
+  relation: OFTEN_PAIRED_WITH
   properties:
     mechanism: Both support reproductive health and hormone balance
 - source: vitex

@@ -11,6 +11,7 @@ from typing import Dict, List, Optional, Any
 import logging
 
 from .schemas import KnowledgeGraphSchema, NodeType, RelationType
+from .dynamic_questions import generate_question_for_attribute
 
 logger = logging.getLogger(__name__)
 
@@ -407,9 +408,12 @@ class KnowledgeGraph:
         """
         Get question to elicit an attribute.
 
+        First tries to find a predefined question in the knowledge graph.
+        If none exists, dynamically generates one using LLM based on attribute metadata.
+
         Args:
             attribute_id: Attribute node ID (e.g., 'skin_type_oily')
-            context: Optional context for conditional questions
+            context: Optional context for conditional questions (may include 'problem_id')
 
         Returns:
             Question dictionary with condition and timing, or None
@@ -421,6 +425,7 @@ class KnowledgeGraph:
 
         attr_category = attr_node.get('category')
 
+        # STEP 1: Try to find predefined question in the knowledge graph
         # Find question for this attribute category
         # Note: We match by category, not by specific value
         # So 'skin_type_oily' -> finds question for 'skin_type'
@@ -435,20 +440,62 @@ class KnowledgeGraph:
                     if edges:
                         break
 
-        if not edges:
-            return None
+        # If predefined question found, return it
+        if edges:
+            edge = edges[0]
+            question = self.get_node(edge['target'])
 
-        # Take first matching question
-        edge = edges[0]
-        question = self.get_node(edge['target'])
+            if question:
+                return {
+                    **question,
+                    'condition': edge.get('condition', 'always'),
+                    'timing': edge.get('timing', 'immediate')
+                }
 
-        if question:
+        # STEP 2: No predefined question found - dynamically generate one
+        logger.info(
+            f"No predefined question found for attribute '{attribute_id}' "
+            f"(category: {attr_category}) in domain '{self.domain}'. "
+            f"Generating dynamically..."
+        )
+
+        # Gather all attributes with the same category to get available values
+        all_attrs = self.find_nodes_by_type('attribute')
+        category_attrs = [
+            attr for attr in all_attrs
+            if attr.get('category') == attr_category
+        ]
+
+        # Extract problem context if available
+        problem_context = None
+        if context and 'problem_id' in context:
+            problem_context = context['problem_id']
+
+        # Get data type from the attribute node
+        data_type = attr_node.get('data_type')
+
+        # Generate question using LLM
+        generated_question = generate_question_for_attribute(
+            domain=self.domain,
+            attribute_category=attr_category,
+            attribute_values=category_attrs,
+            problem_context=problem_context,
+            data_type=data_type
+        )
+
+        if generated_question:
+            # Add default condition and timing for generated questions
             return {
-                **question,
-                'condition': edge.get('condition', 'always'),
-                'timing': edge.get('timing', 'immediate')
+                **generated_question,
+                'condition': 'always',
+                'timing': 'immediate'
             }
 
+        # Fallback: return None if generation also failed
+        logger.warning(
+            f"Failed to generate question for attribute '{attribute_id}' "
+            f"(category: {attr_category})"
+        )
         return None
 
     def find_similar_problems(
