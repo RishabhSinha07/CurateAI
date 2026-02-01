@@ -160,6 +160,13 @@ async def reranker_agent(state: AgentState) -> AgentState:
     search_results = state.get("search_results", [])
     graph_state = extracted_context.get("graph_state", {})
     graph_domain = graph_state.get("graph_domain")
+    low_confidence_search = state.get("low_confidence_search", False)
+
+    if low_confidence_search:
+        logger.info(
+            "Reranker received LOW CONFIDENCE search results "
+            "(fallback threshold 0.15 was used). Results may be less relevant."
+        )
 
     if not search_results:
         # No results to rank
@@ -268,14 +275,20 @@ async def reranker_agent(state: AgentState) -> AgentState:
         if graph_domain:
             match_reasons.append("Matched based on graph-recommended ingredients for your concern")
 
-        # Similarity score
+        # Similarity score (with low-confidence indicator)
         similarity = product.get("similarity_score", 0)
         if similarity >= 0.7:
             match_reasons.append(f"High semantic similarity ({similarity:.2f})")
         elif similarity >= 0.5:
             match_reasons.append(f"Good semantic match ({similarity:.2f})")
-        else:
+        elif similarity >= 0.25:
             match_reasons.append(f"Relevant match ({similarity:.2f})")
+        else:
+            # Low similarity (0.15-0.25 range from fallback)
+            if low_confidence_search:
+                match_reasons.append(f"Potentially relevant match ({similarity:.2f}) - broader search used")
+            else:
+                match_reasons.append(f"Related match ({similarity:.2f})")
 
         # Safety passed
         if user_constraints:
@@ -298,10 +311,12 @@ async def reranker_agent(state: AgentState) -> AgentState:
     new_state["final_products"] = final_products
     new_state["status"] = "ranked"
     new_state["next_agent"] = "safety"
+    new_state["low_confidence_search"] = low_confidence_search  # Pass through to safety agent
 
     # Log summary
+    confidence_note = " (LOW CONFIDENCE fallback)" if low_confidence_search else ""
     logger.info(
-        f"Reranker completed (SIMPLIFIED - NO LLM): {len(final_products)} products recommended, "
+        f"Reranker completed{confidence_note} (SIMPLIFIED - NO LLM): {len(final_products)} products recommended, "
         f"{len(excluded_products)} excluded by safety checks"
     )
     if excluded_products:

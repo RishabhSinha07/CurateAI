@@ -127,15 +127,38 @@ async def search_architect_agent(state: AgentState, db: AsyncSession) -> AgentSt
     # Generate embedding for the search query
     query_embedding = await generate_embedding_async(search_query_text)
 
-    # Perform hybrid search (rely on semantic search, let reranker filter)
+    # Perform hybrid search with fallback strategy
     product_repo = ProductRepository(db)
+
+    # Try primary threshold first (0.25 - balanced precision/recall)
     search_results = await product_repo.hybrid_search(
         domain_slug=state["domain_slug"],
         query_embedding=query_embedding,
         filters=None,  # Skip JSONB filters, use semantic search + reranker
         limit=20,
-        min_similarity=0.3
+        min_similarity=0.25
     )
+
+    # Fallback to lower threshold if we got too few results
+    low_confidence_search = False
+    if len(search_results) < 3:
+        logger.warning(
+            f"Primary search returned only {len(search_results)} results. "
+            f"Attempting fallback with lower threshold (0.15)."
+        )
+        search_results = await product_repo.hybrid_search(
+            domain_slug=state["domain_slug"],
+            query_embedding=query_embedding,
+            filters=None,
+            limit=10,
+            min_similarity=0.15
+        )
+        low_confidence_search = True
+
+        if search_results:
+            logger.info(f"Fallback search returned {len(search_results)} results.")
+        else:
+            logger.warning(f"No products found even with fallback threshold (0.15).")
 
     # Convert results to serializable format
     products_data = []
@@ -158,5 +181,6 @@ async def search_architect_agent(state: AgentState, db: AsyncSession) -> AgentSt
     new_state["search_results"] = products_data
     new_state["status"] = "searching"
     new_state["next_agent"] = "reranker"
+    new_state["low_confidence_search"] = low_confidence_search
 
     return new_state
