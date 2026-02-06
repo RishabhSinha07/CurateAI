@@ -1791,7 +1791,7 @@
                           },
                           {
                             "name": "BEDROCK_MODEL_ID",
-                            "value": "us.anthropic.claude-3-5-haiku-20241022-v1:0"
+                            "value": "us.amazon.nova-lite-v1:0"
                           },
                           {
                             "name": "EMBEDDING_MODEL_ID",
@@ -2380,7 +2380,7 @@
                             },
                             "integrationMethod": "ANY",
                             "integrationType": "HTTP_PROXY",
-                            "integrationUri": "http://44.192.40.3:8000",
+                            "integrationUri": "http://44.203.0.146:8000",
                             "payloadFormatVersion": "1.0"
                           }
                         },

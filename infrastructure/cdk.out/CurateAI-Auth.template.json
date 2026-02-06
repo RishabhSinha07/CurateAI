@@ -203,7 +203,7 @@
     },
     "IntegrationMethod": "ANY",
     "IntegrationType": "HTTP_PROXY",
-    "IntegrationUri": "http://44.192.40.3:8000",
+    "IntegrationUri": "http://44.203.0.146:8000",
     "PayloadFormatVersion": "1.0"
    },
    "Metadata": {

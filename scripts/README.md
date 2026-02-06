@@ -38,6 +38,40 @@ git push origin main
 
 ---
 
+### `get_task_ip.sh` ⭐ NEW
+
+**Purpose**: Quickly get the current ECS task public IP
+
+**When to use**:
+- After deployments to find the new task IP
+- For direct API testing
+- When troubleshooting connectivity
+
+**What it does**:
+1. Finds the running ECS task
+2. Extracts the public IP address
+3. Displays direct API endpoint
+
+**Usage**:
+```bash
+./scripts/get_task_ip.sh
+```
+
+**Output**:
+```
+Getting current Fargate task IP...
+Task ARN: arn:aws:ecs:us-east-1:558599919081:task/CurateAI-Cluster/22adcc21...
+
+✅ Current Task IP: 44.203.0.146
+
+Direct API endpoint: http://44.203.0.146:8000
+
+Test with:
+  curl http://44.203.0.146:8000/health
+```
+
+---
+
 ### `migrate_local_to_prod.py`
 
 **Purpose**: Migrate products from local Docker DB to production Neon DB
