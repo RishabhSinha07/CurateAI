@@ -4,7 +4,8 @@
 # ============================================
 # Stage 1: Builder - Install dependencies
 # ============================================
-FROM python:3.11-slim AS builder
+# Use AWS ECR Public Gallery to avoid Docker Hub rate limits
+FROM public.ecr.aws/docker/library/python:3.11-slim AS builder
 
 WORKDIR /build
 
@@ -28,7 +29,8 @@ RUN uv venv /opt/venv && \
 # ============================================
 # Stage 2: Production - Minimal runtime image
 # ============================================
-FROM python:3.11-slim
+# Use AWS ECR Public Gallery to avoid Docker Hub rate limits
+FROM public.ecr.aws/docker/library/python:3.11-slim
 
 WORKDIR /app
 
