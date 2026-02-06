@@ -161,10 +161,12 @@ class EcsStack(Stack):
                 # AWS Bedrock - Region for boto3 client
                 # Note: AWS credentials are provided via IAM Task Role (no access keys needed)
                 "AWS_REGION": self.region,
-                "BEDROCK_MODEL_ID": "anthropic.claude-3-5-haiku-20241022-v1:0",
+                "BEDROCK_MODEL_ID": "us.anthropic.claude-3-5-haiku-20241022-v1:0",
                 "EMBEDDING_MODEL_ID": "amazon.titan-embed-text-v2:0",
                 "EMBEDDING_DIMENSIONS": "1024",
-                # Knowledge Graphs - Phase 1 uses YAML only
+                # Database - Phase 2: Neon PostgreSQL
+                "DATABASE_URL": "postgresql+asyncpg://neondb_owner:npg_63rZkjATYsiQ@ep-green-moon-aia3mla2-pooler.c-4.us-east-1.aws.neon.tech/neondb",
+                # Knowledge Graphs - Phase 2: Still using YAML (can migrate later)
                 "USE_DB_GRAPHS": "false",
             },
             health_check=ecs.HealthCheck(
