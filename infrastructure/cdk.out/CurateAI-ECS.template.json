@@ -271,7 +271,18 @@
         "bedrock:InvokeModelWithResponseStream"
        ],
        "Effect": "Allow",
-       "Resource": "arn:aws:bedrock:us-east-1::foundation-model/*"
+       "Resource": [
+        "arn:aws:bedrock:*:558599919081:inference-profile/*",
+        "arn:aws:bedrock:*::foundation-model/*"
+       ]
+      },
+      {
+       "Action": [
+        "aws-marketplace:Subscribe",
+        "aws-marketplace:ViewSubscriptions"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
       }
      ],
      "Version": "2012-10-17"
@@ -307,11 +318,11 @@
        },
        {
         "Name": "AWS_REGION",
-        "Value": "us-east-1"
+        "Value": "us-east-2"
        },
        {
         "Name": "BEDROCK_MODEL_ID",
-        "Value": "anthropic.claude-3-5-haiku-20241022-v1:0"
+        "Value": "us.anthropic.claude-3-5-haiku-20241022-v1:0"
        },
        {
         "Name": "EMBEDDING_MODEL_ID",
@@ -320,6 +331,10 @@
        {
         "Name": "EMBEDDING_DIMENSIONS",
         "Value": "1024"
+       },
+       {
+        "Name": "DATABASE_URL",
+        "Value": "postgresql+asyncpg://neondb_owner:npg_63rZkjATYsiQ@ep-green-moon-aia3mla2-pooler.c-4.us-east-1.aws.neon.tech/neondb"
        },
        {
         "Name": "USE_DB_GRAPHS",
@@ -476,7 +491,7 @@
      "MaximumPercent": 200,
      "MinimumHealthyPercent": 50
     },
-    "DesiredCount": 0,
+    "DesiredCount": 1,
     "EnableECSManagedTags": false,
     "HealthCheckGracePeriodSeconds": 60,
     "NetworkConfiguration": {

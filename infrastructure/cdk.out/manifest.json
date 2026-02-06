@@ -281,7 +281,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/11196006c2dee9276c0d5559f88f5146ff2d0ae576c9baca2924e6b5a8d88e70.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/7d288d1e02ef6ada535e10b4ab3a2711499f3d45498fc097730bfb68c6ab8d99.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -460,6 +460,202 @@
       },
       "displayName": "CurateAI-ECS"
     },
+    "CurateAI-Auth.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "CurateAI-Auth.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "CurateAI-Auth": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://558599919081/us-east-1",
+      "properties": {
+        "templateFile": "CurateAI-Auth.template.json",
+        "terminationProtection": false,
+        "tags": {
+          "Component": "Authentication",
+          "Environment": "Production",
+          "ManagedBy": "CDK",
+          "Phase": "1",
+          "Project": "CurateAI",
+          "Repository": "RishabhSinha07/CurateAI"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/b323ed94fb9b89bb4aaa87c7ac7b90302192cb9e2806f565699169d89565157b.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "CurateAI-Auth.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-lookup-role-558599919081-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "CurateAI-ECS",
+        "CurateAI-Auth.assets"
+      ],
+      "metadata": {
+        "/CurateAI-Auth": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "Component",
+                "Value": "Authentication"
+              },
+              {
+                "Key": "Environment",
+                "Value": "Production"
+              },
+              {
+                "Key": "ManagedBy",
+                "Value": "CDK"
+              },
+              {
+                "Key": "Phase",
+                "Value": "1"
+              },
+              {
+                "Key": "Project",
+                "Value": "CurateAI"
+              },
+              {
+                "Key": "Repository",
+                "Value": "RishabhSinha07/CurateAI"
+              }
+            ]
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-UserPool/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIUserPoolD28FCD6D"
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-UserPool/CurateAI-Client/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIUserPoolCurateAIClient54BE623F"
+          }
+        ],
+        "/CurateAI-Auth/AdminUser": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AdminUser"
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-API/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPIBE2DA4B3"
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-API/DefaultStage/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPIDefaultStageA5BAFE46"
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-API/GET--health/BackendIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPIGEThealthBackendIntegration293EA684"
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-API/GET--health/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPIGEThealth75ABFF8D"
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-API/POST--chat/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPIPOSTchat2AD85353"
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-API/CognitoAuthorizer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPICognitoAuthorizerF1F98089"
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-API/ANY--{proxy+}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPIANYproxy2C7487F3"
+          }
+        ],
+        "/CurateAI-Auth/API-Logs/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "APILogs5362790F"
+          }
+        ],
+        "/CurateAI-Auth/APIEndpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "APIEndpoint"
+          }
+        ],
+        "/CurateAI-Auth/UserPoolId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPoolId"
+          }
+        ],
+        "/CurateAI-Auth/UserPoolClientId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPoolClientId"
+          }
+        ],
+        "/CurateAI-Auth/AdminUsername": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AdminUsername"
+          }
+        ],
+        "/CurateAI-Auth/AdminEmail": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AdminEmail"
+          }
+        ],
+        "/CurateAI-Auth/AuthenticationGuide": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AuthenticationGuide"
+          }
+        ],
+        "/CurateAI-Auth/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/CurateAI-Auth/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/CurateAI-Auth/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "CurateAI-Auth"
+    },
     "CurateAI-Pipeline.assets": {
       "type": "cdk:asset-manifest",
       "properties": {
@@ -484,7 +680,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/4451991b9370da62801f757d924f7c6c259ec3a1dd94cdc4fc1f726d67467dbe.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/c2ffa11ecb0793cf4a726dca9b8873365b0fe260e00a81934c784a0cc67045cf.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -634,6 +830,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "PipelineUrl"
+          }
+        ],
+        "/CurateAI-Pipeline/CodeStarConnectionSetup": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CodeStarConnectionSetup"
           }
         ],
         "/CurateAI-Pipeline/CDKMetadata/Default": [

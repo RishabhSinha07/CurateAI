@@ -1,0 +1,471 @@
+{
+ "Description": "Authentication layer with API Gateway and Cognito (direct Fargate integration)",
+ "Resources": {
+  "CurateAIUserPoolD28FCD6D": {
+   "Type": "AWS::Cognito::UserPool",
+   "Properties": {
+    "AccountRecoverySetting": {
+     "RecoveryMechanisms": [
+      {
+       "Name": "verified_email",
+       "Priority": 1
+      }
+     ]
+    },
+    "AdminCreateUserConfig": {
+     "AllowAdminCreateUserOnly": false
+    },
+    "AliasAttributes": [
+     "email"
+    ],
+    "AutoVerifiedAttributes": [
+     "email"
+    ],
+    "EmailConfiguration": {
+     "EmailSendingAccount": "COGNITO_DEFAULT"
+    },
+    "EmailVerificationMessage": "The verification code to your new account is {####}",
+    "EmailVerificationSubject": "Verify your new account",
+    "Policies": {
+     "PasswordPolicy": {
+      "MinimumLength": 8,
+      "RequireLowercase": true,
+      "RequireNumbers": true,
+      "RequireSymbols": true,
+      "RequireUppercase": true
+     }
+    },
+    "Schema": [
+     {
+      "Mutable": true,
+      "Name": "email",
+      "Required": true
+     },
+     {
+      "Mutable": true,
+      "Name": "family_name",
+      "Required": false
+     },
+     {
+      "Mutable": true,
+      "Name": "given_name",
+      "Required": false
+     }
+    ],
+    "SmsVerificationMessage": "The verification code to your new account is {####}",
+    "UserPoolName": "CurateAI-Users",
+    "UserPoolTags": {
+     "Component": "Authentication",
+     "Environment": "Production",
+     "ManagedBy": "CDK",
+     "Phase": "1",
+     "Project": "CurateAI",
+     "Repository": "RishabhSinha07/CurateAI"
+    },
+    "VerificationMessageTemplate": {
+     "DefaultEmailOption": "CONFIRM_WITH_CODE",
+     "EmailMessage": "The verification code to your new account is {####}",
+     "EmailSubject": "Verify your new account",
+     "SmsMessage": "The verification code to your new account is {####}"
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-UserPool/Resource"
+   }
+  },
+  "CurateAIUserPoolCurateAIClient54BE623F": {
+   "Type": "AWS::Cognito::UserPoolClient",
+   "Properties": {
+    "AccessTokenValidity": 60,
+    "AllowedOAuthFlows": [
+     "implicit",
+     "code"
+    ],
+    "AllowedOAuthFlowsUserPoolClient": true,
+    "AllowedOAuthScopes": [
+     "profile",
+     "phone",
+     "email",
+     "openid",
+     "aws.cognito.signin.user.admin"
+    ],
+    "CallbackURLs": [
+     "https://example.com"
+    ],
+    "ClientName": "CurateAI-API-Client",
+    "ExplicitAuthFlows": [
+     "ALLOW_USER_PASSWORD_AUTH",
+     "ALLOW_ADMIN_USER_PASSWORD_AUTH",
+     "ALLOW_USER_SRP_AUTH",
+     "ALLOW_REFRESH_TOKEN_AUTH"
+    ],
+    "IdTokenValidity": 60,
+    "PreventUserExistenceErrors": "ENABLED",
+    "RefreshTokenValidity": 43200,
+    "SupportedIdentityProviders": [
+     "COGNITO"
+    ],
+    "TokenValidityUnits": {
+     "AccessToken": "minutes",
+     "IdToken": "minutes",
+     "RefreshToken": "minutes"
+    },
+    "UserPoolId": {
+     "Ref": "CurateAIUserPoolD28FCD6D"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-UserPool/CurateAI-Client/Resource"
+   }
+  },
+  "AdminUser": {
+   "Type": "AWS::Cognito::UserPoolUser",
+   "Properties": {
+    "DesiredDeliveryMediums": [
+     "EMAIL"
+    ],
+    "UserAttributes": [
+     {
+      "Name": "email",
+      "Value": "admin@noeticex.com"
+     }
+    ],
+    "UserPoolId": {
+     "Ref": "CurateAIUserPoolD28FCD6D"
+    },
+    "Username": "admin"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/AdminUser"
+   }
+  },
+  "CurateAIAPIBE2DA4B3": {
+   "Type": "AWS::ApiGatewayV2::Api",
+   "Properties": {
+    "CorsConfiguration": {
+     "AllowHeaders": [
+      "Authorization",
+      "Content-Type"
+     ],
+     "AllowMethods": [
+      "GET",
+      "POST"
+     ],
+     "AllowOrigins": [
+      "*"
+     ],
+     "MaxAge": 86400
+    },
+    "Description": "CurateAI API with Cognito authentication",
+    "Name": "CurateAI-API",
+    "ProtocolType": "HTTP",
+    "Tags": {
+     "Component": "Authentication",
+     "Environment": "Production",
+     "ManagedBy": "CDK",
+     "Phase": "1",
+     "Project": "CurateAI",
+     "Repository": "RishabhSinha07/CurateAI"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/Resource"
+   }
+  },
+  "CurateAIAPIDefaultStageA5BAFE46": {
+   "Type": "AWS::ApiGatewayV2::Stage",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "AutoDeploy": true,
+    "StageName": "$default",
+    "Tags": {
+     "Component": "Authentication",
+     "Environment": "Production",
+     "ManagedBy": "CDK",
+     "Phase": "1",
+     "Project": "CurateAI",
+     "Repository": "RishabhSinha07/CurateAI"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/DefaultStage/Resource"
+   }
+  },
+  "CurateAIAPIGEThealthBackendIntegration293EA684": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "IntegrationMethod": "ANY",
+    "IntegrationType": "HTTP_PROXY",
+    "IntegrationUri": "http://44.192.40.3:8000",
+    "PayloadFormatVersion": "1.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/GET--health/BackendIntegration/Resource"
+   }
+  },
+  "CurateAIAPIGEThealth75ABFF8D": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "GET /health",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "CurateAIAPIGEThealthBackendIntegration293EA684"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/GET--health/Resource"
+   }
+  },
+  "CurateAIAPIPOSTchat2AD85353": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "CurateAIAPICognitoAuthorizerF1F98089"
+    },
+    "RouteKey": "POST /chat",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "CurateAIAPIGEThealthBackendIntegration293EA684"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/POST--chat/Resource"
+   }
+  },
+  "CurateAIAPICognitoAuthorizerF1F98089": {
+   "Type": "AWS::ApiGatewayV2::Authorizer",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "AuthorizerType": "JWT",
+    "IdentitySource": [
+     "$request.header.Authorization"
+    ],
+    "JwtConfiguration": {
+     "Audience": [
+      {
+       "Ref": "CurateAIUserPoolCurateAIClient54BE623F"
+      }
+     ],
+     "Issuer": {
+      "Fn::Join": [
+       "",
+       [
+        "https://cognito-idp.us-east-1.amazonaws.com/",
+        {
+         "Ref": "CurateAIUserPoolD28FCD6D"
+        }
+       ]
+      ]
+     }
+    },
+    "Name": "CognitoAuthorizer"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/CognitoAuthorizer/Resource"
+   }
+  },
+  "CurateAIAPIANYproxy2C7487F3": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "CurateAIAPICognitoAuthorizerF1F98089"
+    },
+    "RouteKey": "ANY /{proxy+}",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "CurateAIAPIGEThealthBackendIntegration293EA684"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/ANY--{proxy+}/Resource"
+   }
+  },
+  "APILogs5362790F": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/apigateway/",
+       {
+        "Ref": "CurateAIAPIBE2DA4B3"
+       }
+      ]
+     ]
+    },
+    "RetentionInDays": 7,
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "Authentication"
+     },
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/API-Logs/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/2WQwU7DMBBEv6V3x7ThC6oeWiSkVkGckZsuZknwWvaaKLX872QbtVRwmjez47XlWq/qpV4uzBCr9tRVPR51fmHTdmqK3nJL1iGTzq8RwoGoV5t3d+MrbHoEx/ej/4loUcajNQyDGb9rnXfMfu1RaiJip7stSDCDRA0lnunJMdhgGMlJ5Y/97a0Tf1DAM4TL6psrqicbdX4muw2UvEyvXIq4fWKfLu9uIFIKLRR1GKfz7uFx+iq9WnxGxCokx/gFupn1Bwf4HbZGAQAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "APIEndpoint": {
+   "Description": "API Gateway endpoint (use this instead of direct ECS access)",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "CurateAIAPIBE2DA4B3"
+      },
+      ".execute-api.us-east-1.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/"
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "CurateAI-APIEndpoint"
+   }
+  },
+  "UserPoolId": {
+   "Description": "Cognito User Pool ID",
+   "Value": {
+    "Ref": "CurateAIUserPoolD28FCD6D"
+   },
+   "Export": {
+    "Name": "CurateAI-UserPoolId"
+   }
+  },
+  "UserPoolClientId": {
+   "Description": "Cognito User Pool Client ID (use for authentication)",
+   "Value": {
+    "Ref": "CurateAIUserPoolCurateAIClient54BE623F"
+   },
+   "Export": {
+    "Name": "CurateAI-UserPoolClientId"
+   }
+  },
+  "AdminUsername": {
+   "Description": "Admin username (set password via AWS Console or CLI)",
+   "Value": "admin"
+  },
+  "AdminEmail": {
+   "Description": "Admin email for password reset",
+   "Value": "admin@noeticex.com"
+  },
+  "AuthenticationGuide": {
+   "Description": "Next steps",
+   "Value": "See AUTH_SETUP.md for instructions on how to authenticate"
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}
