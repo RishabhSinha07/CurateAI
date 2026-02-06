@@ -1,4 +1,63 @@
-# CurateAI Data Scripts
+# CurateAI Scripts
+
+Utility scripts for deployment, data management, and maintenance.
+
+## 🚀 Deployment Scripts
+
+### `update_api_gateway.sh` / `update_api_gateway.py` ⭐ NEW
+
+**Purpose**: Update API Gateway backend URL after ECS deployment
+
+**When to use**: After pipeline deployment or manual ECS task restart (task IP changes)
+
+**What it does**:
+1. Gets current Fargate task public IP
+2. Updates Auth stack with new backend URL
+3. Tests health endpoints
+
+**Usage**:
+```bash
+# Bash version (recommended)
+./scripts/update_api_gateway.sh
+
+# Python version (alternative)
+python scripts/update_api_gateway.py
+```
+
+**Typical workflow**:
+```bash
+# 1. Push code (triggers pipeline)
+git push origin main
+
+# 2. Wait for pipeline (~8-10 min)
+# https://console.aws.amazon.com/codesuite/codepipeline/pipelines/CurateAI-Pipeline
+
+# 3. Update API Gateway
+./scripts/update_api_gateway.sh
+```
+
+---
+
+### `migrate_local_to_prod.py`
+
+**Purpose**: Migrate products from local Docker DB to production Neon DB
+
+**When to use**: Initial setup or syncing local products to production
+
+**What it does**:
+1. Exports all products from local PostgreSQL
+2. Imports to production Neon database
+3. Preserves embeddings and attributes
+
+**Usage**:
+```bash
+pip install asyncpg
+python scripts/migrate_local_to_prod.py
+```
+
+---
+
+## 📦 Data Scripts
 
 Scripts for scraping product data and seeding the database.
 

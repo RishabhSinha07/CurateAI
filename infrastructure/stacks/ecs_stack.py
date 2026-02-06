@@ -129,6 +129,18 @@ class EcsStack(Stack):
             )
         )
 
+        # Allow AWS Marketplace actions for Bedrock model subscriptions
+        self.task_role.add_to_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                actions=[
+                    "aws-marketplace:ViewSubscriptions",
+                    "aws-marketplace:Subscribe",
+                ],
+                resources=["*"],
+            )
+        )
+
         # ============================================
         # Fargate Task Definition (Ultra Cost-Optimized)
         # ============================================
@@ -201,9 +213,8 @@ class EcsStack(Stack):
             cluster=self.cluster,
             task_definition=self.task_definition,
             service_name="CurateAI-Service",
-            # Start with 0 tasks to allow Docker image push first
-            # Will update to 1 after image is in ECR
-            desired_count=0,
+            # Keep 1 task running always (prevents downtime on deployments)
+            desired_count=1,
             # Fargate Spot for 70% cost savings
             capacity_provider_strategies=[
                 ecs.CapacityProviderStrategy(
