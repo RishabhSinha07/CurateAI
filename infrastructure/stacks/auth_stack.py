@@ -147,23 +147,38 @@ class AuthStack(Stack):
         )
 
         # Backend Integration - direct to Fargate task
-        self.integration = integrations.HttpUrlIntegration(
-            "BackendIntegration",
-            backend_url,
+        # Note: Using separate integrations for each route to ensure correct path forwarding
+
+        # Health check integration (GET /health)
+        health_integration = integrations.HttpUrlIntegration(
+            "HealthIntegration",
+            f"{backend_url}/health",
+        )
+
+        # Chat integration (POST /chat)
+        chat_integration = integrations.HttpUrlIntegration(
+            "ChatIntegration",
+            f"{backend_url}/chat",
+        )
+
+        # Proxy integration (ANY /{proxy+})
+        proxy_integration = integrations.HttpUrlIntegration(
+            "ProxyIntegration",
+            f"{backend_url}/{{proxy}}",
         )
 
         # Public route (no auth required) - health check
         self.api.add_routes(
             path="/health",
             methods=[apigw.HttpMethod.GET],
-            integration=self.integration,
+            integration=health_integration,
         )
 
         # Protected routes (require Cognito auth)
         self.api.add_routes(
             path="/chat",
             methods=[apigw.HttpMethod.POST],
-            integration=self.integration,
+            integration=chat_integration,
             authorizer=self.authorizer,
         )
 
@@ -171,7 +186,7 @@ class AuthStack(Stack):
         self.api.add_routes(
             path="/{proxy+}",
             methods=[apigw.HttpMethod.ANY],
-            integration=self.integration,
+            integration=proxy_integration,
             authorizer=self.authorizer,
         )
 
