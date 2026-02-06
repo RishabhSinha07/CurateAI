@@ -113,7 +113,8 @@ class EcsStack(Stack):
             assumed_by=iam.ServicePrincipal("ecs-tasks.amazonaws.com"),
         )
 
-        # Allow Bedrock model invocation
+        # Allow Bedrock model invocation (foundation models + inference profiles, all regions)
+        # Inference profiles may route to different regions, so we allow all regions
         self.task_role.add_to_policy(
             iam.PolicyStatement(
                 effect=iam.Effect.ALLOW,
@@ -122,7 +123,8 @@ class EcsStack(Stack):
                     "bedrock:InvokeModelWithResponseStream",
                 ],
                 resources=[
-                    f"arn:aws:bedrock:{self.region}::foundation-model/*",
+                    "arn:aws:bedrock:*::foundation-model/*",
+                    f"arn:aws:bedrock:*:{self.account}:inference-profile/*",
                 ],
             )
         )
@@ -160,7 +162,8 @@ class EcsStack(Stack):
                 "DEBUG": "false",
                 # AWS Bedrock - Region for boto3 client
                 # Note: AWS credentials are provided via IAM Task Role (no access keys needed)
-                "AWS_REGION": self.region,
+                # Using us-east-2 for Bedrock (infrastructure is in us-east-1)
+                "AWS_REGION": "us-east-2",
                 "BEDROCK_MODEL_ID": "us.anthropic.claude-3-5-haiku-20241022-v1:0",
                 "EMBEDDING_MODEL_ID": "amazon.titan-embed-text-v2:0",
                 "EMBEDDING_DIMENSIONS": "1024",

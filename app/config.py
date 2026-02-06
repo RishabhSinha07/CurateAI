@@ -17,7 +17,7 @@ class Settings(BaseSettings):
     db_pool_recycle: int = 3600
 
     # AWS Bedrock
-    aws_region: str = "us-east-1"
+    aws_region: str = "us-east-2"
     bedrock_model_id: str = "anthropic.claude-3-5-haiku-20241022-v1:0"
 
     # AWS Bedrock Embeddings (Titan v2)
