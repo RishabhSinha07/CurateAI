@@ -37,6 +37,7 @@ from aws_cdk import App, Environment, Tags
 
 from stacks.network_stack import NetworkStack
 from stacks.ecs_stack import EcsStack
+from stacks.auth_stack import AuthStack
 from stacks.pipeline_stack import PipelineStack
 from stacks.observability_stack import ObservabilityStack
 
@@ -81,6 +82,9 @@ def main():
     # Monitoring Configuration
     alarm_email = get_env_var("ALARM_EMAIL", default="admin@noeticex.com", required=False)
 
+    # Backend URL for API Gateway integration (Fargate task public IP)
+    backend_url = get_env_var("BACKEND_URL", required=False)
+
     # ============================================
     # Deploy Stacks
     # ============================================
@@ -105,7 +109,20 @@ def main():
     )
     ecs_stack.add_dependency(network_stack)
 
-    # Stack 3: CI/CD Pipeline (depends on ECS)
+    # Stack 3: Authentication (API Gateway + Cognito)
+    # Only deploy if BACKEND_URL is set
+    if backend_url:
+        auth_stack = AuthStack(
+            app,
+            "CurateAI-Auth",
+            backend_url=backend_url,
+            admin_email=alarm_email,
+            env=env,
+            description="Authentication layer with API Gateway and Cognito (direct Fargate integration)",
+        )
+        auth_stack.add_dependency(ecs_stack)
+
+    # Stack 4: CI/CD Pipeline (depends on ECS)
     pipeline_stack = PipelineStack(
         app,
         "CurateAI-Pipeline",
@@ -120,7 +137,7 @@ def main():
     )
     pipeline_stack.add_dependency(ecs_stack)
 
-    # Stack 4: Observability (depends on ECS)
+    # Stack 5: Observability (depends on ECS)
     observability_stack = ObservabilityStack(
         app,
         "CurateAI-Observability",
