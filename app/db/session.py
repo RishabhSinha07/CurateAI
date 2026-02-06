@@ -6,24 +6,33 @@ from app.config import get_settings
 
 settings = get_settings()
 
-engine = create_async_engine(
-    settings.database_url,
-    echo=settings.debug,
-    pool_pre_ping=True,
-    pool_size=5,
-    max_overflow=10,
-)
+# Make database connection optional for Phase 1
+if settings.database_url:
+    engine = create_async_engine(
+        settings.database_url,
+        echo=settings.debug,
+        pool_pre_ping=True,
+        pool_size=settings.db_pool_size,
+        max_overflow=settings.db_max_overflow,
+        pool_recycle=settings.db_pool_recycle,
+    )
 
-async_session_factory = async_sessionmaker(
-    engine,
-    class_=AsyncSession,
-    expire_on_commit=False,
-    autoflush=False,
-)
+    async_session_factory = async_sessionmaker(
+        engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+        autoflush=False,
+    )
+else:
+    engine = None
+    async_session_factory = None
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """Dependency for FastAPI routes to get a database session."""
+    if async_session_factory is None:
+        raise RuntimeError("Database is not configured. Set DATABASE_URL environment variable.")
+
     async with async_session_factory() as session:
         try:
             yield session

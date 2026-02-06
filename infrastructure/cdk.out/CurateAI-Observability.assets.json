@@ -1,0 +1,20 @@
+{
+  "version": "36.0.0",
+  "files": {
+    "092fc92cdedcb1d4e36c504894ee9960da3aa83e535c64058aa7a11ee889df61": {
+      "source": {
+        "path": "CurateAI-Observability.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "558599919081-us-east-1": {
+          "bucketName": "cdk-hnb659fds-assets-558599919081-us-east-1",
+          "objectKey": "092fc92cdedcb1d4e36c504894ee9960da3aa83e535c64058aa7a11ee889df61.json",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-file-publishing-role-558599919081-us-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

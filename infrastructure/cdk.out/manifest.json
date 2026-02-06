@@ -1,0 +1,810 @@
+{
+  "version": "36.0.0",
+  "artifacts": {
+    "CurateAI-Network.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "CurateAI-Network.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "CurateAI-Network": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://558599919081/us-east-1",
+      "properties": {
+        "templateFile": "CurateAI-Network.template.json",
+        "terminationProtection": false,
+        "tags": {
+          "Environment": "Production",
+          "ManagedBy": "CDK",
+          "Phase": "1",
+          "Project": "CurateAI",
+          "Repository": "RishabhSinha07/CurateAI"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/0ebc17756ebdd10dc006bf30d8a9550e4ae59dba9551145e4e524eea2fc95427.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "CurateAI-Network.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-lookup-role-558599919081-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "CurateAI-Network.assets"
+      ],
+      "metadata": {
+        "/CurateAI-Network": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "Environment",
+                "Value": "Production"
+              },
+              {
+                "Key": "ManagedBy",
+                "Value": "CDK"
+              },
+              {
+                "Key": "Phase",
+                "Value": "1"
+              },
+              {
+                "Key": "Project",
+                "Value": "CurateAI"
+              },
+              {
+                "Key": "Repository",
+                "Value": "RishabhSinha07/CurateAI"
+              }
+            ]
+          }
+        ],
+        "/CurateAI-Network/CurateAI-VPC/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIVPC67003679"
+          }
+        ],
+        "/CurateAI-Network/CurateAI-VPC/PublicSubnet1/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIVPCPublicSubnet1SubnetB5E92D6E"
+          }
+        ],
+        "/CurateAI-Network/CurateAI-VPC/PublicSubnet1/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIVPCPublicSubnet1RouteTableB2BA8702"
+          }
+        ],
+        "/CurateAI-Network/CurateAI-VPC/PublicSubnet1/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIVPCPublicSubnet1RouteTableAssociationF2E5B9F6"
+          }
+        ],
+        "/CurateAI-Network/CurateAI-VPC/PublicSubnet1/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIVPCPublicSubnet1DefaultRouteC8046DFD"
+          }
+        ],
+        "/CurateAI-Network/CurateAI-VPC/PublicSubnet2/Subnet": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIVPCPublicSubnet2SubnetB85A5986"
+          }
+        ],
+        "/CurateAI-Network/CurateAI-VPC/PublicSubnet2/RouteTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIVPCPublicSubnet2RouteTableEC7CE134"
+          }
+        ],
+        "/CurateAI-Network/CurateAI-VPC/PublicSubnet2/RouteTableAssociation": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIVPCPublicSubnet2RouteTableAssociation6BAE92CA"
+          }
+        ],
+        "/CurateAI-Network/CurateAI-VPC/PublicSubnet2/DefaultRoute": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIVPCPublicSubnet2DefaultRoute3EAAD9C0"
+          }
+        ],
+        "/CurateAI-Network/CurateAI-VPC/IGW": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIVPCIGW27242168"
+          }
+        ],
+        "/CurateAI-Network/CurateAI-VPC/VPCGW": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIVPCVPCGWEF338D37"
+          }
+        ],
+        "/CurateAI-Network/CurateAI-VPC/RestrictDefaultSecurityGroupCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIVPCRestrictDefaultSecurityGroupCustomResource0621CEFE"
+          }
+        ],
+        "/CurateAI-Network/Custom::VpcRestrictDefaultSGCustomResourceProvider/Role": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0"
+          }
+        ],
+        "/CurateAI-Network/Custom::VpcRestrictDefaultSGCustomResourceProvider/Handler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E"
+          }
+        ],
+        "/CurateAI-Network/ECR-API-Endpoint/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ECRAPIEndpointSecurityGroup4547491C"
+          }
+        ],
+        "/CurateAI-Network/ECR-API-Endpoint/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ECRAPIEndpoint958C225F"
+          }
+        ],
+        "/CurateAI-Network/ECR-Docker-Endpoint/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ECRDockerEndpointSecurityGroup6D30C9E8"
+          }
+        ],
+        "/CurateAI-Network/ECR-Docker-Endpoint/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ECRDockerEndpoint04567B85"
+          }
+        ],
+        "/CurateAI-Network/S3-Endpoint/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "S3Endpoint067200C7"
+          }
+        ],
+        "/CurateAI-Network/CloudWatch-Logs-Endpoint/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CloudWatchLogsEndpointSecurityGroupEE065128"
+          }
+        ],
+        "/CurateAI-Network/CloudWatch-Logs-Endpoint/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CloudWatchLogsEndpoint55C1B1BE"
+          }
+        ],
+        "/CurateAI-Network/Bedrock-Runtime-Endpoint/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BedrockRuntimeEndpointSecurityGroup7FF13E70"
+          }
+        ],
+        "/CurateAI-Network/Bedrock-Runtime-Endpoint/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BedrockRuntimeEndpointB46EBC4B"
+          }
+        ],
+        "/CurateAI-Network/Fargate-SG/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "FargateSG3742C269"
+          }
+        ],
+        "/CurateAI-Network/VPC-Endpoint-SG/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VPCEndpointSG5D2DB8AD"
+          }
+        ],
+        "/CurateAI-Network/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/CurateAI-Network/Exports/Output{\"Ref\":\"CurateAIVPCPublicSubnet1SubnetB5E92D6E\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefCurateAIVPCPublicSubnet1SubnetB5E92D6E791FA932"
+          }
+        ],
+        "/CurateAI-Network/Exports/Output{\"Ref\":\"CurateAIVPCPublicSubnet2SubnetB85A5986\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefCurateAIVPCPublicSubnet2SubnetB85A59869C07E00E"
+          }
+        ],
+        "/CurateAI-Network/Exports/Output{\"Fn::GetAtt\":[\"FargateSG3742C269\",\"GroupId\"]}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputFnGetAttFargateSG3742C269GroupIdD51DEC7E"
+          }
+        ],
+        "/CurateAI-Network/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/CurateAI-Network/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "CurateAI-Network"
+    },
+    "CurateAI-ECS.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "CurateAI-ECS.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "CurateAI-ECS": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://558599919081/us-east-1",
+      "properties": {
+        "templateFile": "CurateAI-ECS.template.json",
+        "terminationProtection": false,
+        "tags": {
+          "Environment": "Production",
+          "ManagedBy": "CDK",
+          "Phase": "1",
+          "Project": "CurateAI",
+          "Repository": "RishabhSinha07/CurateAI"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/11196006c2dee9276c0d5559f88f5146ff2d0ae576c9baca2924e6b5a8d88e70.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "CurateAI-ECS.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-lookup-role-558599919081-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "CurateAI-Network",
+        "CurateAI-ECS.assets"
+      ],
+      "metadata": {
+        "/CurateAI-ECS": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "Environment",
+                "Value": "Production"
+              },
+              {
+                "Key": "ManagedBy",
+                "Value": "CDK"
+              },
+              {
+                "Key": "Phase",
+                "Value": "1"
+              },
+              {
+                "Key": "Project",
+                "Value": "CurateAI"
+              },
+              {
+                "Key": "Repository",
+                "Value": "RishabhSinha07/CurateAI"
+              }
+            ]
+          }
+        ],
+        "/CurateAI-ECS/CurateAI-ECR/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIECR3D7C459A"
+          }
+        ],
+        "/CurateAI-ECS/CurateAI-Cluster/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAICluster60AC0717"
+          }
+        ],
+        "/CurateAI-ECS/CurateAI-Logs/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAILogsC43B061E"
+          }
+        ],
+        "/CurateAI-ECS/Task-Execution-Role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TaskExecutionRoleA3CAE0F7"
+          }
+        ],
+        "/CurateAI-ECS/Task-Execution-Role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TaskExecutionRoleDefaultPolicy96A62DFB"
+          }
+        ],
+        "/CurateAI-ECS/Task-Role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TaskRole1951A240"
+          }
+        ],
+        "/CurateAI-ECS/Task-Role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TaskRoleDefaultPolicy2F37F892"
+          }
+        ],
+        "/CurateAI-ECS/CurateAI-Task/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAITask7091D2F0"
+          }
+        ],
+        "/CurateAI-ECS/CurateAI-Service/Service": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIServiceA16C39B1"
+          }
+        ],
+        "/CurateAI-ECS/ClusterName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ClusterName"
+          }
+        ],
+        "/CurateAI-ECS/ServiceName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ServiceName"
+          }
+        ],
+        "/CurateAI-ECS/ECRRepositoryUri": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ECRRepositoryUri"
+          }
+        ],
+        "/CurateAI-ECS/TaskPublicIPNote": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TaskPublicIPNote"
+          }
+        ],
+        "/CurateAI-ECS/APIEndpointPattern": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "APIEndpointPattern"
+          }
+        ],
+        "/CurateAI-ECS/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/CurateAI-ECS/Exports/Output{\"Fn::GetAtt\":[\"CurateAIECR3D7C459A\",\"Arn\"]}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputFnGetAttCurateAIECR3D7C459AArnD82D4123"
+          }
+        ],
+        "/CurateAI-ECS/Exports/Output{\"Ref\":\"CurateAIECR3D7C459A\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefCurateAIECR3D7C459AA9DD5F0E"
+          }
+        ],
+        "/CurateAI-ECS/Exports/Output{\"Ref\":\"CurateAICluster60AC0717\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefCurateAICluster60AC07179B81467C"
+          }
+        ],
+        "/CurateAI-ECS/Exports/Output{\"Fn::GetAtt\":[\"CurateAIServiceA16C39B1\",\"Name\"]}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputFnGetAttCurateAIServiceA16C39B1NameAC081D51"
+          }
+        ],
+        "/CurateAI-ECS/Exports/Output{\"Ref\":\"CurateAILogsC43B061E\"}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExportsOutputRefCurateAILogsC43B061E98A8F540"
+          }
+        ],
+        "/CurateAI-ECS/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/CurateAI-ECS/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "CurateAI-ECS"
+    },
+    "CurateAI-Pipeline.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "CurateAI-Pipeline.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "CurateAI-Pipeline": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://558599919081/us-east-1",
+      "properties": {
+        "templateFile": "CurateAI-Pipeline.template.json",
+        "terminationProtection": false,
+        "tags": {
+          "Environment": "Production",
+          "ManagedBy": "CDK",
+          "Phase": "1",
+          "Project": "CurateAI",
+          "Repository": "RishabhSinha07/CurateAI"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/4451991b9370da62801f757d924f7c6c259ec3a1dd94cdc4fc1f726d67467dbe.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "CurateAI-Pipeline.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-lookup-role-558599919081-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "CurateAI-ECS",
+        "CurateAI-Pipeline.assets"
+      ],
+      "metadata": {
+        "/CurateAI-Pipeline": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "Environment",
+                "Value": "Production"
+              },
+              {
+                "Key": "ManagedBy",
+                "Value": "CDK"
+              },
+              {
+                "Key": "Phase",
+                "Value": "1"
+              },
+              {
+                "Key": "Project",
+                "Value": "CurateAI"
+              },
+              {
+                "Key": "Repository",
+                "Value": "RishabhSinha07/CurateAI"
+              }
+            ]
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-Build/Role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIBuildRoleCD2CD9E8"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-Build/Role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIBuildRoleDefaultPolicyF6344835"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-Build/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIBuild441D4260"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-Pipeline/ArtifactsBucketEncryptionKey/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIPipelineArtifactsBucketEncryptionKey35586106"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-Pipeline/ArtifactsBucketEncryptionKeyAlias/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIPipelineArtifactsBucketEncryptionKeyAlias24FBDAF5"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-Pipeline/ArtifactsBucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIPipelineArtifactsBucket5344FB10"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-Pipeline/ArtifactsBucket/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIPipelineArtifactsBucketPolicy9E3958D2"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-Pipeline/Role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIPipelineRole428C272F"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-Pipeline/Role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIPipelineRoleDefaultPolicyFB7A51D1"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-Pipeline/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIPipelineA4350A50"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-Pipeline/Source/GitHub-Source/CodePipelineActionRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIPipelineSourceGitHubSourceCodePipelineActionRole01206964"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-Pipeline/Source/GitHub-Source/CodePipelineActionRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIPipelineSourceGitHubSourceCodePipelineActionRoleDefaultPolicy5630DFC7"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-Pipeline/Build/Docker-Build/CodePipelineActionRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIPipelineBuildDockerBuildCodePipelineActionRoleBD3598B8"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-Pipeline/Build/Docker-Build/CodePipelineActionRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIPipelineBuildDockerBuildCodePipelineActionRoleDefaultPolicy5A9CD35D"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-Pipeline/Deploy/ECS-Deploy/CodePipelineActionRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIPipelineDeployECSDeployCodePipelineActionRole4FD38F1E"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-Pipeline/Deploy/ECS-Deploy/CodePipelineActionRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIPipelineDeployECSDeployCodePipelineActionRoleDefaultPolicy836E0219"
+          }
+        ],
+        "/CurateAI-Pipeline/PipelineName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PipelineName"
+          }
+        ],
+        "/CurateAI-Pipeline/PipelineUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "PipelineUrl"
+          }
+        ],
+        "/CurateAI-Pipeline/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/CurateAI-Pipeline/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/CurateAI-Pipeline/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "CurateAI-Pipeline"
+    },
+    "CurateAI-Observability.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "CurateAI-Observability.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "CurateAI-Observability": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://558599919081/us-east-1",
+      "properties": {
+        "templateFile": "CurateAI-Observability.template.json",
+        "terminationProtection": false,
+        "tags": {
+          "Environment": "Production",
+          "ManagedBy": "CDK",
+          "Phase": "1",
+          "Project": "CurateAI",
+          "Repository": "RishabhSinha07/CurateAI"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/092fc92cdedcb1d4e36c504894ee9960da3aa83e535c64058aa7a11ee889df61.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "CurateAI-Observability.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-lookup-role-558599919081-us-east-1",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "CurateAI-ECS",
+        "CurateAI-Observability.assets"
+      ],
+      "metadata": {
+        "/CurateAI-Observability": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "Environment",
+                "Value": "Production"
+              },
+              {
+                "Key": "ManagedBy",
+                "Value": "CDK"
+              },
+              {
+                "Key": "Phase",
+                "Value": "1"
+              },
+              {
+                "Key": "Project",
+                "Value": "CurateAI"
+              },
+              {
+                "Key": "Repository",
+                "Value": "RishabhSinha07/CurateAI"
+              }
+            ]
+          }
+        ],
+        "/CurateAI-Observability/CurateAI-Alarms/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAlarms51797298"
+          }
+        ],
+        "/CurateAI-Observability/CurateAI-Alarms/admin@noeticex.com/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAlarmsadminnoeticexcomFD2DE7EF"
+          }
+        ],
+        "/CurateAI-Observability/CPU-High-Alarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CPUHighAlarm6CA25B1A"
+          }
+        ],
+        "/CurateAI-Observability/Memory-High-Alarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "MemoryHighAlarm79542EE9"
+          }
+        ],
+        "/CurateAI-Observability/No-Tasks-Alarm/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NoTasksAlarm7F94FA19"
+          }
+        ],
+        "/CurateAI-Observability/CurateAI-Dashboard/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIDashboard58FB4AE9"
+          }
+        ],
+        "/CurateAI-Observability/DashboardUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DashboardUrl"
+          }
+        ],
+        "/CurateAI-Observability/AlarmTopicArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AlarmTopicArn"
+          }
+        ],
+        "/CurateAI-Observability/AlarmEmail": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "AlarmEmail"
+          }
+        ],
+        "/CurateAI-Observability/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/CurateAI-Observability/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/CurateAI-Observability/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "CurateAI-Observability"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  }
+}

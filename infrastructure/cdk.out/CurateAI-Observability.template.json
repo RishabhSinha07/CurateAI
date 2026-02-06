@@ -1,0 +1,300 @@
+{
+ "Description": "Monitoring and observability for CurateAI (CloudWatch, SNS)",
+ "Resources": {
+  "CurateAIAlarms51797298": {
+   "Type": "AWS::SNS::Topic",
+   "Properties": {
+    "DisplayName": "CurateAI Production Alarms",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ],
+    "TopicName": "CurateAI-Alarms"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Observability/CurateAI-Alarms/Resource"
+   }
+  },
+  "CurateAIAlarmsadminnoeticexcomFD2DE7EF": {
+   "Type": "AWS::SNS::Subscription",
+   "Properties": {
+    "Endpoint": "admin@noeticex.com",
+    "Protocol": "email",
+    "TopicArn": {
+     "Ref": "CurateAIAlarms51797298"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Observability/CurateAI-Alarms/admin@noeticex.com/Resource"
+   }
+  },
+  "CPUHighAlarm6CA25B1A": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "CurateAIAlarms51797298"
+     }
+    ],
+    "AlarmDescription": "CPU utilization is above 80%",
+    "AlarmName": "CurateAI-CPU-High",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "Dimensions": [
+     {
+      "Name": "ClusterName",
+      "Value": {
+       "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAICluster60AC07179B81467C"
+      }
+     },
+     {
+      "Name": "ServiceName",
+      "Value": {
+       "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIServiceA16C39B1NameAC081D51"
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "CPUUtilization",
+    "Namespace": "AWS/ECS",
+    "Period": 300,
+    "Statistic": "Average",
+    "Threshold": 80
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Observability/CPU-High-Alarm/Resource"
+   }
+  },
+  "MemoryHighAlarm79542EE9": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "CurateAIAlarms51797298"
+     }
+    ],
+    "AlarmDescription": "Memory utilization is above 85%",
+    "AlarmName": "CurateAI-Memory-High",
+    "ComparisonOperator": "GreaterThanThreshold",
+    "Dimensions": [
+     {
+      "Name": "ClusterName",
+      "Value": {
+       "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAICluster60AC07179B81467C"
+      }
+     },
+     {
+      "Name": "ServiceName",
+      "Value": {
+       "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIServiceA16C39B1NameAC081D51"
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "MemoryUtilization",
+    "Namespace": "AWS/ECS",
+    "Period": 300,
+    "Statistic": "Average",
+    "Threshold": 85
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Observability/Memory-High-Alarm/Resource"
+   }
+  },
+  "NoTasksAlarm7F94FA19": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "CurateAIAlarms51797298"
+     }
+    ],
+    "AlarmDescription": "No ECS tasks are running",
+    "AlarmName": "CurateAI-No-Tasks",
+    "ComparisonOperator": "LessThanThreshold",
+    "Dimensions": [
+     {
+      "Name": "ClusterName",
+      "Value": {
+       "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAICluster60AC07179B81467C"
+      }
+     },
+     {
+      "Name": "ServiceName",
+      "Value": {
+       "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIServiceA16C39B1NameAC081D51"
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "RunningTaskCount",
+    "Namespace": "AWS/ECS",
+    "Period": 60,
+    "Statistic": "Average",
+    "Threshold": 1
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Observability/No-Tasks-Alarm/Resource"
+   }
+  },
+  "CurateAIDashboard58FB4AE9": {
+   "Type": "AWS::CloudWatch::Dashboard",
+   "Properties": {
+    "DashboardBody": {
+     "Fn::Join": [
+      "",
+      [
+       "{\"widgets\":[{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"title\":\"ECS Service - Running Tasks\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/ECS\",\"RunningTaskCount\",\"ClusterName\",\"",
+       {
+        "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAICluster60AC07179B81467C"
+       },
+       "\",\"ServiceName\",\"",
+       {
+        "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIServiceA16C39B1NameAC081D51"
+       },
+       "\",{\"period\":60}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":3,\"x\":12,\"y\":0,\"properties\":{\"view\":\"singleValue\",\"title\":\"Current Task Count\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/ECS\",\"RunningTaskCount\",\"ClusterName\",\"",
+       {
+        "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAICluster60AC07179B81467C"
+       },
+       "\",\"ServiceName\",\"",
+       {
+        "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIServiceA16C39B1NameAC081D51"
+       },
+       "\",{\"period\":60}]]}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":6,\"properties\":{\"view\":\"timeSeries\",\"title\":\"CPU Utilization (%)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/ECS\",\"CPUUtilization\",\"ClusterName\",\"",
+       {
+        "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAICluster60AC07179B81467C"
+       },
+       "\",\"ServiceName\",\"",
+       {
+        "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIServiceA16C39B1NameAC081D51"
+       },
+       "\"]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":6,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Memory Utilization (%)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/ECS\",\"MemoryUtilization\",\"ClusterName\",\"",
+       {
+        "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAICluster60AC07179B81467C"
+       },
+       "\",\"ServiceName\",\"",
+       {
+        "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIServiceA16C39B1NameAC081D51"
+       },
+       "\"]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":12,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Log Events (Total)\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/Logs\",\"IncomingLogEvents\",\"LogGroupName\",\"",
+       {
+        "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAILogsC43B061E98A8F540"
+       },
+       "\",{\"stat\":\"Sum\"}]],\"yAxis\":{}}}]}"
+      ]
+     ]
+    },
+    "DashboardName": "CurateAI-Production"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Observability/CurateAI-Dashboard/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02OQQ6CMBBFz8K+jIAnMLrXAHtTBgwj0JLONMQ0vbs0JMbVvPfyF1NBWRVQZHrjHPspn6mD0IjGSe3pGdgwhNauhOr6Mgc0vmN0tApZk+q/R4Wz9f2mBUcIl1m7JU0OuGkeO6tdn9JPYkx697J6SVQPbL3DIarHR0ZrTuf9RyizNxPlzhuhZYD6uF/ZEuhsvwAAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Observability/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "DashboardUrl": {
+   "Description": "CloudWatch Dashboard URL",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#dashboards:name=",
+      {
+       "Ref": "CurateAIDashboard58FB4AE9"
+      }
+     ]
+    ]
+   }
+  },
+  "AlarmTopicArn": {
+   "Description": "SNS Topic ARN for alarms",
+   "Value": {
+    "Ref": "CurateAIAlarms51797298"
+   }
+  },
+  "AlarmEmail": {
+   "Description": "Alarm email notification",
+   "Value": "Alarm notifications will be sent to: admin@noeticex.com"
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

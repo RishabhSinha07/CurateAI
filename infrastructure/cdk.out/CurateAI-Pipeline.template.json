@@ -1,0 +1,1185 @@
+{
+ "Description": "CI/CD pipeline for CurateAI (GitHub -> CodeBuild -> ECS)",
+ "Resources": {
+  "CurateAIBuildRoleCD2CD9E8": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "codebuild.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Build/Role/Resource"
+   }
+  },
+  "CurateAIBuildRoleDefaultPolicyF6344835": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:558599919081:log-group:/aws/codebuild/",
+           {
+            "Ref": "CurateAIBuild441D4260"
+           },
+           ":*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:558599919081:log-group:/aws/codebuild/",
+           {
+            "Ref": "CurateAIBuild441D4260"
+           }
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "codebuild:BatchPutCodeCoverages",
+        "codebuild:BatchPutTestCases",
+        "codebuild:CreateReport",
+        "codebuild:CreateReportGroup",
+        "codebuild:UpdateReport"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:aws:codebuild:us-east-1:558599919081:report-group/",
+          {
+           "Ref": "CurateAIBuild441D4260"
+          },
+          "-*"
+         ]
+        ]
+       }
+      },
+      {
+       "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:BatchGetImage",
+        "ecr:CompleteLayerUpload",
+        "ecr:GetDownloadUrlForLayer",
+        "ecr:InitiateLayerUpload",
+        "ecr:PutImage",
+        "ecr:UploadLayerPart"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIECR3D7C459AArnD82D4123"
+       }
+      },
+      {
+       "Action": "ecr:GetAuthorizationToken",
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "s3:Abort*",
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "CurateAIPipelineArtifactsBucket5344FB10",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "CurateAIPipelineArtifactsBucket5344FB10",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CurateAIBuildRoleDefaultPolicyF6344835",
+    "Roles": [
+     {
+      "Ref": "CurateAIBuildRoleCD2CD9E8"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Build/Role/DefaultPolicy/Resource"
+   }
+  },
+  "CurateAIBuild441D4260": {
+   "Type": "AWS::CodeBuild::Project",
+   "Properties": {
+    "Artifacts": {
+     "Type": "CODEPIPELINE"
+    },
+    "Cache": {
+     "Type": "NO_CACHE"
+    },
+    "Description": "Build Docker images for CurateAI",
+    "EncryptionKey": {
+     "Fn::GetAtt": [
+      "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+      "Arn"
+     ]
+    },
+    "Environment": {
+     "ComputeType": "BUILD_GENERAL1_SMALL",
+     "EnvironmentVariables": [
+      {
+       "Name": "ECR_REPOSITORY_URI",
+       "Type": "PLAINTEXT",
+       "Value": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::Select": [
+            4,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIECR3D7C459AArnD82D4123"
+              }
+             ]
+            }
+           ]
+          },
+          ".dkr.ecr.",
+          {
+           "Fn::Select": [
+            3,
+            {
+             "Fn::Split": [
+              ":",
+              {
+               "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIECR3D7C459AArnD82D4123"
+              }
+             ]
+            }
+           ]
+          },
+          ".",
+          {
+           "Ref": "AWS::URLSuffix"
+          },
+          "/",
+          {
+           "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAIECR3D7C459AA9DD5F0E"
+          }
+         ]
+        ]
+       }
+      },
+      {
+       "Name": "AWS_DEFAULT_REGION",
+       "Type": "PLAINTEXT",
+       "Value": "us-east-1"
+      },
+      {
+       "Name": "AWS_ACCOUNT_ID",
+       "Type": "PLAINTEXT",
+       "Value": "558599919081"
+      }
+     ],
+     "Image": "aws/codebuild/standard:7.0",
+     "ImagePullCredentialsType": "CODEBUILD",
+     "PrivilegedMode": true,
+     "Type": "LINUX_CONTAINER"
+    },
+    "Name": "CurateAI-Build",
+    "ServiceRole": {
+     "Fn::GetAtt": [
+      "CurateAIBuildRoleCD2CD9E8",
+      "Arn"
+     ]
+    },
+    "Source": {
+     "BuildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"pre_build\": {\n      \"commands\": [\n        \"echo Logging in to Amazon ECR...\",\n        \"aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY_URI\",\n        \"COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)\",\n        \"IMAGE_TAG=${COMMIT_HASH:=latest}\"\n      ]\n    },\n    \"build\": {\n      \"commands\": [\n        \"echo Build started on `date`\",\n        \"echo Building Docker image...\",\n        \"docker build -f Dockerfile.prod -t $ECR_REPOSITORY_URI:latest .\",\n        \"docker tag $ECR_REPOSITORY_URI:latest $ECR_REPOSITORY_URI:$IMAGE_TAG\"\n      ]\n    },\n    \"post_build\": {\n      \"commands\": [\n        \"echo Build completed on `date`\",\n        \"echo Pushing Docker images...\",\n        \"docker push $ECR_REPOSITORY_URI:latest\",\n        \"docker push $ECR_REPOSITORY_URI:$IMAGE_TAG\",\n        \"echo Writing image definitions file...\",\n        \"printf '[{\\\"name\\\":\\\"curateai-app\\\",\\\"imageUri\\\":\\\"%s\\\"}]' $ECR_REPOSITORY_URI:latest > imagedefinitions.json\",\n        \"cat imagedefinitions.json\"\n      ]\n    }\n  },\n  \"artifacts\": {\n    \"files\": [\n      \"imagedefinitions.json\"\n    ]\n  }\n}",
+     "Type": "CODEPIPELINE"
+    },
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Build/Resource"
+   }
+  },
+  "CurateAIPipelineArtifactsBucketEncryptionKey35586106": {
+   "Type": "AWS::KMS::Key",
+   "Properties": {
+    "KeyPolicy": {
+     "Statement": [
+      {
+       "Action": "kms:*",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": "arn:aws:iam::558599919081:root"
+       },
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Pipeline/ArtifactsBucketEncryptionKey/Resource"
+   }
+  },
+  "CurateAIPipelineArtifactsBucketEncryptionKeyAlias24FBDAF5": {
+   "Type": "AWS::KMS::Alias",
+   "Properties": {
+    "AliasName": "alias/codepipeline-curateai-pipeline-a0de3ca9",
+    "TargetKeyId": {
+     "Fn::GetAtt": [
+      "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+      "Arn"
+     ]
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Pipeline/ArtifactsBucketEncryptionKeyAlias/Resource"
+   }
+  },
+  "CurateAIPipelineArtifactsBucket5344FB10": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "KMSMasterKeyID": {
+         "Fn::GetAtt": [
+          "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+          "Arn"
+         ]
+        },
+        "SSEAlgorithm": "aws:kms"
+       }
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Pipeline/ArtifactsBucket/Resource"
+   }
+  },
+  "CurateAIPipelineArtifactsBucketPolicy9E3958D2": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "CurateAIPipelineArtifactsBucket5344FB10"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "s3:*",
+       "Condition": {
+        "Bool": {
+         "aws:SecureTransport": "false"
+        }
+       },
+       "Effect": "Deny",
+       "Principal": {
+        "AWS": "*"
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "CurateAIPipelineArtifactsBucket5344FB10",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "CurateAIPipelineArtifactsBucket5344FB10",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Pipeline/ArtifactsBucket/Policy/Resource"
+   }
+  },
+  "CurateAIPipelineRole428C272F": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "codepipeline.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Pipeline/Role/Resource"
+   }
+  },
+  "CurateAIPipelineRoleDefaultPolicyFB7A51D1": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:Abort*",
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "CurateAIPipelineArtifactsBucket5344FB10",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "CurateAIPipelineArtifactsBucket5344FB10",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "CurateAIPipelineBuildDockerBuildCodePipelineActionRoleBD3598B8",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "CurateAIPipelineDeployECSDeployCodePipelineActionRole4FD38F1E",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "CurateAIPipelineSourceGitHubSourceCodePipelineActionRole01206964",
+          "Arn"
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CurateAIPipelineRoleDefaultPolicyFB7A51D1",
+    "Roles": [
+     {
+      "Ref": "CurateAIPipelineRole428C272F"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Pipeline/Role/DefaultPolicy/Resource"
+   }
+  },
+  "CurateAIPipelineA4350A50": {
+   "Type": "AWS::CodePipeline::Pipeline",
+   "Properties": {
+    "ArtifactStore": {
+     "EncryptionKey": {
+      "Id": {
+       "Fn::GetAtt": [
+        "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+        "Arn"
+       ]
+      },
+      "Type": "KMS"
+     },
+     "Location": {
+      "Ref": "CurateAIPipelineArtifactsBucket5344FB10"
+     },
+     "Type": "S3"
+    },
+    "Name": "CurateAI-Pipeline",
+    "RoleArn": {
+     "Fn::GetAtt": [
+      "CurateAIPipelineRole428C272F",
+      "Arn"
+     ]
+    },
+    "Stages": [
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Source",
+         "Owner": "AWS",
+         "Provider": "CodeStarSourceConnection",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ConnectionArn": "arn:aws:codestar-connections:us-east-1:558599919081:connection/213b4c6a-80b7-4436-aa8e-3363db24b7e9",
+         "FullRepositoryId": "RishabhSinha07/CurateAI",
+         "BranchName": "main"
+        },
+        "Name": "GitHub-Source",
+        "OutputArtifacts": [
+         {
+          "Name": "SourceOutput"
+         }
+        ],
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "CurateAIPipelineSourceGitHubSourceCodePipelineActionRole01206964",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "Source"
+     },
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Build",
+         "Owner": "AWS",
+         "Provider": "CodeBuild",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ProjectName": {
+          "Ref": "CurateAIBuild441D4260"
+         }
+        },
+        "InputArtifacts": [
+         {
+          "Name": "SourceOutput"
+         }
+        ],
+        "Name": "Docker-Build",
+        "OutputArtifacts": [
+         {
+          "Name": "BuildOutput"
+         }
+        ],
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "CurateAIPipelineBuildDockerBuildCodePipelineActionRoleBD3598B8",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "Build"
+     },
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Deploy",
+         "Owner": "AWS",
+         "Provider": "ECS",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ClusterName": {
+          "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAICluster60AC07179B81467C"
+         },
+         "ServiceName": {
+          "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIServiceA16C39B1NameAC081D51"
+         }
+        },
+        "InputArtifacts": [
+         {
+          "Name": "BuildOutput"
+         }
+        ],
+        "Name": "ECS-Deploy",
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "CurateAIPipelineDeployECSDeployCodePipelineActionRole4FD38F1E",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "Deploy"
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "DependsOn": [
+    "CurateAIPipelineRoleDefaultPolicyFB7A51D1",
+    "CurateAIPipelineRole428C272F"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Pipeline/Resource"
+   }
+  },
+  "CurateAIPipelineSourceGitHubSourceCodePipelineActionRole01206964": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": "arn:aws:iam::558599919081:root"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Pipeline/Source/GitHub-Source/CodePipelineActionRole/Resource"
+   }
+  },
+  "CurateAIPipelineSourceGitHubSourceCodePipelineActionRoleDefaultPolicy5630DFC7": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "codestar-connections:UseConnection",
+       "Effect": "Allow",
+       "Resource": "arn:aws:codestar-connections:us-east-1:558599919081:connection/213b4c6a-80b7-4436-aa8e-3363db24b7e9"
+      },
+      {
+       "Action": [
+        "s3:Abort*",
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "CurateAIPipelineArtifactsBucket5344FB10",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "CurateAIPipelineArtifactsBucket5344FB10",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "s3:PutObjectAcl",
+        "s3:PutObjectVersionAcl"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          {
+           "Fn::GetAtt": [
+            "CurateAIPipelineArtifactsBucket5344FB10",
+            "Arn"
+           ]
+          },
+          "/*"
+         ]
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CurateAIPipelineSourceGitHubSourceCodePipelineActionRoleDefaultPolicy5630DFC7",
+    "Roles": [
+     {
+      "Ref": "CurateAIPipelineSourceGitHubSourceCodePipelineActionRole01206964"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Pipeline/Source/GitHub-Source/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "CurateAIPipelineBuildDockerBuildCodePipelineActionRoleBD3598B8": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": "arn:aws:iam::558599919081:root"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Pipeline/Build/Docker-Build/CodePipelineActionRole/Resource"
+   }
+  },
+  "CurateAIPipelineBuildDockerBuildCodePipelineActionRoleDefaultPolicy5A9CD35D": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "codebuild:BatchGetBuilds",
+        "codebuild:StartBuild",
+        "codebuild:StopBuild"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "CurateAIBuild441D4260",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CurateAIPipelineBuildDockerBuildCodePipelineActionRoleDefaultPolicy5A9CD35D",
+    "Roles": [
+     {
+      "Ref": "CurateAIPipelineBuildDockerBuildCodePipelineActionRoleBD3598B8"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Pipeline/Build/Docker-Build/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "CurateAIPipelineDeployECSDeployCodePipelineActionRole4FD38F1E": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": "arn:aws:iam::558599919081:root"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Pipeline/Deploy/ECS-Deploy/CodePipelineActionRole/Resource"
+   }
+  },
+  "CurateAIPipelineDeployECSDeployCodePipelineActionRoleDefaultPolicy836E0219": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "ecs:DescribeServices",
+        "ecs:DescribeTaskDefinition",
+        "ecs:DescribeTasks",
+        "ecs:ListTasks",
+        "ecs:RegisterTaskDefinition",
+        "ecs:UpdateService"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": "iam:PassRole",
+       "Condition": {
+        "StringEqualsIfExists": {
+         "iam:PassedToService": [
+          "ec2.amazonaws.com",
+          "ecs-tasks.amazonaws.com"
+         ]
+        }
+       },
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "CurateAIPipelineArtifactsBucket5344FB10",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "CurateAIPipelineArtifactsBucket5344FB10",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:DescribeKey"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CurateAIPipelineDeployECSDeployCodePipelineActionRoleDefaultPolicy836E0219",
+    "Roles": [
+     {
+      "Ref": "CurateAIPipelineDeployECSDeployCodePipelineActionRole4FD38F1E"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Pipeline/Deploy/ECS-Deploy/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02QSw6DMAxEz8I+uHxO0HbZRRE9QAXBVQ2BIJKoQlHuXjBUdDXPI3tGcgZplkASVR8Ty6aLFdXgH7aSnVisp5e6wdqRasAXNKKiAYtJtyituL6GHYOgqgdfaoWry1poRXLmJaYg1qhxzzjSeGPnILregL8h361yVlSZdWAIwuTgL052yPU7bXIU/s8hiBKNdpPkpruzo+PbnxtEMdu3Hk758glIo9YQxZMbLPUI5aZfR+oxziUBAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "PipelineName": {
+   "Description": "CodePipeline name",
+   "Value": {
+    "Ref": "CurateAIPipelineA4350A50"
+   }
+  },
+  "PipelineUrl": {
+   "Description": "CodePipeline console URL",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://us-east-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/",
+      {
+       "Ref": "CurateAIPipelineA4350A50"
+      },
+      "/view"
+     ]
+    ]
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

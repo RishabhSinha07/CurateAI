@@ -10,8 +10,11 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    # Database
-    database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/curateai"
+    # Database (optional for Phase 1)
+    database_url: str | None = None
+    db_pool_size: int = 10
+    db_max_overflow: int = 20
+    db_pool_recycle: int = 3600
 
     # AWS Bedrock
     aws_region: str = "us-east-1"
@@ -24,6 +27,12 @@ class Settings(BaseSettings):
     # Application
     debug: bool = False
     log_level: str = "INFO"
+    environment: str = "development"  # development/staging/production
+    cors_origins: list[str] = ["*"]  # Override in production
+    enable_metrics: bool = True
+
+    # Knowledge Graphs - Phase 1 uses YAML only
+    use_db_graphs: bool = False
 
 
 @lru_cache

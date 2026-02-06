@@ -1,0 +1,1069 @@
+{
+ "Description": "Network infrastructure for CurateAI (VPC, subnets, security groups)",
+ "Resources": {
+  "CurateAIVPC67003679": {
+   "Type": "AWS::EC2::VPC",
+   "Properties": {
+    "CidrBlock": "10.0.0.0/16",
+    "EnableDnsHostnames": true,
+    "EnableDnsSupport": true,
+    "InstanceTenancy": "default",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Name",
+      "Value": "CurateAI-VPC"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/CurateAI-VPC/Resource"
+   }
+  },
+  "CurateAIVPCPublicSubnet1SubnetB5E92D6E": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-1a",
+    "CidrBlock": "10.0.0.0/24",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Public"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Name",
+      "Value": "CurateAI-Network/CurateAI-VPC/PublicSubnet1"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CurateAIVPC67003679"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/CurateAI-VPC/PublicSubnet1/Subnet"
+   }
+  },
+  "CurateAIVPCPublicSubnet1RouteTableB2BA8702": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Name",
+      "Value": "CurateAI-Network/CurateAI-VPC/PublicSubnet1"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CurateAIVPC67003679"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/CurateAI-VPC/PublicSubnet1/RouteTable"
+   }
+  },
+  "CurateAIVPCPublicSubnet1RouteTableAssociationF2E5B9F6": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "CurateAIVPCPublicSubnet1RouteTableB2BA8702"
+    },
+    "SubnetId": {
+     "Ref": "CurateAIVPCPublicSubnet1SubnetB5E92D6E"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/CurateAI-VPC/PublicSubnet1/RouteTableAssociation"
+   }
+  },
+  "CurateAIVPCPublicSubnet1DefaultRouteC8046DFD": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "CurateAIVPCIGW27242168"
+    },
+    "RouteTableId": {
+     "Ref": "CurateAIVPCPublicSubnet1RouteTableB2BA8702"
+    }
+   },
+   "DependsOn": [
+    "CurateAIVPCVPCGWEF338D37"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/CurateAI-VPC/PublicSubnet1/DefaultRoute"
+   }
+  },
+  "CurateAIVPCPublicSubnet2SubnetB85A5986": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-1b",
+    "CidrBlock": "10.0.1.0/24",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Public"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Name",
+      "Value": "CurateAI-Network/CurateAI-VPC/PublicSubnet2"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CurateAIVPC67003679"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/CurateAI-VPC/PublicSubnet2/Subnet"
+   }
+  },
+  "CurateAIVPCPublicSubnet2RouteTableEC7CE134": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Name",
+      "Value": "CurateAI-Network/CurateAI-VPC/PublicSubnet2"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CurateAIVPC67003679"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/CurateAI-VPC/PublicSubnet2/RouteTable"
+   }
+  },
+  "CurateAIVPCPublicSubnet2RouteTableAssociation6BAE92CA": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "CurateAIVPCPublicSubnet2RouteTableEC7CE134"
+    },
+    "SubnetId": {
+     "Ref": "CurateAIVPCPublicSubnet2SubnetB85A5986"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/CurateAI-VPC/PublicSubnet2/RouteTableAssociation"
+   }
+  },
+  "CurateAIVPCPublicSubnet2DefaultRoute3EAAD9C0": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "CurateAIVPCIGW27242168"
+    },
+    "RouteTableId": {
+     "Ref": "CurateAIVPCPublicSubnet2RouteTableEC7CE134"
+    }
+   },
+   "DependsOn": [
+    "CurateAIVPCVPCGWEF338D37"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/CurateAI-VPC/PublicSubnet2/DefaultRoute"
+   }
+  },
+  "CurateAIVPCIGW27242168": {
+   "Type": "AWS::EC2::InternetGateway",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Name",
+      "Value": "CurateAI-VPC"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/CurateAI-VPC/IGW"
+   }
+  },
+  "CurateAIVPCVPCGWEF338D37": {
+   "Type": "AWS::EC2::VPCGatewayAttachment",
+   "Properties": {
+    "InternetGatewayId": {
+     "Ref": "CurateAIVPCIGW27242168"
+    },
+    "VpcId": {
+     "Ref": "CurateAIVPC67003679"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/CurateAI-VPC/VPCGW"
+   }
+  },
+  "CurateAIVPCRestrictDefaultSecurityGroupCustomResource0621CEFE": {
+   "Type": "Custom::VpcRestrictDefaultSG",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E",
+      "Arn"
+     ]
+    },
+    "DefaultSecurityGroupId": {
+     "Fn::GetAtt": [
+      "CurateAIVPC67003679",
+      "DefaultSecurityGroup"
+     ]
+    },
+    "Account": "558599919081"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/CurateAI-VPC/RestrictDefaultSecurityGroupCustomResource/Default"
+   }
+  },
+  "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ],
+    "Policies": [
+     {
+      "PolicyName": "Inline",
+      "PolicyDocument": {
+       "Version": "2012-10-17",
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": [
+          "ec2:AuthorizeSecurityGroupIngress",
+          "ec2:AuthorizeSecurityGroupEgress",
+          "ec2:RevokeSecurityGroupIngress",
+          "ec2:RevokeSecurityGroupEgress"
+         ],
+         "Resource": [
+          {
+           "Fn::Join": [
+            "",
+            [
+             "arn:aws:ec2:us-east-1:558599919081:security-group/",
+             {
+              "Fn::GetAtt": [
+               "CurateAIVPC67003679",
+               "DefaultSecurityGroup"
+              ]
+             }
+            ]
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/Custom::VpcRestrictDefaultSGCustomResourceProvider/Role"
+   }
+  },
+  "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-558599919081-us-east-1",
+     "S3Key": "dd5711540f04e06aa955d7f4862fc04e8cdea464cb590dae91ed2976bb78098e.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "__entrypoint__.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs18.x",
+    "Description": "Lambda function for removing all inbound/outbound rules from the VPC default security group"
+   },
+   "DependsOn": [
+    "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/Custom::VpcRestrictDefaultSGCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.dd5711540f04e06aa955d7f4862fc04e8cdea464cb590dae91ed2976bb78098e",
+    "aws:asset:property": "Code"
+   }
+  },
+  "ECRAPIEndpointSecurityGroup4547491C": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "CurateAI-Network/ECR-API-Endpoint/SecurityGroup",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": {
+       "Fn::GetAtt": [
+        "CurateAIVPC67003679",
+        "CidrBlock"
+       ]
+      },
+      "Description": {
+       "Fn::Join": [
+        "",
+        [
+         "from ",
+         {
+          "Fn::GetAtt": [
+           "CurateAIVPC67003679",
+           "CidrBlock"
+          ]
+         },
+         ":443"
+        ]
+       ]
+      },
+      "FromPort": 443,
+      "IpProtocol": "tcp",
+      "ToPort": 443
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CurateAIVPC67003679"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/ECR-API-Endpoint/SecurityGroup/Resource"
+   }
+  },
+  "ECRAPIEndpoint958C225F": {
+   "Type": "AWS::EC2::VPCEndpoint",
+   "Properties": {
+    "PrivateDnsEnabled": true,
+    "SecurityGroupIds": [
+     {
+      "Fn::GetAtt": [
+       "ECRAPIEndpointSecurityGroup4547491C",
+       "GroupId"
+      ]
+     }
+    ],
+    "ServiceName": "com.amazonaws.us-east-1.ecr.api",
+    "SubnetIds": [
+     {
+      "Ref": "CurateAIVPCPublicSubnet1SubnetB5E92D6E"
+     },
+     {
+      "Ref": "CurateAIVPCPublicSubnet2SubnetB85A5986"
+     }
+    ],
+    "VpcEndpointType": "Interface",
+    "VpcId": {
+     "Ref": "CurateAIVPC67003679"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/ECR-API-Endpoint/Resource"
+   }
+  },
+  "ECRDockerEndpointSecurityGroup6D30C9E8": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "CurateAI-Network/ECR-Docker-Endpoint/SecurityGroup",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": {
+       "Fn::GetAtt": [
+        "CurateAIVPC67003679",
+        "CidrBlock"
+       ]
+      },
+      "Description": {
+       "Fn::Join": [
+        "",
+        [
+         "from ",
+         {
+          "Fn::GetAtt": [
+           "CurateAIVPC67003679",
+           "CidrBlock"
+          ]
+         },
+         ":443"
+        ]
+       ]
+      },
+      "FromPort": 443,
+      "IpProtocol": "tcp",
+      "ToPort": 443
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CurateAIVPC67003679"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/ECR-Docker-Endpoint/SecurityGroup/Resource"
+   }
+  },
+  "ECRDockerEndpoint04567B85": {
+   "Type": "AWS::EC2::VPCEndpoint",
+   "Properties": {
+    "PrivateDnsEnabled": true,
+    "SecurityGroupIds": [
+     {
+      "Fn::GetAtt": [
+       "ECRDockerEndpointSecurityGroup6D30C9E8",
+       "GroupId"
+      ]
+     }
+    ],
+    "ServiceName": "com.amazonaws.us-east-1.ecr.dkr",
+    "SubnetIds": [
+     {
+      "Ref": "CurateAIVPCPublicSubnet1SubnetB5E92D6E"
+     },
+     {
+      "Ref": "CurateAIVPCPublicSubnet2SubnetB85A5986"
+     }
+    ],
+    "VpcEndpointType": "Interface",
+    "VpcId": {
+     "Ref": "CurateAIVPC67003679"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/ECR-Docker-Endpoint/Resource"
+   }
+  },
+  "S3Endpoint067200C7": {
+   "Type": "AWS::EC2::VPCEndpoint",
+   "Properties": {
+    "RouteTableIds": [
+     {
+      "Ref": "CurateAIVPCPublicSubnet1RouteTableB2BA8702"
+     },
+     {
+      "Ref": "CurateAIVPCPublicSubnet2RouteTableEC7CE134"
+     }
+    ],
+    "ServiceName": {
+     "Fn::Join": [
+      "",
+      [
+       "com.amazonaws.",
+       {
+        "Ref": "AWS::Region"
+       },
+       ".s3"
+      ]
+     ]
+    },
+    "VpcEndpointType": "Gateway",
+    "VpcId": {
+     "Ref": "CurateAIVPC67003679"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/S3-Endpoint/Resource"
+   }
+  },
+  "CloudWatchLogsEndpointSecurityGroupEE065128": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "CurateAI-Network/CloudWatch-Logs-Endpoint/SecurityGroup",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": {
+       "Fn::GetAtt": [
+        "CurateAIVPC67003679",
+        "CidrBlock"
+       ]
+      },
+      "Description": {
+       "Fn::Join": [
+        "",
+        [
+         "from ",
+         {
+          "Fn::GetAtt": [
+           "CurateAIVPC67003679",
+           "CidrBlock"
+          ]
+         },
+         ":443"
+        ]
+       ]
+      },
+      "FromPort": 443,
+      "IpProtocol": "tcp",
+      "ToPort": 443
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CurateAIVPC67003679"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/CloudWatch-Logs-Endpoint/SecurityGroup/Resource"
+   }
+  },
+  "CloudWatchLogsEndpoint55C1B1BE": {
+   "Type": "AWS::EC2::VPCEndpoint",
+   "Properties": {
+    "PrivateDnsEnabled": true,
+    "SecurityGroupIds": [
+     {
+      "Fn::GetAtt": [
+       "CloudWatchLogsEndpointSecurityGroupEE065128",
+       "GroupId"
+      ]
+     }
+    ],
+    "ServiceName": "com.amazonaws.us-east-1.logs",
+    "SubnetIds": [
+     {
+      "Ref": "CurateAIVPCPublicSubnet1SubnetB5E92D6E"
+     },
+     {
+      "Ref": "CurateAIVPCPublicSubnet2SubnetB85A5986"
+     }
+    ],
+    "VpcEndpointType": "Interface",
+    "VpcId": {
+     "Ref": "CurateAIVPC67003679"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/CloudWatch-Logs-Endpoint/Resource"
+   }
+  },
+  "BedrockRuntimeEndpointSecurityGroup7FF13E70": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "CurateAI-Network/Bedrock-Runtime-Endpoint/SecurityGroup",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": {
+       "Fn::GetAtt": [
+        "CurateAIVPC67003679",
+        "CidrBlock"
+       ]
+      },
+      "Description": {
+       "Fn::Join": [
+        "",
+        [
+         "from ",
+         {
+          "Fn::GetAtt": [
+           "CurateAIVPC67003679",
+           "CidrBlock"
+          ]
+         },
+         ":443"
+        ]
+       ]
+      },
+      "FromPort": 443,
+      "IpProtocol": "tcp",
+      "ToPort": 443
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CurateAIVPC67003679"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/Bedrock-Runtime-Endpoint/SecurityGroup/Resource"
+   }
+  },
+  "BedrockRuntimeEndpointB46EBC4B": {
+   "Type": "AWS::EC2::VPCEndpoint",
+   "Properties": {
+    "PrivateDnsEnabled": false,
+    "SecurityGroupIds": [
+     {
+      "Fn::GetAtt": [
+       "BedrockRuntimeEndpointSecurityGroup7FF13E70",
+       "GroupId"
+      ]
+     }
+    ],
+    "ServiceName": "com.amazonaws.us-east-1.bedrock-runtime",
+    "SubnetIds": [
+     {
+      "Ref": "CurateAIVPCPublicSubnet1SubnetB5E92D6E"
+     },
+     {
+      "Ref": "CurateAIVPCPublicSubnet2SubnetB85A5986"
+     }
+    ],
+    "VpcEndpointType": "Interface",
+    "VpcId": {
+     "Ref": "CurateAIVPC67003679"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/Bedrock-Runtime-Endpoint/Resource"
+   }
+  },
+  "FargateSG3742C269": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Security group for CurateAI Fargate tasks",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow HTTP traffic from internet",
+      "FromPort": 8000,
+      "IpProtocol": "tcp",
+      "ToPort": 8000
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CurateAIVPC67003679"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/Fargate-SG/Resource"
+   }
+  },
+  "VPCEndpointSG5D2DB8AD": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Security group for VPC endpoints",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "255.255.255.255/32",
+      "Description": "Disallow all traffic",
+      "FromPort": 252,
+      "IpProtocol": "icmp",
+      "ToPort": 86
+     }
+    ],
+    "SecurityGroupIngress": [
+     {
+      "Description": "Allow HTTPS from Fargate tasks",
+      "FromPort": 443,
+      "IpProtocol": "tcp",
+      "SourceSecurityGroupId": {
+       "Fn::GetAtt": [
+        "FargateSG3742C269",
+        "GroupId"
+       ]
+      },
+      "ToPort": 443
+     },
+     {
+      "CidrIp": {
+       "Fn::GetAtt": [
+        "CurateAIVPC67003679",
+        "CidrBlock"
+       ]
+      },
+      "Description": {
+       "Fn::Join": [
+        "",
+        [
+         "from ",
+         {
+          "Fn::GetAtt": [
+           "CurateAIVPC67003679",
+           "CidrBlock"
+          ]
+         },
+         ":443"
+        ]
+       ]
+      },
+      "FromPort": 443,
+      "IpProtocol": "tcp",
+      "ToPort": 443
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CurateAIVPC67003679"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/VPC-Endpoint-SG/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/22Q0W7CMAxFv4X3NIPyBYAmtLeqRbxOaWrAo7WrxBmqEP+OYRWdpj3FPrm6vnZuF/nczmfuEjPfnLMWa3utxPmzUfQJPrfXfe/N5kD7YmOKVLfoq1QTyINNVclJYOfqFiY+sVWM7NEJMr3Ej+KDBIIqt07g4oZxzNitRHOcOiAxT93BedAs79T0jAor8CmgDNvAqX9O/QvU66UeTX8Z3EwJkVPwGiVF4W5qNeL/X0Xgb2wgrF0Eo1uB6LGOSMebKQY5Mb0t9aJ2MfuKiFlIJNiBLX/eO0g1mYhtAQAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "ExportsOutputRefCurateAIVPCPublicSubnet1SubnetB5E92D6E791FA932": {
+   "Value": {
+    "Ref": "CurateAIVPCPublicSubnet1SubnetB5E92D6E"
+   },
+   "Export": {
+    "Name": "CurateAI-Network:ExportsOutputRefCurateAIVPCPublicSubnet1SubnetB5E92D6E791FA932"
+   }
+  },
+  "ExportsOutputRefCurateAIVPCPublicSubnet2SubnetB85A59869C07E00E": {
+   "Value": {
+    "Ref": "CurateAIVPCPublicSubnet2SubnetB85A5986"
+   },
+   "Export": {
+    "Name": "CurateAI-Network:ExportsOutputRefCurateAIVPCPublicSubnet2SubnetB85A59869C07E00E"
+   }
+  },
+  "ExportsOutputFnGetAttFargateSG3742C269GroupIdD51DEC7E": {
+   "Value": {
+    "Fn::GetAtt": [
+     "FargateSG3742C269",
+     "GroupId"
+    ]
+   },
+   "Export": {
+    "Name": "CurateAI-Network:ExportsOutputFnGetAttFargateSG3742C269GroupIdD51DEC7E"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

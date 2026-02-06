@@ -1,0 +1,3996 @@
+{
+  "version": "tree-0.1",
+  "tree": {
+    "id": "App",
+    "path": "",
+    "children": {
+      "CurateAI-Network": {
+        "id": "CurateAI-Network",
+        "path": "CurateAI-Network",
+        "children": {
+          "CurateAI-VPC": {
+            "id": "CurateAI-VPC",
+            "path": "CurateAI-Network/CurateAI-VPC",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-Network/CurateAI-VPC/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::EC2::VPC",
+                  "aws:cdk:cloudformation:props": {
+                    "cidrBlock": "10.0.0.0/16",
+                    "enableDnsHostnames": true,
+                    "enableDnsSupport": true,
+                    "instanceTenancy": "default",
+                    "tags": [
+                      {
+                        "key": "Environment",
+                        "value": "Production"
+                      },
+                      {
+                        "key": "ManagedBy",
+                        "value": "CDK"
+                      },
+                      {
+                        "key": "Name",
+                        "value": "CurateAI-VPC"
+                      },
+                      {
+                        "key": "Phase",
+                        "value": "1"
+                      },
+                      {
+                        "key": "Project",
+                        "value": "CurateAI"
+                      },
+                      {
+                        "key": "Repository",
+                        "value": "RishabhSinha07/CurateAI"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ec2.CfnVPC",
+                  "version": "2.120.0"
+                }
+              },
+              "PublicSubnet1": {
+                "id": "PublicSubnet1",
+                "path": "CurateAI-Network/CurateAI-VPC/PublicSubnet1",
+                "children": {
+                  "Subnet": {
+                    "id": "Subnet",
+                    "path": "CurateAI-Network/CurateAI-VPC/PublicSubnet1/Subnet",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::EC2::Subnet",
+                      "aws:cdk:cloudformation:props": {
+                        "availabilityZone": "us-east-1a",
+                        "cidrBlock": "10.0.0.0/24",
+                        "mapPublicIpOnLaunch": true,
+                        "tags": [
+                          {
+                            "key": "aws-cdk:subnet-name",
+                            "value": "Public"
+                          },
+                          {
+                            "key": "aws-cdk:subnet-type",
+                            "value": "Public"
+                          },
+                          {
+                            "key": "Environment",
+                            "value": "Production"
+                          },
+                          {
+                            "key": "ManagedBy",
+                            "value": "CDK"
+                          },
+                          {
+                            "key": "Name",
+                            "value": "CurateAI-Network/CurateAI-VPC/PublicSubnet1"
+                          },
+                          {
+                            "key": "Phase",
+                            "value": "1"
+                          },
+                          {
+                            "key": "Project",
+                            "value": "CurateAI"
+                          },
+                          {
+                            "key": "Repository",
+                            "value": "RishabhSinha07/CurateAI"
+                          }
+                        ],
+                        "vpcId": {
+                          "Ref": "CurateAIVPC67003679"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnSubnet",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "Acl": {
+                    "id": "Acl",
+                    "path": "CurateAI-Network/CurateAI-VPC/PublicSubnet1/Acl",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.Resource",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "RouteTable": {
+                    "id": "RouteTable",
+                    "path": "CurateAI-Network/CurateAI-VPC/PublicSubnet1/RouteTable",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::EC2::RouteTable",
+                      "aws:cdk:cloudformation:props": {
+                        "tags": [
+                          {
+                            "key": "Environment",
+                            "value": "Production"
+                          },
+                          {
+                            "key": "ManagedBy",
+                            "value": "CDK"
+                          },
+                          {
+                            "key": "Name",
+                            "value": "CurateAI-Network/CurateAI-VPC/PublicSubnet1"
+                          },
+                          {
+                            "key": "Phase",
+                            "value": "1"
+                          },
+                          {
+                            "key": "Project",
+                            "value": "CurateAI"
+                          },
+                          {
+                            "key": "Repository",
+                            "value": "RishabhSinha07/CurateAI"
+                          }
+                        ],
+                        "vpcId": {
+                          "Ref": "CurateAIVPC67003679"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnRouteTable",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "RouteTableAssociation": {
+                    "id": "RouteTableAssociation",
+                    "path": "CurateAI-Network/CurateAI-VPC/PublicSubnet1/RouteTableAssociation",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::EC2::SubnetRouteTableAssociation",
+                      "aws:cdk:cloudformation:props": {
+                        "routeTableId": {
+                          "Ref": "CurateAIVPCPublicSubnet1RouteTableB2BA8702"
+                        },
+                        "subnetId": {
+                          "Ref": "CurateAIVPCPublicSubnet1SubnetB5E92D6E"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnSubnetRouteTableAssociation",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "DefaultRoute": {
+                    "id": "DefaultRoute",
+                    "path": "CurateAI-Network/CurateAI-VPC/PublicSubnet1/DefaultRoute",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::EC2::Route",
+                      "aws:cdk:cloudformation:props": {
+                        "destinationCidrBlock": "0.0.0.0/0",
+                        "gatewayId": {
+                          "Ref": "CurateAIVPCIGW27242168"
+                        },
+                        "routeTableId": {
+                          "Ref": "CurateAIVPCPublicSubnet1RouteTableB2BA8702"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnRoute",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ec2.PublicSubnet",
+                  "version": "2.120.0"
+                }
+              },
+              "PublicSubnet2": {
+                "id": "PublicSubnet2",
+                "path": "CurateAI-Network/CurateAI-VPC/PublicSubnet2",
+                "children": {
+                  "Subnet": {
+                    "id": "Subnet",
+                    "path": "CurateAI-Network/CurateAI-VPC/PublicSubnet2/Subnet",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::EC2::Subnet",
+                      "aws:cdk:cloudformation:props": {
+                        "availabilityZone": "us-east-1b",
+                        "cidrBlock": "10.0.1.0/24",
+                        "mapPublicIpOnLaunch": true,
+                        "tags": [
+                          {
+                            "key": "aws-cdk:subnet-name",
+                            "value": "Public"
+                          },
+                          {
+                            "key": "aws-cdk:subnet-type",
+                            "value": "Public"
+                          },
+                          {
+                            "key": "Environment",
+                            "value": "Production"
+                          },
+                          {
+                            "key": "ManagedBy",
+                            "value": "CDK"
+                          },
+                          {
+                            "key": "Name",
+                            "value": "CurateAI-Network/CurateAI-VPC/PublicSubnet2"
+                          },
+                          {
+                            "key": "Phase",
+                            "value": "1"
+                          },
+                          {
+                            "key": "Project",
+                            "value": "CurateAI"
+                          },
+                          {
+                            "key": "Repository",
+                            "value": "RishabhSinha07/CurateAI"
+                          }
+                        ],
+                        "vpcId": {
+                          "Ref": "CurateAIVPC67003679"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnSubnet",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "Acl": {
+                    "id": "Acl",
+                    "path": "CurateAI-Network/CurateAI-VPC/PublicSubnet2/Acl",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.Resource",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "RouteTable": {
+                    "id": "RouteTable",
+                    "path": "CurateAI-Network/CurateAI-VPC/PublicSubnet2/RouteTable",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::EC2::RouteTable",
+                      "aws:cdk:cloudformation:props": {
+                        "tags": [
+                          {
+                            "key": "Environment",
+                            "value": "Production"
+                          },
+                          {
+                            "key": "ManagedBy",
+                            "value": "CDK"
+                          },
+                          {
+                            "key": "Name",
+                            "value": "CurateAI-Network/CurateAI-VPC/PublicSubnet2"
+                          },
+                          {
+                            "key": "Phase",
+                            "value": "1"
+                          },
+                          {
+                            "key": "Project",
+                            "value": "CurateAI"
+                          },
+                          {
+                            "key": "Repository",
+                            "value": "RishabhSinha07/CurateAI"
+                          }
+                        ],
+                        "vpcId": {
+                          "Ref": "CurateAIVPC67003679"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnRouteTable",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "RouteTableAssociation": {
+                    "id": "RouteTableAssociation",
+                    "path": "CurateAI-Network/CurateAI-VPC/PublicSubnet2/RouteTableAssociation",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::EC2::SubnetRouteTableAssociation",
+                      "aws:cdk:cloudformation:props": {
+                        "routeTableId": {
+                          "Ref": "CurateAIVPCPublicSubnet2RouteTableEC7CE134"
+                        },
+                        "subnetId": {
+                          "Ref": "CurateAIVPCPublicSubnet2SubnetB85A5986"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnSubnetRouteTableAssociation",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "DefaultRoute": {
+                    "id": "DefaultRoute",
+                    "path": "CurateAI-Network/CurateAI-VPC/PublicSubnet2/DefaultRoute",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::EC2::Route",
+                      "aws:cdk:cloudformation:props": {
+                        "destinationCidrBlock": "0.0.0.0/0",
+                        "gatewayId": {
+                          "Ref": "CurateAIVPCIGW27242168"
+                        },
+                        "routeTableId": {
+                          "Ref": "CurateAIVPCPublicSubnet2RouteTableEC7CE134"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnRoute",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ec2.PublicSubnet",
+                  "version": "2.120.0"
+                }
+              },
+              "IGW": {
+                "id": "IGW",
+                "path": "CurateAI-Network/CurateAI-VPC/IGW",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::EC2::InternetGateway",
+                  "aws:cdk:cloudformation:props": {
+                    "tags": [
+                      {
+                        "key": "Environment",
+                        "value": "Production"
+                      },
+                      {
+                        "key": "ManagedBy",
+                        "value": "CDK"
+                      },
+                      {
+                        "key": "Name",
+                        "value": "CurateAI-VPC"
+                      },
+                      {
+                        "key": "Phase",
+                        "value": "1"
+                      },
+                      {
+                        "key": "Project",
+                        "value": "CurateAI"
+                      },
+                      {
+                        "key": "Repository",
+                        "value": "RishabhSinha07/CurateAI"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ec2.CfnInternetGateway",
+                  "version": "2.120.0"
+                }
+              },
+              "VPCGW": {
+                "id": "VPCGW",
+                "path": "CurateAI-Network/CurateAI-VPC/VPCGW",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::EC2::VPCGatewayAttachment",
+                  "aws:cdk:cloudformation:props": {
+                    "internetGatewayId": {
+                      "Ref": "CurateAIVPCIGW27242168"
+                    },
+                    "vpcId": {
+                      "Ref": "CurateAIVPC67003679"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ec2.CfnVPCGatewayAttachment",
+                  "version": "2.120.0"
+                }
+              },
+              "RestrictDefaultSecurityGroupCustomResource": {
+                "id": "RestrictDefaultSecurityGroupCustomResource",
+                "path": "CurateAI-Network/CurateAI-VPC/RestrictDefaultSecurityGroupCustomResource",
+                "children": {
+                  "Default": {
+                    "id": "Default",
+                    "path": "CurateAI-Network/CurateAI-VPC/RestrictDefaultSecurityGroupCustomResource/Default",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.CfnResource",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CustomResource",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_ec2.Vpc",
+              "version": "2.120.0"
+            }
+          },
+          "Custom::VpcRestrictDefaultSGCustomResourceProvider": {
+            "id": "Custom::VpcRestrictDefaultSGCustomResourceProvider",
+            "path": "CurateAI-Network/Custom::VpcRestrictDefaultSGCustomResourceProvider",
+            "children": {
+              "Staging": {
+                "id": "Staging",
+                "path": "CurateAI-Network/Custom::VpcRestrictDefaultSGCustomResourceProvider/Staging",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.AssetStaging",
+                  "version": "2.120.0"
+                }
+              },
+              "Role": {
+                "id": "Role",
+                "path": "CurateAI-Network/Custom::VpcRestrictDefaultSGCustomResourceProvider/Role",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnResource",
+                  "version": "2.120.0"
+                }
+              },
+              "Handler": {
+                "id": "Handler",
+                "path": "CurateAI-Network/Custom::VpcRestrictDefaultSGCustomResourceProvider/Handler",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnResource",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CustomResourceProviderBase",
+              "version": "2.120.0"
+            }
+          },
+          "ECR-API-Endpoint": {
+            "id": "ECR-API-Endpoint",
+            "path": "CurateAI-Network/ECR-API-Endpoint",
+            "children": {
+              "SecurityGroup": {
+                "id": "SecurityGroup",
+                "path": "CurateAI-Network/ECR-API-Endpoint/SecurityGroup",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "CurateAI-Network/ECR-API-Endpoint/SecurityGroup/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::EC2::SecurityGroup",
+                      "aws:cdk:cloudformation:props": {
+                        "groupDescription": "CurateAI-Network/ECR-API-Endpoint/SecurityGroup",
+                        "securityGroupEgress": [
+                          {
+                            "cidrIp": "0.0.0.0/0",
+                            "description": "Allow all outbound traffic by default",
+                            "ipProtocol": "-1"
+                          }
+                        ],
+                        "securityGroupIngress": [
+                          {
+                            "cidrIp": {
+                              "Fn::GetAtt": [
+                                "CurateAIVPC67003679",
+                                "CidrBlock"
+                              ]
+                            },
+                            "ipProtocol": "tcp",
+                            "fromPort": 443,
+                            "toPort": 443,
+                            "description": {
+                              "Fn::Join": [
+                                "",
+                                [
+                                  "from ",
+                                  {
+                                    "Fn::GetAtt": [
+                                      "CurateAIVPC67003679",
+                                      "CidrBlock"
+                                    ]
+                                  },
+                                  ":443"
+                                ]
+                              ]
+                            }
+                          }
+                        ],
+                        "tags": [
+                          {
+                            "key": "Environment",
+                            "value": "Production"
+                          },
+                          {
+                            "key": "ManagedBy",
+                            "value": "CDK"
+                          },
+                          {
+                            "key": "Phase",
+                            "value": "1"
+                          },
+                          {
+                            "key": "Project",
+                            "value": "CurateAI"
+                          },
+                          {
+                            "key": "Repository",
+                            "value": "RishabhSinha07/CurateAI"
+                          }
+                        ],
+                        "vpcId": {
+                          "Ref": "CurateAIVPC67003679"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnSecurityGroup",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ec2.SecurityGroup",
+                  "version": "2.120.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-Network/ECR-API-Endpoint/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::EC2::VPCEndpoint",
+                  "aws:cdk:cloudformation:props": {
+                    "privateDnsEnabled": true,
+                    "securityGroupIds": [
+                      {
+                        "Fn::GetAtt": [
+                          "ECRAPIEndpointSecurityGroup4547491C",
+                          "GroupId"
+                        ]
+                      }
+                    ],
+                    "serviceName": "com.amazonaws.us-east-1.ecr.api",
+                    "subnetIds": [
+                      {
+                        "Ref": "CurateAIVPCPublicSubnet1SubnetB5E92D6E"
+                      },
+                      {
+                        "Ref": "CurateAIVPCPublicSubnet2SubnetB85A5986"
+                      }
+                    ],
+                    "vpcEndpointType": "Interface",
+                    "vpcId": {
+                      "Ref": "CurateAIVPC67003679"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ec2.CfnVPCEndpoint",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_ec2.InterfaceVpcEndpoint",
+              "version": "2.120.0"
+            }
+          },
+          "ECR-Docker-Endpoint": {
+            "id": "ECR-Docker-Endpoint",
+            "path": "CurateAI-Network/ECR-Docker-Endpoint",
+            "children": {
+              "SecurityGroup": {
+                "id": "SecurityGroup",
+                "path": "CurateAI-Network/ECR-Docker-Endpoint/SecurityGroup",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "CurateAI-Network/ECR-Docker-Endpoint/SecurityGroup/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::EC2::SecurityGroup",
+                      "aws:cdk:cloudformation:props": {
+                        "groupDescription": "CurateAI-Network/ECR-Docker-Endpoint/SecurityGroup",
+                        "securityGroupEgress": [
+                          {
+                            "cidrIp": "0.0.0.0/0",
+                            "description": "Allow all outbound traffic by default",
+                            "ipProtocol": "-1"
+                          }
+                        ],
+                        "securityGroupIngress": [
+                          {
+                            "cidrIp": {
+                              "Fn::GetAtt": [
+                                "CurateAIVPC67003679",
+                                "CidrBlock"
+                              ]
+                            },
+                            "ipProtocol": "tcp",
+                            "fromPort": 443,
+                            "toPort": 443,
+                            "description": {
+                              "Fn::Join": [
+                                "",
+                                [
+                                  "from ",
+                                  {
+                                    "Fn::GetAtt": [
+                                      "CurateAIVPC67003679",
+                                      "CidrBlock"
+                                    ]
+                                  },
+                                  ":443"
+                                ]
+                              ]
+                            }
+                          }
+                        ],
+                        "tags": [
+                          {
+                            "key": "Environment",
+                            "value": "Production"
+                          },
+                          {
+                            "key": "ManagedBy",
+                            "value": "CDK"
+                          },
+                          {
+                            "key": "Phase",
+                            "value": "1"
+                          },
+                          {
+                            "key": "Project",
+                            "value": "CurateAI"
+                          },
+                          {
+                            "key": "Repository",
+                            "value": "RishabhSinha07/CurateAI"
+                          }
+                        ],
+                        "vpcId": {
+                          "Ref": "CurateAIVPC67003679"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnSecurityGroup",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ec2.SecurityGroup",
+                  "version": "2.120.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-Network/ECR-Docker-Endpoint/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::EC2::VPCEndpoint",
+                  "aws:cdk:cloudformation:props": {
+                    "privateDnsEnabled": true,
+                    "securityGroupIds": [
+                      {
+                        "Fn::GetAtt": [
+                          "ECRDockerEndpointSecurityGroup6D30C9E8",
+                          "GroupId"
+                        ]
+                      }
+                    ],
+                    "serviceName": "com.amazonaws.us-east-1.ecr.dkr",
+                    "subnetIds": [
+                      {
+                        "Ref": "CurateAIVPCPublicSubnet1SubnetB5E92D6E"
+                      },
+                      {
+                        "Ref": "CurateAIVPCPublicSubnet2SubnetB85A5986"
+                      }
+                    ],
+                    "vpcEndpointType": "Interface",
+                    "vpcId": {
+                      "Ref": "CurateAIVPC67003679"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ec2.CfnVPCEndpoint",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_ec2.InterfaceVpcEndpoint",
+              "version": "2.120.0"
+            }
+          },
+          "S3-Endpoint": {
+            "id": "S3-Endpoint",
+            "path": "CurateAI-Network/S3-Endpoint",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-Network/S3-Endpoint/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::EC2::VPCEndpoint",
+                  "aws:cdk:cloudformation:props": {
+                    "routeTableIds": [
+                      {
+                        "Ref": "CurateAIVPCPublicSubnet1RouteTableB2BA8702"
+                      },
+                      {
+                        "Ref": "CurateAIVPCPublicSubnet2RouteTableEC7CE134"
+                      }
+                    ],
+                    "serviceName": {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "com.amazonaws.",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          ".s3"
+                        ]
+                      ]
+                    },
+                    "vpcEndpointType": "Gateway",
+                    "vpcId": {
+                      "Ref": "CurateAIVPC67003679"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ec2.CfnVPCEndpoint",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_ec2.GatewayVpcEndpoint",
+              "version": "2.120.0"
+            }
+          },
+          "CloudWatch-Logs-Endpoint": {
+            "id": "CloudWatch-Logs-Endpoint",
+            "path": "CurateAI-Network/CloudWatch-Logs-Endpoint",
+            "children": {
+              "SecurityGroup": {
+                "id": "SecurityGroup",
+                "path": "CurateAI-Network/CloudWatch-Logs-Endpoint/SecurityGroup",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "CurateAI-Network/CloudWatch-Logs-Endpoint/SecurityGroup/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::EC2::SecurityGroup",
+                      "aws:cdk:cloudformation:props": {
+                        "groupDescription": "CurateAI-Network/CloudWatch-Logs-Endpoint/SecurityGroup",
+                        "securityGroupEgress": [
+                          {
+                            "cidrIp": "0.0.0.0/0",
+                            "description": "Allow all outbound traffic by default",
+                            "ipProtocol": "-1"
+                          }
+                        ],
+                        "securityGroupIngress": [
+                          {
+                            "cidrIp": {
+                              "Fn::GetAtt": [
+                                "CurateAIVPC67003679",
+                                "CidrBlock"
+                              ]
+                            },
+                            "ipProtocol": "tcp",
+                            "fromPort": 443,
+                            "toPort": 443,
+                            "description": {
+                              "Fn::Join": [
+                                "",
+                                [
+                                  "from ",
+                                  {
+                                    "Fn::GetAtt": [
+                                      "CurateAIVPC67003679",
+                                      "CidrBlock"
+                                    ]
+                                  },
+                                  ":443"
+                                ]
+                              ]
+                            }
+                          }
+                        ],
+                        "tags": [
+                          {
+                            "key": "Environment",
+                            "value": "Production"
+                          },
+                          {
+                            "key": "ManagedBy",
+                            "value": "CDK"
+                          },
+                          {
+                            "key": "Phase",
+                            "value": "1"
+                          },
+                          {
+                            "key": "Project",
+                            "value": "CurateAI"
+                          },
+                          {
+                            "key": "Repository",
+                            "value": "RishabhSinha07/CurateAI"
+                          }
+                        ],
+                        "vpcId": {
+                          "Ref": "CurateAIVPC67003679"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnSecurityGroup",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ec2.SecurityGroup",
+                  "version": "2.120.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-Network/CloudWatch-Logs-Endpoint/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::EC2::VPCEndpoint",
+                  "aws:cdk:cloudformation:props": {
+                    "privateDnsEnabled": true,
+                    "securityGroupIds": [
+                      {
+                        "Fn::GetAtt": [
+                          "CloudWatchLogsEndpointSecurityGroupEE065128",
+                          "GroupId"
+                        ]
+                      }
+                    ],
+                    "serviceName": "com.amazonaws.us-east-1.logs",
+                    "subnetIds": [
+                      {
+                        "Ref": "CurateAIVPCPublicSubnet1SubnetB5E92D6E"
+                      },
+                      {
+                        "Ref": "CurateAIVPCPublicSubnet2SubnetB85A5986"
+                      }
+                    ],
+                    "vpcEndpointType": "Interface",
+                    "vpcId": {
+                      "Ref": "CurateAIVPC67003679"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ec2.CfnVPCEndpoint",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_ec2.InterfaceVpcEndpoint",
+              "version": "2.120.0"
+            }
+          },
+          "Bedrock-Runtime-Endpoint": {
+            "id": "Bedrock-Runtime-Endpoint",
+            "path": "CurateAI-Network/Bedrock-Runtime-Endpoint",
+            "children": {
+              "SecurityGroup": {
+                "id": "SecurityGroup",
+                "path": "CurateAI-Network/Bedrock-Runtime-Endpoint/SecurityGroup",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "CurateAI-Network/Bedrock-Runtime-Endpoint/SecurityGroup/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::EC2::SecurityGroup",
+                      "aws:cdk:cloudformation:props": {
+                        "groupDescription": "CurateAI-Network/Bedrock-Runtime-Endpoint/SecurityGroup",
+                        "securityGroupEgress": [
+                          {
+                            "cidrIp": "0.0.0.0/0",
+                            "description": "Allow all outbound traffic by default",
+                            "ipProtocol": "-1"
+                          }
+                        ],
+                        "securityGroupIngress": [
+                          {
+                            "cidrIp": {
+                              "Fn::GetAtt": [
+                                "CurateAIVPC67003679",
+                                "CidrBlock"
+                              ]
+                            },
+                            "ipProtocol": "tcp",
+                            "fromPort": 443,
+                            "toPort": 443,
+                            "description": {
+                              "Fn::Join": [
+                                "",
+                                [
+                                  "from ",
+                                  {
+                                    "Fn::GetAtt": [
+                                      "CurateAIVPC67003679",
+                                      "CidrBlock"
+                                    ]
+                                  },
+                                  ":443"
+                                ]
+                              ]
+                            }
+                          }
+                        ],
+                        "tags": [
+                          {
+                            "key": "Environment",
+                            "value": "Production"
+                          },
+                          {
+                            "key": "ManagedBy",
+                            "value": "CDK"
+                          },
+                          {
+                            "key": "Phase",
+                            "value": "1"
+                          },
+                          {
+                            "key": "Project",
+                            "value": "CurateAI"
+                          },
+                          {
+                            "key": "Repository",
+                            "value": "RishabhSinha07/CurateAI"
+                          }
+                        ],
+                        "vpcId": {
+                          "Ref": "CurateAIVPC67003679"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnSecurityGroup",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ec2.SecurityGroup",
+                  "version": "2.120.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-Network/Bedrock-Runtime-Endpoint/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::EC2::VPCEndpoint",
+                  "aws:cdk:cloudformation:props": {
+                    "privateDnsEnabled": false,
+                    "securityGroupIds": [
+                      {
+                        "Fn::GetAtt": [
+                          "BedrockRuntimeEndpointSecurityGroup7FF13E70",
+                          "GroupId"
+                        ]
+                      }
+                    ],
+                    "serviceName": "com.amazonaws.us-east-1.bedrock-runtime",
+                    "subnetIds": [
+                      {
+                        "Ref": "CurateAIVPCPublicSubnet1SubnetB5E92D6E"
+                      },
+                      {
+                        "Ref": "CurateAIVPCPublicSubnet2SubnetB85A5986"
+                      }
+                    ],
+                    "vpcEndpointType": "Interface",
+                    "vpcId": {
+                      "Ref": "CurateAIVPC67003679"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ec2.CfnVPCEndpoint",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_ec2.InterfaceVpcEndpoint",
+              "version": "2.120.0"
+            }
+          },
+          "Fargate-SG": {
+            "id": "Fargate-SG",
+            "path": "CurateAI-Network/Fargate-SG",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-Network/Fargate-SG/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::EC2::SecurityGroup",
+                  "aws:cdk:cloudformation:props": {
+                    "groupDescription": "Security group for CurateAI Fargate tasks",
+                    "securityGroupEgress": [
+                      {
+                        "cidrIp": "0.0.0.0/0",
+                        "description": "Allow all outbound traffic by default",
+                        "ipProtocol": "-1"
+                      }
+                    ],
+                    "securityGroupIngress": [
+                      {
+                        "cidrIp": "0.0.0.0/0",
+                        "ipProtocol": "tcp",
+                        "fromPort": 8000,
+                        "toPort": 8000,
+                        "description": "Allow HTTP traffic from internet"
+                      }
+                    ],
+                    "tags": [
+                      {
+                        "key": "Environment",
+                        "value": "Production"
+                      },
+                      {
+                        "key": "ManagedBy",
+                        "value": "CDK"
+                      },
+                      {
+                        "key": "Phase",
+                        "value": "1"
+                      },
+                      {
+                        "key": "Project",
+                        "value": "CurateAI"
+                      },
+                      {
+                        "key": "Repository",
+                        "value": "RishabhSinha07/CurateAI"
+                      }
+                    ],
+                    "vpcId": {
+                      "Ref": "CurateAIVPC67003679"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ec2.CfnSecurityGroup",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_ec2.SecurityGroup",
+              "version": "2.120.0"
+            }
+          },
+          "VPC-Endpoint-SG": {
+            "id": "VPC-Endpoint-SG",
+            "path": "CurateAI-Network/VPC-Endpoint-SG",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-Network/VPC-Endpoint-SG/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::EC2::SecurityGroup",
+                  "aws:cdk:cloudformation:props": {
+                    "groupDescription": "Security group for VPC endpoints",
+                    "securityGroupEgress": [
+                      {
+                        "cidrIp": "255.255.255.255/32",
+                        "description": "Disallow all traffic",
+                        "ipProtocol": "icmp",
+                        "fromPort": 252,
+                        "toPort": 86
+                      }
+                    ],
+                    "securityGroupIngress": [
+                      {
+                        "sourceSecurityGroupId": {
+                          "Fn::GetAtt": [
+                            "FargateSG3742C269",
+                            "GroupId"
+                          ]
+                        },
+                        "ipProtocol": "tcp",
+                        "fromPort": 443,
+                        "toPort": 443,
+                        "description": "Allow HTTPS from Fargate tasks"
+                      },
+                      {
+                        "cidrIp": {
+                          "Fn::GetAtt": [
+                            "CurateAIVPC67003679",
+                            "CidrBlock"
+                          ]
+                        },
+                        "ipProtocol": "tcp",
+                        "fromPort": 443,
+                        "toPort": 443,
+                        "description": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "from ",
+                              {
+                                "Fn::GetAtt": [
+                                  "CurateAIVPC67003679",
+                                  "CidrBlock"
+                                ]
+                              },
+                              ":443"
+                            ]
+                          ]
+                        }
+                      }
+                    ],
+                    "tags": [
+                      {
+                        "key": "Environment",
+                        "value": "Production"
+                      },
+                      {
+                        "key": "ManagedBy",
+                        "value": "CDK"
+                      },
+                      {
+                        "key": "Phase",
+                        "value": "1"
+                      },
+                      {
+                        "key": "Project",
+                        "value": "CurateAI"
+                      },
+                      {
+                        "key": "Repository",
+                        "value": "RishabhSinha07/CurateAI"
+                      }
+                    ],
+                    "vpcId": {
+                      "Ref": "CurateAIVPC67003679"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ec2.CfnSecurityGroup",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_ec2.SecurityGroup",
+              "version": "2.120.0"
+            }
+          },
+          "CDKMetadata": {
+            "id": "CDKMetadata",
+            "path": "CurateAI-Network/CDKMetadata",
+            "children": {
+              "Default": {
+                "id": "Default",
+                "path": "CurateAI-Network/CDKMetadata/Default",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnResource",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "constructs.Construct",
+              "version": "10.4.5"
+            }
+          },
+          "Exports": {
+            "id": "Exports",
+            "path": "CurateAI-Network/Exports",
+            "children": {
+              "Output{\"Ref\":\"CurateAIVPCPublicSubnet1SubnetB5E92D6E\"}": {
+                "id": "Output{\"Ref\":\"CurateAIVPCPublicSubnet1SubnetB5E92D6E\"}",
+                "path": "CurateAI-Network/Exports/Output{\"Ref\":\"CurateAIVPCPublicSubnet1SubnetB5E92D6E\"}",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnOutput",
+                  "version": "2.120.0"
+                }
+              },
+              "Output{\"Ref\":\"CurateAIVPCPublicSubnet2SubnetB85A5986\"}": {
+                "id": "Output{\"Ref\":\"CurateAIVPCPublicSubnet2SubnetB85A5986\"}",
+                "path": "CurateAI-Network/Exports/Output{\"Ref\":\"CurateAIVPCPublicSubnet2SubnetB85A5986\"}",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnOutput",
+                  "version": "2.120.0"
+                }
+              },
+              "Output{\"Fn::GetAtt\":[\"FargateSG3742C269\",\"GroupId\"]}": {
+                "id": "Output{\"Fn::GetAtt\":[\"FargateSG3742C269\",\"GroupId\"]}",
+                "path": "CurateAI-Network/Exports/Output{\"Fn::GetAtt\":[\"FargateSG3742C269\",\"GroupId\"]}",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnOutput",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "constructs.Construct",
+              "version": "10.4.5"
+            }
+          },
+          "BootstrapVersion": {
+            "id": "BootstrapVersion",
+            "path": "CurateAI-Network/BootstrapVersion",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnParameter",
+              "version": "2.120.0"
+            }
+          },
+          "CheckBootstrapVersion": {
+            "id": "CheckBootstrapVersion",
+            "path": "CurateAI-Network/CheckBootstrapVersion",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnRule",
+              "version": "2.120.0"
+            }
+          }
+        },
+        "constructInfo": {
+          "fqn": "aws-cdk-lib.Stack",
+          "version": "2.120.0"
+        }
+      },
+      "CurateAI-ECS": {
+        "id": "CurateAI-ECS",
+        "path": "CurateAI-ECS",
+        "children": {
+          "CurateAI-ECR": {
+            "id": "CurateAI-ECR",
+            "path": "CurateAI-ECS/CurateAI-ECR",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-ECS/CurateAI-ECR/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::ECR::Repository",
+                  "aws:cdk:cloudformation:props": {
+                    "imageScanningConfiguration": {
+                      "scanOnPush": true
+                    },
+                    "lifecyclePolicy": {
+                      "lifecyclePolicyText": "{\"rules\":[{\"rulePriority\":1,\"description\":\"Keep last 10 images\",\"selection\":{\"tagStatus\":\"any\",\"countType\":\"imageCountMoreThan\",\"countNumber\":10},\"action\":{\"type\":\"expire\"}}]}"
+                    },
+                    "repositoryName": "curateai-app",
+                    "tags": [
+                      {
+                        "key": "Environment",
+                        "value": "Production"
+                      },
+                      {
+                        "key": "ManagedBy",
+                        "value": "CDK"
+                      },
+                      {
+                        "key": "Phase",
+                        "value": "1"
+                      },
+                      {
+                        "key": "Project",
+                        "value": "CurateAI"
+                      },
+                      {
+                        "key": "Repository",
+                        "value": "RishabhSinha07/CurateAI"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ecr.CfnRepository",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_ecr.Repository",
+              "version": "2.120.0"
+            }
+          },
+          "CurateAI-Cluster": {
+            "id": "CurateAI-Cluster",
+            "path": "CurateAI-ECS/CurateAI-Cluster",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-ECS/CurateAI-Cluster/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::ECS::Cluster",
+                  "aws:cdk:cloudformation:props": {
+                    "clusterName": "CurateAI-Cluster",
+                    "clusterSettings": [
+                      {
+                        "name": "containerInsights",
+                        "value": "disabled"
+                      }
+                    ],
+                    "tags": [
+                      {
+                        "key": "Environment",
+                        "value": "Production"
+                      },
+                      {
+                        "key": "ManagedBy",
+                        "value": "CDK"
+                      },
+                      {
+                        "key": "Phase",
+                        "value": "1"
+                      },
+                      {
+                        "key": "Project",
+                        "value": "CurateAI"
+                      },
+                      {
+                        "key": "Repository",
+                        "value": "RishabhSinha07/CurateAI"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ecs.CfnCluster",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_ecs.Cluster",
+              "version": "2.120.0"
+            }
+          },
+          "CurateAI-Logs": {
+            "id": "CurateAI-Logs",
+            "path": "CurateAI-ECS/CurateAI-Logs",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-ECS/CurateAI-Logs/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Logs::LogGroup",
+                  "aws:cdk:cloudformation:props": {
+                    "logGroupName": "/ecs/curateai-app",
+                    "retentionInDays": 3,
+                    "tags": [
+                      {
+                        "key": "Environment",
+                        "value": "Production"
+                      },
+                      {
+                        "key": "ManagedBy",
+                        "value": "CDK"
+                      },
+                      {
+                        "key": "Phase",
+                        "value": "1"
+                      },
+                      {
+                        "key": "Project",
+                        "value": "CurateAI"
+                      },
+                      {
+                        "key": "Repository",
+                        "value": "RishabhSinha07/CurateAI"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_logs.CfnLogGroup",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_logs.LogGroup",
+              "version": "2.120.0"
+            }
+          },
+          "Task-Execution-Role": {
+            "id": "Task-Execution-Role",
+            "path": "CurateAI-ECS/Task-Execution-Role",
+            "children": {
+              "ImportTask-Execution-Role": {
+                "id": "ImportTask-Execution-Role",
+                "path": "CurateAI-ECS/Task-Execution-Role/ImportTask-Execution-Role",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.Resource",
+                  "version": "2.120.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-ECS/Task-Execution-Role/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRole",
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Service": "ecs-tasks.amazonaws.com"
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "managedPolicyArns": [
+                      {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+                          ]
+                        ]
+                      }
+                    ],
+                    "tags": [
+                      {
+                        "key": "Environment",
+                        "value": "Production"
+                      },
+                      {
+                        "key": "ManagedBy",
+                        "value": "CDK"
+                      },
+                      {
+                        "key": "Phase",
+                        "value": "1"
+                      },
+                      {
+                        "key": "Project",
+                        "value": "CurateAI"
+                      },
+                      {
+                        "key": "Repository",
+                        "value": "RishabhSinha07/CurateAI"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                  "version": "2.120.0"
+                }
+              },
+              "DefaultPolicy": {
+                "id": "DefaultPolicy",
+                "path": "CurateAI-ECS/Task-Execution-Role/DefaultPolicy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "CurateAI-ECS/Task-Execution-Role/DefaultPolicy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                      "aws:cdk:cloudformation:props": {
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "ecr:BatchCheckLayerAvailability",
+                                "ecr:BatchGetImage",
+                                "ecr:GetDownloadUrlForLayer"
+                              ],
+                              "Effect": "Allow",
+                              "Resource": {
+                                "Fn::GetAtt": [
+                                  "CurateAIECR3D7C459A",
+                                  "Arn"
+                                ]
+                              }
+                            },
+                            {
+                              "Action": "ecr:GetAuthorizationToken",
+                              "Effect": "Allow",
+                              "Resource": "*"
+                            },
+                            {
+                              "Action": [
+                                "logs:CreateLogStream",
+                                "logs:PutLogEvents"
+                              ],
+                              "Effect": "Allow",
+                              "Resource": {
+                                "Fn::GetAtt": [
+                                  "CurateAILogsC43B061E",
+                                  "Arn"
+                                ]
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "policyName": "TaskExecutionRoleDefaultPolicy96A62DFB",
+                        "roles": [
+                          {
+                            "Ref": "TaskExecutionRoleA3CAE0F7"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Policy",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Role",
+              "version": "2.120.0"
+            }
+          },
+          "Task-Role": {
+            "id": "Task-Role",
+            "path": "CurateAI-ECS/Task-Role",
+            "children": {
+              "ImportTask-Role": {
+                "id": "ImportTask-Role",
+                "path": "CurateAI-ECS/Task-Role/ImportTask-Role",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.Resource",
+                  "version": "2.120.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-ECS/Task-Role/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                  "aws:cdk:cloudformation:props": {
+                    "assumeRolePolicyDocument": {
+                      "Statement": [
+                        {
+                          "Action": "sts:AssumeRole",
+                          "Effect": "Allow",
+                          "Principal": {
+                            "Service": "ecs-tasks.amazonaws.com"
+                          }
+                        }
+                      ],
+                      "Version": "2012-10-17"
+                    },
+                    "tags": [
+                      {
+                        "key": "Environment",
+                        "value": "Production"
+                      },
+                      {
+                        "key": "ManagedBy",
+                        "value": "CDK"
+                      },
+                      {
+                        "key": "Phase",
+                        "value": "1"
+                      },
+                      {
+                        "key": "Project",
+                        "value": "CurateAI"
+                      },
+                      {
+                        "key": "Repository",
+                        "value": "RishabhSinha07/CurateAI"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                  "version": "2.120.0"
+                }
+              },
+              "DefaultPolicy": {
+                "id": "DefaultPolicy",
+                "path": "CurateAI-ECS/Task-Role/DefaultPolicy",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "CurateAI-ECS/Task-Role/DefaultPolicy/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                      "aws:cdk:cloudformation:props": {
+                        "policyDocument": {
+                          "Statement": [
+                            {
+                              "Action": [
+                                "bedrock:InvokeModel",
+                                "bedrock:InvokeModelWithResponseStream"
+                              ],
+                              "Effect": "Allow",
+                              "Resource": "arn:aws:bedrock:us-east-1::foundation-model/*"
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "policyName": "TaskRoleDefaultPolicy2F37F892",
+                        "roles": [
+                          {
+                            "Ref": "TaskRole1951A240"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Policy",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_iam.Role",
+              "version": "2.120.0"
+            }
+          },
+          "CurateAI-Task": {
+            "id": "CurateAI-Task",
+            "path": "CurateAI-ECS/CurateAI-Task",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-ECS/CurateAI-Task/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::ECS::TaskDefinition",
+                  "aws:cdk:cloudformation:props": {
+                    "containerDefinitions": [
+                      {
+                        "essential": true,
+                        "image": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              {
+                                "Fn::Select": [
+                                  4,
+                                  {
+                                    "Fn::Split": [
+                                      ":",
+                                      {
+                                        "Fn::GetAtt": [
+                                          "CurateAIECR3D7C459A",
+                                          "Arn"
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              ".dkr.ecr.",
+                              {
+                                "Fn::Select": [
+                                  3,
+                                  {
+                                    "Fn::Split": [
+                                      ":",
+                                      {
+                                        "Fn::GetAtt": [
+                                          "CurateAIECR3D7C459A",
+                                          "Arn"
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              ".",
+                              {
+                                "Ref": "AWS::URLSuffix"
+                              },
+                              "/",
+                              {
+                                "Ref": "CurateAIECR3D7C459A"
+                              },
+                              ":latest"
+                            ]
+                          ]
+                        },
+                        "name": "curateai-app",
+                        "portMappings": [
+                          {
+                            "containerPort": 8000,
+                            "protocol": "tcp"
+                          }
+                        ],
+                        "logConfiguration": {
+                          "logDriver": "awslogs",
+                          "options": {
+                            "awslogs-group": {
+                              "Ref": "CurateAILogsC43B061E"
+                            },
+                            "awslogs-stream-prefix": "curateai",
+                            "awslogs-region": "us-east-1"
+                          }
+                        },
+                        "environment": [
+                          {
+                            "name": "ENVIRONMENT",
+                            "value": "production"
+                          },
+                          {
+                            "name": "LOG_LEVEL",
+                            "value": "INFO"
+                          },
+                          {
+                            "name": "DEBUG",
+                            "value": "false"
+                          },
+                          {
+                            "name": "AWS_REGION",
+                            "value": "us-east-1"
+                          },
+                          {
+                            "name": "BEDROCK_MODEL_ID",
+                            "value": "anthropic.claude-3-5-haiku-20241022-v1:0"
+                          },
+                          {
+                            "name": "EMBEDDING_MODEL_ID",
+                            "value": "amazon.titan-embed-text-v2:0"
+                          },
+                          {
+                            "name": "EMBEDDING_DIMENSIONS",
+                            "value": "1024"
+                          },
+                          {
+                            "name": "USE_DB_GRAPHS",
+                            "value": "false"
+                          }
+                        ],
+                        "healthCheck": {
+                          "command": [
+                            "CMD-SHELL",
+                            "python /app/scripts/healthcheck.py || exit 1"
+                          ],
+                          "interval": 30,
+                          "retries": 3,
+                          "startPeriod": 40,
+                          "timeout": 5
+                        }
+                      }
+                    ],
+                    "cpu": "512",
+                    "executionRoleArn": {
+                      "Fn::GetAtt": [
+                        "TaskExecutionRoleA3CAE0F7",
+                        "Arn"
+                      ]
+                    },
+                    "family": "curateai-task",
+                    "memory": "1024",
+                    "networkMode": "awsvpc",
+                    "requiresCompatibilities": [
+                      "FARGATE"
+                    ],
+                    "tags": [
+                      {
+                        "key": "Environment",
+                        "value": "Production"
+                      },
+                      {
+                        "key": "ManagedBy",
+                        "value": "CDK"
+                      },
+                      {
+                        "key": "Phase",
+                        "value": "1"
+                      },
+                      {
+                        "key": "Project",
+                        "value": "CurateAI"
+                      },
+                      {
+                        "key": "Repository",
+                        "value": "RishabhSinha07/CurateAI"
+                      }
+                    ],
+                    "taskRoleArn": {
+                      "Fn::GetAtt": [
+                        "TaskRole1951A240",
+                        "Arn"
+                      ]
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ecs.CfnTaskDefinition",
+                  "version": "2.120.0"
+                }
+              },
+              "CurateAI-Container": {
+                "id": "CurateAI-Container",
+                "path": "CurateAI-ECS/CurateAI-Task/CurateAI-Container",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ecs.ContainerDefinition",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_ecs.FargateTaskDefinition",
+              "version": "2.120.0"
+            }
+          },
+          "CurateAI-Service": {
+            "id": "CurateAI-Service",
+            "path": "CurateAI-ECS/CurateAI-Service",
+            "children": {
+              "Service": {
+                "id": "Service",
+                "path": "CurateAI-ECS/CurateAI-Service/Service",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::ECS::Service",
+                  "aws:cdk:cloudformation:props": {
+                    "capacityProviderStrategy": [
+                      {
+                        "capacityProvider": "FARGATE_SPOT",
+                        "weight": 1
+                      }
+                    ],
+                    "cluster": {
+                      "Ref": "CurateAICluster60AC0717"
+                    },
+                    "deploymentConfiguration": {
+                      "maximumPercent": 200,
+                      "minimumHealthyPercent": 50,
+                      "deploymentCircuitBreaker": {
+                        "enable": true,
+                        "rollback": true
+                      },
+                      "alarms": {
+                        "alarmNames": [],
+                        "enable": false,
+                        "rollback": false
+                      }
+                    },
+                    "desiredCount": 0,
+                    "enableEcsManagedTags": false,
+                    "healthCheckGracePeriodSeconds": 60,
+                    "networkConfiguration": {
+                      "awsvpcConfiguration": {
+                        "assignPublicIp": "ENABLED",
+                        "subnets": [
+                          {
+                            "Fn::ImportValue": "CurateAI-Network:ExportsOutputRefCurateAIVPCPublicSubnet1SubnetB5E92D6E791FA932"
+                          },
+                          {
+                            "Fn::ImportValue": "CurateAI-Network:ExportsOutputRefCurateAIVPCPublicSubnet2SubnetB85A59869C07E00E"
+                          }
+                        ],
+                        "securityGroups": [
+                          {
+                            "Fn::ImportValue": "CurateAI-Network:ExportsOutputFnGetAttFargateSG3742C269GroupIdD51DEC7E"
+                          }
+                        ]
+                      }
+                    },
+                    "serviceName": "CurateAI-Service",
+                    "tags": [
+                      {
+                        "key": "Environment",
+                        "value": "Production"
+                      },
+                      {
+                        "key": "ManagedBy",
+                        "value": "CDK"
+                      },
+                      {
+                        "key": "Phase",
+                        "value": "1"
+                      },
+                      {
+                        "key": "Project",
+                        "value": "CurateAI"
+                      },
+                      {
+                        "key": "Repository",
+                        "value": "RishabhSinha07/CurateAI"
+                      }
+                    ],
+                    "taskDefinition": {
+                      "Ref": "CurateAITask7091D2F0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_ecs.CfnService",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_ecs.FargateService",
+              "version": "2.120.0"
+            }
+          },
+          "ClusterName": {
+            "id": "ClusterName",
+            "path": "CurateAI-ECS/ClusterName",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.120.0"
+            }
+          },
+          "ServiceName": {
+            "id": "ServiceName",
+            "path": "CurateAI-ECS/ServiceName",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.120.0"
+            }
+          },
+          "ECRRepositoryUri": {
+            "id": "ECRRepositoryUri",
+            "path": "CurateAI-ECS/ECRRepositoryUri",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.120.0"
+            }
+          },
+          "TaskPublicIPNote": {
+            "id": "TaskPublicIPNote",
+            "path": "CurateAI-ECS/TaskPublicIPNote",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.120.0"
+            }
+          },
+          "APIEndpointPattern": {
+            "id": "APIEndpointPattern",
+            "path": "CurateAI-ECS/APIEndpointPattern",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.120.0"
+            }
+          },
+          "CDKMetadata": {
+            "id": "CDKMetadata",
+            "path": "CurateAI-ECS/CDKMetadata",
+            "children": {
+              "Default": {
+                "id": "Default",
+                "path": "CurateAI-ECS/CDKMetadata/Default",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnResource",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "constructs.Construct",
+              "version": "10.4.5"
+            }
+          },
+          "Exports": {
+            "id": "Exports",
+            "path": "CurateAI-ECS/Exports",
+            "children": {
+              "Output{\"Fn::GetAtt\":[\"CurateAIECR3D7C459A\",\"Arn\"]}": {
+                "id": "Output{\"Fn::GetAtt\":[\"CurateAIECR3D7C459A\",\"Arn\"]}",
+                "path": "CurateAI-ECS/Exports/Output{\"Fn::GetAtt\":[\"CurateAIECR3D7C459A\",\"Arn\"]}",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnOutput",
+                  "version": "2.120.0"
+                }
+              },
+              "Output{\"Ref\":\"CurateAIECR3D7C459A\"}": {
+                "id": "Output{\"Ref\":\"CurateAIECR3D7C459A\"}",
+                "path": "CurateAI-ECS/Exports/Output{\"Ref\":\"CurateAIECR3D7C459A\"}",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnOutput",
+                  "version": "2.120.0"
+                }
+              },
+              "Output{\"Ref\":\"CurateAICluster60AC0717\"}": {
+                "id": "Output{\"Ref\":\"CurateAICluster60AC0717\"}",
+                "path": "CurateAI-ECS/Exports/Output{\"Ref\":\"CurateAICluster60AC0717\"}",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnOutput",
+                  "version": "2.120.0"
+                }
+              },
+              "Output{\"Fn::GetAtt\":[\"CurateAIServiceA16C39B1\",\"Name\"]}": {
+                "id": "Output{\"Fn::GetAtt\":[\"CurateAIServiceA16C39B1\",\"Name\"]}",
+                "path": "CurateAI-ECS/Exports/Output{\"Fn::GetAtt\":[\"CurateAIServiceA16C39B1\",\"Name\"]}",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnOutput",
+                  "version": "2.120.0"
+                }
+              },
+              "Output{\"Ref\":\"CurateAILogsC43B061E\"}": {
+                "id": "Output{\"Ref\":\"CurateAILogsC43B061E\"}",
+                "path": "CurateAI-ECS/Exports/Output{\"Ref\":\"CurateAILogsC43B061E\"}",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnOutput",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "constructs.Construct",
+              "version": "10.4.5"
+            }
+          },
+          "BootstrapVersion": {
+            "id": "BootstrapVersion",
+            "path": "CurateAI-ECS/BootstrapVersion",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnParameter",
+              "version": "2.120.0"
+            }
+          },
+          "CheckBootstrapVersion": {
+            "id": "CheckBootstrapVersion",
+            "path": "CurateAI-ECS/CheckBootstrapVersion",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnRule",
+              "version": "2.120.0"
+            }
+          }
+        },
+        "constructInfo": {
+          "fqn": "aws-cdk-lib.Stack",
+          "version": "2.120.0"
+        }
+      },
+      "CurateAI-Pipeline": {
+        "id": "CurateAI-Pipeline",
+        "path": "CurateAI-Pipeline",
+        "children": {
+          "CurateAI-Build": {
+            "id": "CurateAI-Build",
+            "path": "CurateAI-Pipeline/CurateAI-Build",
+            "children": {
+              "Role": {
+                "id": "Role",
+                "path": "CurateAI-Pipeline/CurateAI-Build/Role",
+                "children": {
+                  "ImportRole": {
+                    "id": "ImportRole",
+                    "path": "CurateAI-Pipeline/CurateAI-Build/Role/ImportRole",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.Resource",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "CurateAI-Pipeline/CurateAI-Build/Role/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "sts:AssumeRole",
+                              "Effect": "Allow",
+                              "Principal": {
+                                "Service": "codebuild.amazonaws.com"
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "tags": [
+                          {
+                            "key": "Environment",
+                            "value": "Production"
+                          },
+                          {
+                            "key": "ManagedBy",
+                            "value": "CDK"
+                          },
+                          {
+                            "key": "Phase",
+                            "value": "1"
+                          },
+                          {
+                            "key": "Project",
+                            "value": "CurateAI"
+                          },
+                          {
+                            "key": "Repository",
+                            "value": "RishabhSinha07/CurateAI"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "DefaultPolicy": {
+                    "id": "DefaultPolicy",
+                    "path": "CurateAI-Pipeline/CurateAI-Build/Role/DefaultPolicy",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "CurateAI-Pipeline/CurateAI-Build/Role/DefaultPolicy/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                          "aws:cdk:cloudformation:props": {
+                            "policyDocument": {
+                              "Statement": [
+                                {
+                                  "Action": [
+                                    "logs:CreateLogGroup",
+                                    "logs:CreateLogStream",
+                                    "logs:PutLogEvents"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": [
+                                    {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          "arn:aws:logs:us-east-1:558599919081:log-group:/aws/codebuild/",
+                                          {
+                                            "Ref": "CurateAIBuild441D4260"
+                                          },
+                                          ":*"
+                                        ]
+                                      ]
+                                    },
+                                    {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          "arn:aws:logs:us-east-1:558599919081:log-group:/aws/codebuild/",
+                                          {
+                                            "Ref": "CurateAIBuild441D4260"
+                                          }
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "Action": [
+                                    "codebuild:BatchPutCodeCoverages",
+                                    "codebuild:BatchPutTestCases",
+                                    "codebuild:CreateReport",
+                                    "codebuild:CreateReportGroup",
+                                    "codebuild:UpdateReport"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": {
+                                    "Fn::Join": [
+                                      "",
+                                      [
+                                        "arn:aws:codebuild:us-east-1:558599919081:report-group/",
+                                        {
+                                          "Ref": "CurateAIBuild441D4260"
+                                        },
+                                        "-*"
+                                      ]
+                                    ]
+                                  }
+                                },
+                                {
+                                  "Action": [
+                                    "ecr:BatchCheckLayerAvailability",
+                                    "ecr:BatchGetImage",
+                                    "ecr:CompleteLayerUpload",
+                                    "ecr:GetDownloadUrlForLayer",
+                                    "ecr:InitiateLayerUpload",
+                                    "ecr:PutImage",
+                                    "ecr:UploadLayerPart"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": {
+                                    "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIECR3D7C459AArnD82D4123"
+                                  }
+                                },
+                                {
+                                  "Action": "ecr:GetAuthorizationToken",
+                                  "Effect": "Allow",
+                                  "Resource": "*"
+                                },
+                                {
+                                  "Action": [
+                                    "s3:Abort*",
+                                    "s3:DeleteObject*",
+                                    "s3:GetBucket*",
+                                    "s3:GetObject*",
+                                    "s3:List*",
+                                    "s3:PutObject",
+                                    "s3:PutObjectLegalHold",
+                                    "s3:PutObjectRetention",
+                                    "s3:PutObjectTagging",
+                                    "s3:PutObjectVersionTagging"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": [
+                                    {
+                                      "Fn::GetAtt": [
+                                        "CurateAIPipelineArtifactsBucket5344FB10",
+                                        "Arn"
+                                      ]
+                                    },
+                                    {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          {
+                                            "Fn::GetAtt": [
+                                              "CurateAIPipelineArtifactsBucket5344FB10",
+                                              "Arn"
+                                            ]
+                                          },
+                                          "/*"
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "Action": [
+                                    "kms:Decrypt",
+                                    "kms:DescribeKey",
+                                    "kms:Encrypt",
+                                    "kms:GenerateDataKey*",
+                                    "kms:ReEncrypt*"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": {
+                                    "Fn::GetAtt": [
+                                      "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+                                      "Arn"
+                                    ]
+                                  }
+                                }
+                              ],
+                              "Version": "2012-10-17"
+                            },
+                            "policyName": "CurateAIBuildRoleDefaultPolicyF6344835",
+                            "roles": [
+                              {
+                                "Ref": "CurateAIBuildRoleCD2CD9E8"
+                              }
+                            ]
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                          "version": "2.120.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.Policy",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Role",
+                  "version": "2.120.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-Pipeline/CurateAI-Build/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::CodeBuild::Project",
+                  "aws:cdk:cloudformation:props": {
+                    "artifacts": {
+                      "type": "CODEPIPELINE"
+                    },
+                    "cache": {
+                      "type": "NO_CACHE"
+                    },
+                    "description": "Build Docker images for CurateAI",
+                    "encryptionKey": {
+                      "Fn::GetAtt": [
+                        "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+                        "Arn"
+                      ]
+                    },
+                    "environment": {
+                      "type": "LINUX_CONTAINER",
+                      "image": "aws/codebuild/standard:7.0",
+                      "imagePullCredentialsType": "CODEBUILD",
+                      "privilegedMode": true,
+                      "computeType": "BUILD_GENERAL1_SMALL",
+                      "environmentVariables": [
+                        {
+                          "name": "ECR_REPOSITORY_URI",
+                          "type": "PLAINTEXT",
+                          "value": {
+                            "Fn::Join": [
+                              "",
+                              [
+                                {
+                                  "Fn::Select": [
+                                    4,
+                                    {
+                                      "Fn::Split": [
+                                        ":",
+                                        {
+                                          "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIECR3D7C459AArnD82D4123"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                ".dkr.ecr.",
+                                {
+                                  "Fn::Select": [
+                                    3,
+                                    {
+                                      "Fn::Split": [
+                                        ":",
+                                        {
+                                          "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIECR3D7C459AArnD82D4123"
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                },
+                                ".",
+                                {
+                                  "Ref": "AWS::URLSuffix"
+                                },
+                                "/",
+                                {
+                                  "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAIECR3D7C459AA9DD5F0E"
+                                }
+                              ]
+                            ]
+                          }
+                        },
+                        {
+                          "name": "AWS_DEFAULT_REGION",
+                          "type": "PLAINTEXT",
+                          "value": "us-east-1"
+                        },
+                        {
+                          "name": "AWS_ACCOUNT_ID",
+                          "type": "PLAINTEXT",
+                          "value": "558599919081"
+                        }
+                      ]
+                    },
+                    "name": "CurateAI-Build",
+                    "serviceRole": {
+                      "Fn::GetAtt": [
+                        "CurateAIBuildRoleCD2CD9E8",
+                        "Arn"
+                      ]
+                    },
+                    "source": {
+                      "type": "CODEPIPELINE",
+                      "buildSpec": "{\n  \"version\": \"0.2\",\n  \"phases\": {\n    \"pre_build\": {\n      \"commands\": [\n        \"echo Logging in to Amazon ECR...\",\n        \"aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY_URI\",\n        \"COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)\",\n        \"IMAGE_TAG=${COMMIT_HASH:=latest}\"\n      ]\n    },\n    \"build\": {\n      \"commands\": [\n        \"echo Build started on `date`\",\n        \"echo Building Docker image...\",\n        \"docker build -f Dockerfile.prod -t $ECR_REPOSITORY_URI:latest .\",\n        \"docker tag $ECR_REPOSITORY_URI:latest $ECR_REPOSITORY_URI:$IMAGE_TAG\"\n      ]\n    },\n    \"post_build\": {\n      \"commands\": [\n        \"echo Build completed on `date`\",\n        \"echo Pushing Docker images...\",\n        \"docker push $ECR_REPOSITORY_URI:latest\",\n        \"docker push $ECR_REPOSITORY_URI:$IMAGE_TAG\",\n        \"echo Writing image definitions file...\",\n        \"printf '[{\\\"name\\\":\\\"curateai-app\\\",\\\"imageUri\\\":\\\"%s\\\"}]' $ECR_REPOSITORY_URI:latest > imagedefinitions.json\",\n        \"cat imagedefinitions.json\"\n      ]\n    }\n  },\n  \"artifacts\": {\n    \"files\": [\n      \"imagedefinitions.json\"\n    ]\n  }\n}"
+                    },
+                    "tags": [
+                      {
+                        "key": "Environment",
+                        "value": "Production"
+                      },
+                      {
+                        "key": "ManagedBy",
+                        "value": "CDK"
+                      },
+                      {
+                        "key": "Phase",
+                        "value": "1"
+                      },
+                      {
+                        "key": "Project",
+                        "value": "CurateAI"
+                      },
+                      {
+                        "key": "Repository",
+                        "value": "RishabhSinha07/CurateAI"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_codebuild.CfnProject",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_codebuild.PipelineProject",
+              "version": "2.120.0"
+            }
+          },
+          "CurateAI-Pipeline": {
+            "id": "CurateAI-Pipeline",
+            "path": "CurateAI-Pipeline/CurateAI-Pipeline",
+            "children": {
+              "ArtifactsBucketEncryptionKey": {
+                "id": "ArtifactsBucketEncryptionKey",
+                "path": "CurateAI-Pipeline/CurateAI-Pipeline/ArtifactsBucketEncryptionKey",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "CurateAI-Pipeline/CurateAI-Pipeline/ArtifactsBucketEncryptionKey/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::KMS::Key",
+                      "aws:cdk:cloudformation:props": {
+                        "keyPolicy": {
+                          "Statement": [
+                            {
+                              "Action": "kms:*",
+                              "Effect": "Allow",
+                              "Principal": {
+                                "AWS": "arn:aws:iam::558599919081:root"
+                              },
+                              "Resource": "*"
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "tags": [
+                          {
+                            "key": "Environment",
+                            "value": "Production"
+                          },
+                          {
+                            "key": "ManagedBy",
+                            "value": "CDK"
+                          },
+                          {
+                            "key": "Phase",
+                            "value": "1"
+                          },
+                          {
+                            "key": "Project",
+                            "value": "CurateAI"
+                          },
+                          {
+                            "key": "Repository",
+                            "value": "RishabhSinha07/CurateAI"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_kms.CfnKey",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_kms.Key",
+                  "version": "2.120.0"
+                }
+              },
+              "ArtifactsBucketEncryptionKeyAlias": {
+                "id": "ArtifactsBucketEncryptionKeyAlias",
+                "path": "CurateAI-Pipeline/CurateAI-Pipeline/ArtifactsBucketEncryptionKeyAlias",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "CurateAI-Pipeline/CurateAI-Pipeline/ArtifactsBucketEncryptionKeyAlias/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::KMS::Alias",
+                      "aws:cdk:cloudformation:props": {
+                        "aliasName": "alias/codepipeline-curateai-pipeline-a0de3ca9",
+                        "targetKeyId": {
+                          "Fn::GetAtt": [
+                            "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+                            "Arn"
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_kms.CfnAlias",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_kms.Alias",
+                  "version": "2.120.0"
+                }
+              },
+              "ArtifactsBucket": {
+                "id": "ArtifactsBucket",
+                "path": "CurateAI-Pipeline/CurateAI-Pipeline/ArtifactsBucket",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "CurateAI-Pipeline/CurateAI-Pipeline/ArtifactsBucket/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::S3::Bucket",
+                      "aws:cdk:cloudformation:props": {
+                        "bucketEncryption": {
+                          "serverSideEncryptionConfiguration": [
+                            {
+                              "serverSideEncryptionByDefault": {
+                                "sseAlgorithm": "aws:kms",
+                                "kmsMasterKeyId": {
+                                  "Fn::GetAtt": [
+                                    "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+                                    "Arn"
+                                  ]
+                                }
+                              }
+                            }
+                          ]
+                        },
+                        "publicAccessBlockConfiguration": {
+                          "blockPublicAcls": true,
+                          "blockPublicPolicy": true,
+                          "ignorePublicAcls": true,
+                          "restrictPublicBuckets": true
+                        },
+                        "tags": [
+                          {
+                            "key": "Environment",
+                            "value": "Production"
+                          },
+                          {
+                            "key": "ManagedBy",
+                            "value": "CDK"
+                          },
+                          {
+                            "key": "Phase",
+                            "value": "1"
+                          },
+                          {
+                            "key": "Project",
+                            "value": "CurateAI"
+                          },
+                          {
+                            "key": "Repository",
+                            "value": "RishabhSinha07/CurateAI"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.CfnBucket",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "Policy": {
+                    "id": "Policy",
+                    "path": "CurateAI-Pipeline/CurateAI-Pipeline/ArtifactsBucket/Policy",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "CurateAI-Pipeline/CurateAI-Pipeline/ArtifactsBucket/Policy/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::S3::BucketPolicy",
+                          "aws:cdk:cloudformation:props": {
+                            "bucket": {
+                              "Ref": "CurateAIPipelineArtifactsBucket5344FB10"
+                            },
+                            "policyDocument": {
+                              "Statement": [
+                                {
+                                  "Action": "s3:*",
+                                  "Condition": {
+                                    "Bool": {
+                                      "aws:SecureTransport": "false"
+                                    }
+                                  },
+                                  "Effect": "Deny",
+                                  "Principal": {
+                                    "AWS": "*"
+                                  },
+                                  "Resource": [
+                                    {
+                                      "Fn::GetAtt": [
+                                        "CurateAIPipelineArtifactsBucket5344FB10",
+                                        "Arn"
+                                      ]
+                                    },
+                                    {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          {
+                                            "Fn::GetAtt": [
+                                              "CurateAIPipelineArtifactsBucket5344FB10",
+                                              "Arn"
+                                            ]
+                                          },
+                                          "/*"
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "Version": "2012-10-17"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_s3.CfnBucketPolicy",
+                          "version": "2.120.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.BucketPolicy",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3.Bucket",
+                  "version": "2.120.0"
+                }
+              },
+              "Role": {
+                "id": "Role",
+                "path": "CurateAI-Pipeline/CurateAI-Pipeline/Role",
+                "children": {
+                  "ImportRole": {
+                    "id": "ImportRole",
+                    "path": "CurateAI-Pipeline/CurateAI-Pipeline/Role/ImportRole",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.Resource",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "CurateAI-Pipeline/CurateAI-Pipeline/Role/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "sts:AssumeRole",
+                              "Effect": "Allow",
+                              "Principal": {
+                                "Service": "codepipeline.amazonaws.com"
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "tags": [
+                          {
+                            "key": "Environment",
+                            "value": "Production"
+                          },
+                          {
+                            "key": "ManagedBy",
+                            "value": "CDK"
+                          },
+                          {
+                            "key": "Phase",
+                            "value": "1"
+                          },
+                          {
+                            "key": "Project",
+                            "value": "CurateAI"
+                          },
+                          {
+                            "key": "Repository",
+                            "value": "RishabhSinha07/CurateAI"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "DefaultPolicy": {
+                    "id": "DefaultPolicy",
+                    "path": "CurateAI-Pipeline/CurateAI-Pipeline/Role/DefaultPolicy",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "CurateAI-Pipeline/CurateAI-Pipeline/Role/DefaultPolicy/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                          "aws:cdk:cloudformation:props": {
+                            "policyDocument": {
+                              "Statement": [
+                                {
+                                  "Action": [
+                                    "s3:Abort*",
+                                    "s3:DeleteObject*",
+                                    "s3:GetBucket*",
+                                    "s3:GetObject*",
+                                    "s3:List*",
+                                    "s3:PutObject",
+                                    "s3:PutObjectLegalHold",
+                                    "s3:PutObjectRetention",
+                                    "s3:PutObjectTagging",
+                                    "s3:PutObjectVersionTagging"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": [
+                                    {
+                                      "Fn::GetAtt": [
+                                        "CurateAIPipelineArtifactsBucket5344FB10",
+                                        "Arn"
+                                      ]
+                                    },
+                                    {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          {
+                                            "Fn::GetAtt": [
+                                              "CurateAIPipelineArtifactsBucket5344FB10",
+                                              "Arn"
+                                            ]
+                                          },
+                                          "/*"
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "Action": [
+                                    "kms:Decrypt",
+                                    "kms:DescribeKey",
+                                    "kms:Encrypt",
+                                    "kms:GenerateDataKey*",
+                                    "kms:ReEncrypt*"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": {
+                                    "Fn::GetAtt": [
+                                      "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+                                      "Arn"
+                                    ]
+                                  }
+                                },
+                                {
+                                  "Action": "sts:AssumeRole",
+                                  "Effect": "Allow",
+                                  "Resource": [
+                                    {
+                                      "Fn::GetAtt": [
+                                        "CurateAIPipelineBuildDockerBuildCodePipelineActionRoleBD3598B8",
+                                        "Arn"
+                                      ]
+                                    },
+                                    {
+                                      "Fn::GetAtt": [
+                                        "CurateAIPipelineDeployECSDeployCodePipelineActionRole4FD38F1E",
+                                        "Arn"
+                                      ]
+                                    },
+                                    {
+                                      "Fn::GetAtt": [
+                                        "CurateAIPipelineSourceGitHubSourceCodePipelineActionRole01206964",
+                                        "Arn"
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ],
+                              "Version": "2012-10-17"
+                            },
+                            "policyName": "CurateAIPipelineRoleDefaultPolicyFB7A51D1",
+                            "roles": [
+                              {
+                                "Ref": "CurateAIPipelineRole428C272F"
+                              }
+                            ]
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                          "version": "2.120.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.Policy",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Role",
+                  "version": "2.120.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-Pipeline/CurateAI-Pipeline/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::CodePipeline::Pipeline",
+                  "aws:cdk:cloudformation:props": {
+                    "artifactStore": {
+                      "type": "S3",
+                      "location": {
+                        "Ref": "CurateAIPipelineArtifactsBucket5344FB10"
+                      },
+                      "encryptionKey": {
+                        "type": "KMS",
+                        "id": {
+                          "Fn::GetAtt": [
+                            "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+                            "Arn"
+                          ]
+                        }
+                      }
+                    },
+                    "name": "CurateAI-Pipeline",
+                    "roleArn": {
+                      "Fn::GetAtt": [
+                        "CurateAIPipelineRole428C272F",
+                        "Arn"
+                      ]
+                    },
+                    "stages": [
+                      {
+                        "name": "Source",
+                        "actions": [
+                          {
+                            "name": "GitHub-Source",
+                            "outputArtifacts": [
+                              {
+                                "name": "SourceOutput"
+                              }
+                            ],
+                            "actionTypeId": {
+                              "category": "Source",
+                              "version": "1",
+                              "owner": "AWS",
+                              "provider": "CodeStarSourceConnection"
+                            },
+                            "configuration": {
+                              "ConnectionArn": "arn:aws:codestar-connections:us-east-1:558599919081:connection/213b4c6a-80b7-4436-aa8e-3363db24b7e9",
+                              "FullRepositoryId": "RishabhSinha07/CurateAI",
+                              "BranchName": "main"
+                            },
+                            "runOrder": 1,
+                            "roleArn": {
+                              "Fn::GetAtt": [
+                                "CurateAIPipelineSourceGitHubSourceCodePipelineActionRole01206964",
+                                "Arn"
+                              ]
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "name": "Build",
+                        "actions": [
+                          {
+                            "name": "Docker-Build",
+                            "inputArtifacts": [
+                              {
+                                "name": "SourceOutput"
+                              }
+                            ],
+                            "outputArtifacts": [
+                              {
+                                "name": "BuildOutput"
+                              }
+                            ],
+                            "actionTypeId": {
+                              "category": "Build",
+                              "version": "1",
+                              "owner": "AWS",
+                              "provider": "CodeBuild"
+                            },
+                            "configuration": {
+                              "ProjectName": {
+                                "Ref": "CurateAIBuild441D4260"
+                              }
+                            },
+                            "runOrder": 1,
+                            "roleArn": {
+                              "Fn::GetAtt": [
+                                "CurateAIPipelineBuildDockerBuildCodePipelineActionRoleBD3598B8",
+                                "Arn"
+                              ]
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "name": "Deploy",
+                        "actions": [
+                          {
+                            "name": "ECS-Deploy",
+                            "inputArtifacts": [
+                              {
+                                "name": "BuildOutput"
+                              }
+                            ],
+                            "actionTypeId": {
+                              "category": "Deploy",
+                              "version": "1",
+                              "owner": "AWS",
+                              "provider": "ECS"
+                            },
+                            "configuration": {
+                              "ClusterName": {
+                                "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAICluster60AC07179B81467C"
+                              },
+                              "ServiceName": {
+                                "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIServiceA16C39B1NameAC081D51"
+                              }
+                            },
+                            "runOrder": 1,
+                            "roleArn": {
+                              "Fn::GetAtt": [
+                                "CurateAIPipelineDeployECSDeployCodePipelineActionRole4FD38F1E",
+                                "Arn"
+                              ]
+                            }
+                          }
+                        ]
+                      }
+                    ],
+                    "tags": [
+                      {
+                        "key": "Environment",
+                        "value": "Production"
+                      },
+                      {
+                        "key": "ManagedBy",
+                        "value": "CDK"
+                      },
+                      {
+                        "key": "Phase",
+                        "value": "1"
+                      },
+                      {
+                        "key": "Project",
+                        "value": "CurateAI"
+                      },
+                      {
+                        "key": "Repository",
+                        "value": "RishabhSinha07/CurateAI"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_codepipeline.CfnPipeline",
+                  "version": "2.120.0"
+                }
+              },
+              "Source": {
+                "id": "Source",
+                "path": "CurateAI-Pipeline/CurateAI-Pipeline/Source",
+                "children": {
+                  "GitHub-Source": {
+                    "id": "GitHub-Source",
+                    "path": "CurateAI-Pipeline/CurateAI-Pipeline/Source/GitHub-Source",
+                    "children": {
+                      "CodePipelineActionRole": {
+                        "id": "CodePipelineActionRole",
+                        "path": "CurateAI-Pipeline/CurateAI-Pipeline/Source/GitHub-Source/CodePipelineActionRole",
+                        "children": {
+                          "ImportCodePipelineActionRole": {
+                            "id": "ImportCodePipelineActionRole",
+                            "path": "CurateAI-Pipeline/CurateAI-Pipeline/Source/GitHub-Source/CodePipelineActionRole/ImportCodePipelineActionRole",
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.Resource",
+                              "version": "2.120.0"
+                            }
+                          },
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "CurateAI-Pipeline/CurateAI-Pipeline/Source/GitHub-Source/CodePipelineActionRole/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                              "aws:cdk:cloudformation:props": {
+                                "assumeRolePolicyDocument": {
+                                  "Statement": [
+                                    {
+                                      "Action": "sts:AssumeRole",
+                                      "Effect": "Allow",
+                                      "Principal": {
+                                        "AWS": "arn:aws:iam::558599919081:root"
+                                      }
+                                    }
+                                  ],
+                                  "Version": "2012-10-17"
+                                },
+                                "tags": [
+                                  {
+                                    "key": "Environment",
+                                    "value": "Production"
+                                  },
+                                  {
+                                    "key": "ManagedBy",
+                                    "value": "CDK"
+                                  },
+                                  {
+                                    "key": "Phase",
+                                    "value": "1"
+                                  },
+                                  {
+                                    "key": "Project",
+                                    "value": "CurateAI"
+                                  },
+                                  {
+                                    "key": "Repository",
+                                    "value": "RishabhSinha07/CurateAI"
+                                  }
+                                ]
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                              "version": "2.120.0"
+                            }
+                          },
+                          "DefaultPolicy": {
+                            "id": "DefaultPolicy",
+                            "path": "CurateAI-Pipeline/CurateAI-Pipeline/Source/GitHub-Source/CodePipelineActionRole/DefaultPolicy",
+                            "children": {
+                              "Resource": {
+                                "id": "Resource",
+                                "path": "CurateAI-Pipeline/CurateAI-Pipeline/Source/GitHub-Source/CodePipelineActionRole/DefaultPolicy/Resource",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                                  "aws:cdk:cloudformation:props": {
+                                    "policyDocument": {
+                                      "Statement": [
+                                        {
+                                          "Action": "codestar-connections:UseConnection",
+                                          "Effect": "Allow",
+                                          "Resource": "arn:aws:codestar-connections:us-east-1:558599919081:connection/213b4c6a-80b7-4436-aa8e-3363db24b7e9"
+                                        },
+                                        {
+                                          "Action": [
+                                            "s3:Abort*",
+                                            "s3:DeleteObject*",
+                                            "s3:GetBucket*",
+                                            "s3:GetObject*",
+                                            "s3:List*",
+                                            "s3:PutObject",
+                                            "s3:PutObjectLegalHold",
+                                            "s3:PutObjectRetention",
+                                            "s3:PutObjectTagging",
+                                            "s3:PutObjectVersionTagging"
+                                          ],
+                                          "Effect": "Allow",
+                                          "Resource": [
+                                            {
+                                              "Fn::GetAtt": [
+                                                "CurateAIPipelineArtifactsBucket5344FB10",
+                                                "Arn"
+                                              ]
+                                            },
+                                            {
+                                              "Fn::Join": [
+                                                "",
+                                                [
+                                                  {
+                                                    "Fn::GetAtt": [
+                                                      "CurateAIPipelineArtifactsBucket5344FB10",
+                                                      "Arn"
+                                                    ]
+                                                  },
+                                                  "/*"
+                                                ]
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "Action": [
+                                            "kms:Decrypt",
+                                            "kms:DescribeKey",
+                                            "kms:Encrypt",
+                                            "kms:GenerateDataKey*",
+                                            "kms:ReEncrypt*"
+                                          ],
+                                          "Effect": "Allow",
+                                          "Resource": {
+                                            "Fn::GetAtt": [
+                                              "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+                                              "Arn"
+                                            ]
+                                          }
+                                        },
+                                        {
+                                          "Action": [
+                                            "s3:PutObjectAcl",
+                                            "s3:PutObjectVersionAcl"
+                                          ],
+                                          "Effect": "Allow",
+                                          "Resource": {
+                                            "Fn::Join": [
+                                              "",
+                                              [
+                                                {
+                                                  "Fn::GetAtt": [
+                                                    "CurateAIPipelineArtifactsBucket5344FB10",
+                                                    "Arn"
+                                                  ]
+                                                },
+                                                "/*"
+                                              ]
+                                            ]
+                                          }
+                                        }
+                                      ],
+                                      "Version": "2012-10-17"
+                                    },
+                                    "policyName": "CurateAIPipelineSourceGitHubSourceCodePipelineActionRoleDefaultPolicy5630DFC7",
+                                    "roles": [
+                                      {
+                                        "Ref": "CurateAIPipelineSourceGitHubSourceCodePipelineActionRole01206964"
+                                      }
+                                    ]
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                                  "version": "2.120.0"
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_iam.Policy",
+                              "version": "2.120.0"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_iam.Role",
+                          "version": "2.120.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "constructs.Construct",
+                      "version": "10.4.5"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "constructs.Construct",
+                  "version": "10.4.5"
+                }
+              },
+              "Build": {
+                "id": "Build",
+                "path": "CurateAI-Pipeline/CurateAI-Pipeline/Build",
+                "children": {
+                  "Docker-Build": {
+                    "id": "Docker-Build",
+                    "path": "CurateAI-Pipeline/CurateAI-Pipeline/Build/Docker-Build",
+                    "children": {
+                      "CodePipelineActionRole": {
+                        "id": "CodePipelineActionRole",
+                        "path": "CurateAI-Pipeline/CurateAI-Pipeline/Build/Docker-Build/CodePipelineActionRole",
+                        "children": {
+                          "ImportCodePipelineActionRole": {
+                            "id": "ImportCodePipelineActionRole",
+                            "path": "CurateAI-Pipeline/CurateAI-Pipeline/Build/Docker-Build/CodePipelineActionRole/ImportCodePipelineActionRole",
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.Resource",
+                              "version": "2.120.0"
+                            }
+                          },
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "CurateAI-Pipeline/CurateAI-Pipeline/Build/Docker-Build/CodePipelineActionRole/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                              "aws:cdk:cloudformation:props": {
+                                "assumeRolePolicyDocument": {
+                                  "Statement": [
+                                    {
+                                      "Action": "sts:AssumeRole",
+                                      "Effect": "Allow",
+                                      "Principal": {
+                                        "AWS": "arn:aws:iam::558599919081:root"
+                                      }
+                                    }
+                                  ],
+                                  "Version": "2012-10-17"
+                                },
+                                "tags": [
+                                  {
+                                    "key": "Environment",
+                                    "value": "Production"
+                                  },
+                                  {
+                                    "key": "ManagedBy",
+                                    "value": "CDK"
+                                  },
+                                  {
+                                    "key": "Phase",
+                                    "value": "1"
+                                  },
+                                  {
+                                    "key": "Project",
+                                    "value": "CurateAI"
+                                  },
+                                  {
+                                    "key": "Repository",
+                                    "value": "RishabhSinha07/CurateAI"
+                                  }
+                                ]
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                              "version": "2.120.0"
+                            }
+                          },
+                          "DefaultPolicy": {
+                            "id": "DefaultPolicy",
+                            "path": "CurateAI-Pipeline/CurateAI-Pipeline/Build/Docker-Build/CodePipelineActionRole/DefaultPolicy",
+                            "children": {
+                              "Resource": {
+                                "id": "Resource",
+                                "path": "CurateAI-Pipeline/CurateAI-Pipeline/Build/Docker-Build/CodePipelineActionRole/DefaultPolicy/Resource",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                                  "aws:cdk:cloudformation:props": {
+                                    "policyDocument": {
+                                      "Statement": [
+                                        {
+                                          "Action": [
+                                            "codebuild:BatchGetBuilds",
+                                            "codebuild:StartBuild",
+                                            "codebuild:StopBuild"
+                                          ],
+                                          "Effect": "Allow",
+                                          "Resource": {
+                                            "Fn::GetAtt": [
+                                              "CurateAIBuild441D4260",
+                                              "Arn"
+                                            ]
+                                          }
+                                        }
+                                      ],
+                                      "Version": "2012-10-17"
+                                    },
+                                    "policyName": "CurateAIPipelineBuildDockerBuildCodePipelineActionRoleDefaultPolicy5A9CD35D",
+                                    "roles": [
+                                      {
+                                        "Ref": "CurateAIPipelineBuildDockerBuildCodePipelineActionRoleBD3598B8"
+                                      }
+                                    ]
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                                  "version": "2.120.0"
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_iam.Policy",
+                              "version": "2.120.0"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_iam.Role",
+                          "version": "2.120.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "constructs.Construct",
+                      "version": "10.4.5"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "constructs.Construct",
+                  "version": "10.4.5"
+                }
+              },
+              "Deploy": {
+                "id": "Deploy",
+                "path": "CurateAI-Pipeline/CurateAI-Pipeline/Deploy",
+                "children": {
+                  "ECS-Deploy": {
+                    "id": "ECS-Deploy",
+                    "path": "CurateAI-Pipeline/CurateAI-Pipeline/Deploy/ECS-Deploy",
+                    "children": {
+                      "CodePipelineActionRole": {
+                        "id": "CodePipelineActionRole",
+                        "path": "CurateAI-Pipeline/CurateAI-Pipeline/Deploy/ECS-Deploy/CodePipelineActionRole",
+                        "children": {
+                          "ImportCodePipelineActionRole": {
+                            "id": "ImportCodePipelineActionRole",
+                            "path": "CurateAI-Pipeline/CurateAI-Pipeline/Deploy/ECS-Deploy/CodePipelineActionRole/ImportCodePipelineActionRole",
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.Resource",
+                              "version": "2.120.0"
+                            }
+                          },
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "CurateAI-Pipeline/CurateAI-Pipeline/Deploy/ECS-Deploy/CodePipelineActionRole/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                              "aws:cdk:cloudformation:props": {
+                                "assumeRolePolicyDocument": {
+                                  "Statement": [
+                                    {
+                                      "Action": "sts:AssumeRole",
+                                      "Effect": "Allow",
+                                      "Principal": {
+                                        "AWS": "arn:aws:iam::558599919081:root"
+                                      }
+                                    }
+                                  ],
+                                  "Version": "2012-10-17"
+                                },
+                                "tags": [
+                                  {
+                                    "key": "Environment",
+                                    "value": "Production"
+                                  },
+                                  {
+                                    "key": "ManagedBy",
+                                    "value": "CDK"
+                                  },
+                                  {
+                                    "key": "Phase",
+                                    "value": "1"
+                                  },
+                                  {
+                                    "key": "Project",
+                                    "value": "CurateAI"
+                                  },
+                                  {
+                                    "key": "Repository",
+                                    "value": "RishabhSinha07/CurateAI"
+                                  }
+                                ]
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                              "version": "2.120.0"
+                            }
+                          },
+                          "DefaultPolicy": {
+                            "id": "DefaultPolicy",
+                            "path": "CurateAI-Pipeline/CurateAI-Pipeline/Deploy/ECS-Deploy/CodePipelineActionRole/DefaultPolicy",
+                            "children": {
+                              "Resource": {
+                                "id": "Resource",
+                                "path": "CurateAI-Pipeline/CurateAI-Pipeline/Deploy/ECS-Deploy/CodePipelineActionRole/DefaultPolicy/Resource",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                                  "aws:cdk:cloudformation:props": {
+                                    "policyDocument": {
+                                      "Statement": [
+                                        {
+                                          "Action": [
+                                            "ecs:DescribeServices",
+                                            "ecs:DescribeTaskDefinition",
+                                            "ecs:DescribeTasks",
+                                            "ecs:ListTasks",
+                                            "ecs:RegisterTaskDefinition",
+                                            "ecs:UpdateService"
+                                          ],
+                                          "Effect": "Allow",
+                                          "Resource": "*"
+                                        },
+                                        {
+                                          "Action": "iam:PassRole",
+                                          "Condition": {
+                                            "StringEqualsIfExists": {
+                                              "iam:PassedToService": [
+                                                "ec2.amazonaws.com",
+                                                "ecs-tasks.amazonaws.com"
+                                              ]
+                                            }
+                                          },
+                                          "Effect": "Allow",
+                                          "Resource": "*"
+                                        },
+                                        {
+                                          "Action": [
+                                            "s3:GetBucket*",
+                                            "s3:GetObject*",
+                                            "s3:List*"
+                                          ],
+                                          "Effect": "Allow",
+                                          "Resource": [
+                                            {
+                                              "Fn::GetAtt": [
+                                                "CurateAIPipelineArtifactsBucket5344FB10",
+                                                "Arn"
+                                              ]
+                                            },
+                                            {
+                                              "Fn::Join": [
+                                                "",
+                                                [
+                                                  {
+                                                    "Fn::GetAtt": [
+                                                      "CurateAIPipelineArtifactsBucket5344FB10",
+                                                      "Arn"
+                                                    ]
+                                                  },
+                                                  "/*"
+                                                ]
+                                              ]
+                                            }
+                                          ]
+                                        },
+                                        {
+                                          "Action": [
+                                            "kms:Decrypt",
+                                            "kms:DescribeKey"
+                                          ],
+                                          "Effect": "Allow",
+                                          "Resource": {
+                                            "Fn::GetAtt": [
+                                              "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+                                              "Arn"
+                                            ]
+                                          }
+                                        }
+                                      ],
+                                      "Version": "2012-10-17"
+                                    },
+                                    "policyName": "CurateAIPipelineDeployECSDeployCodePipelineActionRoleDefaultPolicy836E0219",
+                                    "roles": [
+                                      {
+                                        "Ref": "CurateAIPipelineDeployECSDeployCodePipelineActionRole4FD38F1E"
+                                      }
+                                    ]
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                                  "version": "2.120.0"
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_iam.Policy",
+                              "version": "2.120.0"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_iam.Role",
+                          "version": "2.120.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "constructs.Construct",
+                      "version": "10.4.5"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "constructs.Construct",
+                  "version": "10.4.5"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_codepipeline.Pipeline",
+              "version": "2.120.0"
+            }
+          },
+          "PipelineName": {
+            "id": "PipelineName",
+            "path": "CurateAI-Pipeline/PipelineName",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.120.0"
+            }
+          },
+          "PipelineUrl": {
+            "id": "PipelineUrl",
+            "path": "CurateAI-Pipeline/PipelineUrl",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.120.0"
+            }
+          },
+          "CDKMetadata": {
+            "id": "CDKMetadata",
+            "path": "CurateAI-Pipeline/CDKMetadata",
+            "children": {
+              "Default": {
+                "id": "Default",
+                "path": "CurateAI-Pipeline/CDKMetadata/Default",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnResource",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "constructs.Construct",
+              "version": "10.4.5"
+            }
+          },
+          "BootstrapVersion": {
+            "id": "BootstrapVersion",
+            "path": "CurateAI-Pipeline/BootstrapVersion",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnParameter",
+              "version": "2.120.0"
+            }
+          },
+          "CheckBootstrapVersion": {
+            "id": "CheckBootstrapVersion",
+            "path": "CurateAI-Pipeline/CheckBootstrapVersion",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnRule",
+              "version": "2.120.0"
+            }
+          }
+        },
+        "constructInfo": {
+          "fqn": "aws-cdk-lib.Stack",
+          "version": "2.120.0"
+        }
+      },
+      "CurateAI-Observability": {
+        "id": "CurateAI-Observability",
+        "path": "CurateAI-Observability",
+        "children": {
+          "CurateAI-Alarms": {
+            "id": "CurateAI-Alarms",
+            "path": "CurateAI-Observability/CurateAI-Alarms",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-Observability/CurateAI-Alarms/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::SNS::Topic",
+                  "aws:cdk:cloudformation:props": {
+                    "displayName": "CurateAI Production Alarms",
+                    "tags": [
+                      {
+                        "key": "Environment",
+                        "value": "Production"
+                      },
+                      {
+                        "key": "ManagedBy",
+                        "value": "CDK"
+                      },
+                      {
+                        "key": "Phase",
+                        "value": "1"
+                      },
+                      {
+                        "key": "Project",
+                        "value": "CurateAI"
+                      },
+                      {
+                        "key": "Repository",
+                        "value": "RishabhSinha07/CurateAI"
+                      }
+                    ],
+                    "topicName": "CurateAI-Alarms"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_sns.CfnTopic",
+                  "version": "2.120.0"
+                }
+              },
+              "admin@noeticex.com": {
+                "id": "admin@noeticex.com",
+                "path": "CurateAI-Observability/CurateAI-Alarms/admin@noeticex.com",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "CurateAI-Observability/CurateAI-Alarms/admin@noeticex.com/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::SNS::Subscription",
+                      "aws:cdk:cloudformation:props": {
+                        "endpoint": "admin@noeticex.com",
+                        "protocol": "email",
+                        "topicArn": {
+                          "Ref": "CurateAIAlarms51797298"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_sns.CfnSubscription",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_sns.Subscription",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_sns.Topic",
+              "version": "2.120.0"
+            }
+          },
+          "CPU-High-Alarm": {
+            "id": "CPU-High-Alarm",
+            "path": "CurateAI-Observability/CPU-High-Alarm",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-Observability/CPU-High-Alarm/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::CloudWatch::Alarm",
+                  "aws:cdk:cloudformation:props": {
+                    "alarmActions": [
+                      {
+                        "Ref": "CurateAIAlarms51797298"
+                      }
+                    ],
+                    "alarmDescription": "CPU utilization is above 80%",
+                    "alarmName": "CurateAI-CPU-High",
+                    "comparisonOperator": "GreaterThanThreshold",
+                    "dimensions": [
+                      {
+                        "name": "ClusterName",
+                        "value": {
+                          "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAICluster60AC07179B81467C"
+                        }
+                      },
+                      {
+                        "name": "ServiceName",
+                        "value": {
+                          "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIServiceA16C39B1NameAC081D51"
+                        }
+                      }
+                    ],
+                    "evaluationPeriods": 2,
+                    "metricName": "CPUUtilization",
+                    "namespace": "AWS/ECS",
+                    "period": 300,
+                    "statistic": "Average",
+                    "threshold": 80
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_cloudwatch.CfnAlarm",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_cloudwatch.Alarm",
+              "version": "2.120.0"
+            }
+          },
+          "Memory-High-Alarm": {
+            "id": "Memory-High-Alarm",
+            "path": "CurateAI-Observability/Memory-High-Alarm",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-Observability/Memory-High-Alarm/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::CloudWatch::Alarm",
+                  "aws:cdk:cloudformation:props": {
+                    "alarmActions": [
+                      {
+                        "Ref": "CurateAIAlarms51797298"
+                      }
+                    ],
+                    "alarmDescription": "Memory utilization is above 85%",
+                    "alarmName": "CurateAI-Memory-High",
+                    "comparisonOperator": "GreaterThanThreshold",
+                    "dimensions": [
+                      {
+                        "name": "ClusterName",
+                        "value": {
+                          "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAICluster60AC07179B81467C"
+                        }
+                      },
+                      {
+                        "name": "ServiceName",
+                        "value": {
+                          "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIServiceA16C39B1NameAC081D51"
+                        }
+                      }
+                    ],
+                    "evaluationPeriods": 2,
+                    "metricName": "MemoryUtilization",
+                    "namespace": "AWS/ECS",
+                    "period": 300,
+                    "statistic": "Average",
+                    "threshold": 85
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_cloudwatch.CfnAlarm",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_cloudwatch.Alarm",
+              "version": "2.120.0"
+            }
+          },
+          "No-Tasks-Alarm": {
+            "id": "No-Tasks-Alarm",
+            "path": "CurateAI-Observability/No-Tasks-Alarm",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-Observability/No-Tasks-Alarm/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::CloudWatch::Alarm",
+                  "aws:cdk:cloudformation:props": {
+                    "alarmActions": [
+                      {
+                        "Ref": "CurateAIAlarms51797298"
+                      }
+                    ],
+                    "alarmDescription": "No ECS tasks are running",
+                    "alarmName": "CurateAI-No-Tasks",
+                    "comparisonOperator": "LessThanThreshold",
+                    "dimensions": [
+                      {
+                        "name": "ClusterName",
+                        "value": {
+                          "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAICluster60AC07179B81467C"
+                        }
+                      },
+                      {
+                        "name": "ServiceName",
+                        "value": {
+                          "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIServiceA16C39B1NameAC081D51"
+                        }
+                      }
+                    ],
+                    "evaluationPeriods": 2,
+                    "metricName": "RunningTaskCount",
+                    "namespace": "AWS/ECS",
+                    "period": 60,
+                    "statistic": "Average",
+                    "threshold": 1
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_cloudwatch.CfnAlarm",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_cloudwatch.Alarm",
+              "version": "2.120.0"
+            }
+          },
+          "CurateAI-Dashboard": {
+            "id": "CurateAI-Dashboard",
+            "path": "CurateAI-Observability/CurateAI-Dashboard",
+            "children": {
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-Observability/CurateAI-Dashboard/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::CloudWatch::Dashboard",
+                  "aws:cdk:cloudformation:props": {
+                    "dashboardBody": {
+                      "Fn::Join": [
+                        "",
+                        [
+                          "{\"widgets\":[{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"title\":\"ECS Service - Running Tasks\",\"region\":\"",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          "\",\"metrics\":[[\"AWS/ECS\",\"RunningTaskCount\",\"ClusterName\",\"",
+                          {
+                            "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAICluster60AC07179B81467C"
+                          },
+                          "\",\"ServiceName\",\"",
+                          {
+                            "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIServiceA16C39B1NameAC081D51"
+                          },
+                          "\",{\"period\":60}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":3,\"x\":12,\"y\":0,\"properties\":{\"view\":\"singleValue\",\"title\":\"Current Task Count\",\"region\":\"",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          "\",\"metrics\":[[\"AWS/ECS\",\"RunningTaskCount\",\"ClusterName\",\"",
+                          {
+                            "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAICluster60AC07179B81467C"
+                          },
+                          "\",\"ServiceName\",\"",
+                          {
+                            "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIServiceA16C39B1NameAC081D51"
+                          },
+                          "\",{\"period\":60}]]}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":6,\"properties\":{\"view\":\"timeSeries\",\"title\":\"CPU Utilization (%)\",\"region\":\"",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          "\",\"metrics\":[[\"AWS/ECS\",\"CPUUtilization\",\"ClusterName\",\"",
+                          {
+                            "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAICluster60AC07179B81467C"
+                          },
+                          "\",\"ServiceName\",\"",
+                          {
+                            "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIServiceA16C39B1NameAC081D51"
+                          },
+                          "\"]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":12,\"y\":6,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Memory Utilization (%)\",\"region\":\"",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          "\",\"metrics\":[[\"AWS/ECS\",\"MemoryUtilization\",\"ClusterName\",\"",
+                          {
+                            "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAICluster60AC07179B81467C"
+                          },
+                          "\",\"ServiceName\",\"",
+                          {
+                            "Fn::ImportValue": "CurateAI-ECS:ExportsOutputFnGetAttCurateAIServiceA16C39B1NameAC081D51"
+                          },
+                          "\"]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":24,\"height\":6,\"x\":0,\"y\":12,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Log Events (Total)\",\"region\":\"",
+                          {
+                            "Ref": "AWS::Region"
+                          },
+                          "\",\"metrics\":[[\"AWS/Logs\",\"IncomingLogEvents\",\"LogGroupName\",\"",
+                          {
+                            "Fn::ImportValue": "CurateAI-ECS:ExportsOutputRefCurateAILogsC43B061E98A8F540"
+                          },
+                          "\",{\"stat\":\"Sum\"}]],\"yAxis\":{}}}]}"
+                        ]
+                      ]
+                    },
+                    "dashboardName": "CurateAI-Production"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_cloudwatch.CfnDashboard",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_cloudwatch.Dashboard",
+              "version": "2.120.0"
+            }
+          },
+          "DashboardUrl": {
+            "id": "DashboardUrl",
+            "path": "CurateAI-Observability/DashboardUrl",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.120.0"
+            }
+          },
+          "AlarmTopicArn": {
+            "id": "AlarmTopicArn",
+            "path": "CurateAI-Observability/AlarmTopicArn",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.120.0"
+            }
+          },
+          "AlarmEmail": {
+            "id": "AlarmEmail",
+            "path": "CurateAI-Observability/AlarmEmail",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.120.0"
+            }
+          },
+          "CDKMetadata": {
+            "id": "CDKMetadata",
+            "path": "CurateAI-Observability/CDKMetadata",
+            "children": {
+              "Default": {
+                "id": "Default",
+                "path": "CurateAI-Observability/CDKMetadata/Default",
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.CfnResource",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "constructs.Construct",
+              "version": "10.4.5"
+            }
+          },
+          "BootstrapVersion": {
+            "id": "BootstrapVersion",
+            "path": "CurateAI-Observability/BootstrapVersion",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnParameter",
+              "version": "2.120.0"
+            }
+          },
+          "CheckBootstrapVersion": {
+            "id": "CheckBootstrapVersion",
+            "path": "CurateAI-Observability/CheckBootstrapVersion",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.CfnRule",
+              "version": "2.120.0"
+            }
+          }
+        },
+        "constructInfo": {
+          "fqn": "aws-cdk-lib.Stack",
+          "version": "2.120.0"
+        }
+      },
+      "Tree": {
+        "id": "Tree",
+        "path": "Tree",
+        "constructInfo": {
+          "fqn": "constructs.Construct",
+          "version": "10.4.5"
+        }
+      }
+    },
+    "constructInfo": {
+      "fqn": "aws-cdk-lib.App",
+      "version": "2.120.0"
+    }
+  }
+}
