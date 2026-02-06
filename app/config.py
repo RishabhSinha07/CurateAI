@@ -18,7 +18,7 @@ class Settings(BaseSettings):
 
     # AWS Bedrock
     aws_region: str = "us-east-2"
-    bedrock_model_id: str = "anthropic.claude-3-5-haiku-20241022-v1:0"
+    bedrock_model_id: str = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
 
     # AWS Bedrock Embeddings (Titan v2)
     embedding_model_id: str = "amazon.titan-embed-text-v2:0"
