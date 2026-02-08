@@ -291,7 +291,7 @@ def main():
         print(f"  {domain}: {count}")
 
     # Save to JSON file
-    output_dir = Path(__file__).parent.parent / "data"
+    output_dir = Path(__file__).parent / "data"
     output_dir.mkdir(exist_ok=True)
     output_file = output_dir / "scraped_products.json"
 

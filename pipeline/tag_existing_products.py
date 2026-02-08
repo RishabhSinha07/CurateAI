@@ -6,9 +6,9 @@ to ingredient IDs from the skin_health_radiance and hair_health_growth
 knowledge graphs based on product names and descriptions.
 
 Run with:
-  python -m scripts.tag_existing_products                    # Tag all domains
-  python -m scripts.tag_existing_products --domain skin      # Skin health only
-  python -m scripts.tag_existing_products --domain hair      # Hair health only
+  python -m pipeline.tag_existing_products                    # Tag all domains
+  python -m pipeline.tag_existing_products --domain skin      # Skin health only
+  python -m pipeline.tag_existing_products --domain hair      # Hair health only
 """
 
 import asyncio
@@ -211,7 +211,7 @@ async def tag_existing_products(domain_filter: str = "all"):
         domain_filter: "all", "skin", or "hair"
     """
     # Load products from JSON
-    products_json = Path(__file__).resolve().parents[1] / "data" / "scraped_products_v2.json"
+    products_json = Path(__file__).resolve().parent / "data" / "scraped_products_v2.json"
 
     with open(products_json, 'r') as f:
         products = json.load(f)

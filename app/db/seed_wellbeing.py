@@ -3,8 +3,8 @@ Seed script for Wellbeing Nutrition products.
 
 Run with: python -m app.db.seed_wellbeing
 
-Products are loaded from data/scraped_products_v2.json (scraped from
-https://wellbeingnutrition.com/).  Domain configuration is defined inline
+Products are loaded from pipeline/data/scraped_products_v3.json (scraped and
+enriched from https://wellbeingnutrition.com/).  Domain configuration is defined inline
 below because it controls AI agent behaviour (personas, slots, safety rules).
 """
 
@@ -19,7 +19,7 @@ from app.db.models import Product
 from app.db.session import async_session_factory
 
 # Path to the scraped product catalogue (relative to project root).
-PRODUCTS_JSON = Path(__file__).resolve().parents[2] / "data" / "scraped_products_v2.json"
+PRODUCTS_JSON = Path(__file__).resolve().parents[2] / "pipeline" / "data" / "scraped_products_v3.json"
 
 # =============================================================================
 # NOTE: Domain configuration has been migrated to knowledge graphs

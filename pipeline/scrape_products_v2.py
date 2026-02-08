@@ -6,7 +6,7 @@ This improved version:
 - Maps website collections to our domain structure
 - More accurate than keyword-based classification
 
-Run with: python -m scripts.scrape_products_v2
+Run with: python -m pipeline.scrape_products_v2
 """
 
 import json
@@ -324,7 +324,7 @@ def main():
         print(f"  {domain}: {count}")
 
     # Save to JSON
-    output_dir = Path(__file__).parent.parent / "data"
+    output_dir = Path(__file__).parent / "data"
     output_dir.mkdir(exist_ok=True)
     output_file = output_dir / "scraped_products_v2.json"
 

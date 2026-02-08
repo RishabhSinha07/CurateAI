@@ -281,7 +281,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/7d288d1e02ef6ada535e10b4ab3a2711499f3d45498fc097730bfb68c6ab8d99.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/baa2bd42439d4c3ee7d675b2b47644a09d49acb04500b9c7eae05c4a950e50cf.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -485,7 +485,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/b323ed94fb9b89bb4aaa87c7ac7b90302192cb9e2806f565699169d89565157b.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/b15c5fdbabef69e9b7485f6fc241d71d762326883c564ae5ee6bddca1b0ee6ab.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -563,16 +563,28 @@
             "data": "CurateAIAPIDefaultStageA5BAFE46"
           }
         ],
-        "/CurateAI-Auth/CurateAI-API/GET--health/BackendIntegration/Resource": [
+        "/CurateAI-Auth/CurateAI-API/GET--health/HealthIntegration/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "CurateAIAPIGEThealthBackendIntegration293EA684"
+            "data": "CurateAIAPIGEThealthHealthIntegrationAC194E15"
           }
         ],
         "/CurateAI-Auth/CurateAI-API/GET--health/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "CurateAIAPIGEThealth75ABFF8D"
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-API/OPTIONS--chat/ChatIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPIOPTIONSchatChatIntegration5932511A"
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-API/OPTIONS--chat/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPIOPTIONSchatCFC79161"
           }
         ],
         "/CurateAI-Auth/CurateAI-API/POST--chat/Resource": [
@@ -585,12 +597,6 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "CurateAIAPICognitoAuthorizerF1F98089"
-          }
-        ],
-        "/CurateAI-Auth/CurateAI-API/ANY--{proxy+}/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CurateAIAPIANYproxy2C7487F3"
           }
         ],
         "/CurateAI-Auth/API-Logs/Resource": [

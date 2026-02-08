@@ -6,7 +6,7 @@ This script:
 2. Updates their domain_slug to 'gut_health_digestion'
 3. Generates embeddings for updated products
 
-Run with: python -m scripts.update_gut_health_products
+Run with: python -m pipeline.update_gut_health_products
 """
 
 import asyncio

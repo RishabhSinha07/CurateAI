@@ -80,7 +80,6 @@ async def journey_agent(state: AgentState, db: AsyncSession) -> AgentState:
     
     # Perform hybrid search with low threshold to ensure we get results
     search_results = await product_repo.hybrid_search(
-        domain_slug=domain_slug,
         query_embedding=query_embedding,
         filters=None,
         limit=50,  # Get more products to filter by categories

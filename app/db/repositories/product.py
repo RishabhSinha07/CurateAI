@@ -15,8 +15,8 @@ class ProductRepository:
 
     async def hybrid_search(
         self,
-        domain_slug: str,
         query_embedding: list[float],
+        domain_slug: Optional[str] = None,
         filters: Optional[dict[str, Any]] = None,
         limit: int = 5,
         min_similarity: float = 0.5
@@ -24,23 +24,23 @@ class ProductRepository:
         """
         Perform hybrid search using vector similarity and JSONB filters.
 
-        Searches products that belong to the specified domain (domain can be
-        in any position of the domain_slugs array).
+        When *domain_slug* is provided, restricts to products in that domain.
+        When ``None``, searches across all active products.
 
         Returns a list of tuples containing (Product, similarity_score).
         """
         # Vector similarity: 1 - cosine distance (using literal to avoid parameter)
         similarity = (literal(1.0) - Product.description_embedding.cosine_distance(query_embedding)).label("similarity")
 
-        # Base query: active products in the specified domain
-        # Use any() to check if domain_slug is in the domain_slugs array
-        query = select(Product, similarity).where(
-            and_(
-                Product.domain_slugs.any(domain_slug),
-                Product.is_active == True,
-                Product.description_embedding.is_not(None)
-            )
-        )
+        # Base query: active products with embeddings
+        conditions = [
+            Product.is_active == True,
+            Product.description_embedding.is_not(None),
+        ]
+        if domain_slug:
+            conditions.append(Product.domain_slugs.any(domain_slug))
+
+        query = select(Product, similarity).where(and_(*conditions))
 
         # Apply JSONB filters if provided
         if filters:

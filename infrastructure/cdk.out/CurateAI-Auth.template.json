@@ -147,11 +147,14 @@
     "CorsConfiguration": {
      "AllowHeaders": [
       "Authorization",
-      "Content-Type"
+      "Content-Type",
+      "X-Amz-Date",
+      "X-Api-Key"
      ],
      "AllowMethods": [
       "GET",
-      "POST"
+      "POST",
+      "OPTIONS"
      ],
      "AllowOrigins": [
       "*"
@@ -195,7 +198,7 @@
     "aws:cdk:path": "CurateAI-Auth/CurateAI-API/DefaultStage/Resource"
    }
   },
-  "CurateAIAPIGEThealthBackendIntegration293EA684": {
+  "CurateAIAPIGEThealthHealthIntegrationAC194E15": {
    "Type": "AWS::ApiGatewayV2::Integration",
    "Properties": {
     "ApiId": {
@@ -203,11 +206,11 @@
     },
     "IntegrationMethod": "ANY",
     "IntegrationType": "HTTP_PROXY",
-    "IntegrationUri": "http://44.192.40.3:8000",
+    "IntegrationUri": "http://35.175.144.102:8000/health",
     "PayloadFormatVersion": "1.0"
    },
    "Metadata": {
-    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/GET--health/BackendIntegration/Resource"
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/GET--health/HealthIntegration/Resource"
    }
   },
   "CurateAIAPIGEThealth75ABFF8D": {
@@ -224,7 +227,7 @@
       [
        "integrations/",
        {
-        "Ref": "CurateAIAPIGEThealthBackendIntegration293EA684"
+        "Ref": "CurateAIAPIGEThealthHealthIntegrationAC194E15"
        }
       ]
      ]
@@ -232,6 +235,45 @@
    },
    "Metadata": {
     "aws:cdk:path": "CurateAI-Auth/CurateAI-API/GET--health/Resource"
+   }
+  },
+  "CurateAIAPIOPTIONSchatChatIntegration5932511A": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "IntegrationMethod": "ANY",
+    "IntegrationType": "HTTP_PROXY",
+    "IntegrationUri": "http://35.175.144.102:8000/chat",
+    "PayloadFormatVersion": "1.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/OPTIONS--chat/ChatIntegration/Resource"
+   }
+  },
+  "CurateAIAPIOPTIONSchatCFC79161": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "OPTIONS /chat",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "CurateAIAPIOPTIONSchatChatIntegration5932511A"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/OPTIONS--chat/Resource"
    }
   },
   "CurateAIAPIPOSTchat2AD85353": {
@@ -251,7 +293,7 @@
       [
        "integrations/",
        {
-        "Ref": "CurateAIAPIGEThealthBackendIntegration293EA684"
+        "Ref": "CurateAIAPIOPTIONSchatChatIntegration5932511A"
        }
       ]
      ]
@@ -293,33 +335,6 @@
    },
    "Metadata": {
     "aws:cdk:path": "CurateAI-Auth/CurateAI-API/CognitoAuthorizer/Resource"
-   }
-  },
-  "CurateAIAPIANYproxy2C7487F3": {
-   "Type": "AWS::ApiGatewayV2::Route",
-   "Properties": {
-    "ApiId": {
-     "Ref": "CurateAIAPIBE2DA4B3"
-    },
-    "AuthorizationType": "JWT",
-    "AuthorizerId": {
-     "Ref": "CurateAIAPICognitoAuthorizerF1F98089"
-    },
-    "RouteKey": "ANY /{proxy+}",
-    "Target": {
-     "Fn::Join": [
-      "",
-      [
-       "integrations/",
-       {
-        "Ref": "CurateAIAPIGEThealthBackendIntegration293EA684"
-       }
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/ANY--{proxy+}/Resource"
    }
   },
   "APILogs5362790F": {

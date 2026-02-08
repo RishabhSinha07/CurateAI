@@ -1,7 +1,7 @@
 """
 Seed script for Hair Health & Growth products.
 
-Run with: python -m scripts.seed_hair_health_products
+Run with: python -m pipeline.seed_hair_health_products
 
 This script adds sample hair health products to demonstrate the hair_health_growth
 knowledge graph integration.

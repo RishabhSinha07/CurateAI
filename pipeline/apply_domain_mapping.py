@@ -4,7 +4,7 @@ Script to apply multi-domain mapping to products.
 This script reads the product_domain_mapping.yaml file and updates products
 to belong to multiple domains based on their benefits and ingredients.
 
-Run with: python -m scripts.apply_domain_mapping
+Run with: python -m pipeline.apply_domain_mapping
 """
 
 import asyncio

@@ -1,7 +1,7 @@
 """
 Quick seed script: Load products from existing scraped JSON file.
 
-Run with: python -m scripts.seed_from_json
+Run with: python -m pipeline.seed_from_json
 """
 
 import asyncio
@@ -23,7 +23,7 @@ async def load_from_json():
     """Load products from scraped JSON and insert into database."""
 
     # Load scraped data
-    json_file = Path(__file__).parent.parent / "data" / "scraped_products_v2.json"
+    json_file = Path(__file__).parent / "data" / "scraped_products_v2.json"
     if not json_file.exists():
         print(f"Error: {json_file} not found!")
         return

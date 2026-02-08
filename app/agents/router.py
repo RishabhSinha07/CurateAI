@@ -226,21 +226,19 @@ Current User Message: "{state['user_message']}"
             new_state["intent_type"] = result.intent_type
             new_state["status"] = "collecting_info"
 
-            # Store validated problem in extracted_context if found
+            # Never auto-assign the problem from the router.
+            # The interviewer should always ask the user to confirm/specify
+            # their concern, even if the router detected a candidate.
             if problem_id and graph_domain:
-                # Problem was successfully identified and validated
-                new_state["extracted_context"] = {
-                    **new_state.get("extracted_context", {}),
-                    "graph_state": {
-                        "identified_problem": problem_id,
-                        "problem_source": "router",
-                        "graph_domain": graph_domain
-                    }
-                }
-                logger.info(f"Router identified problem '{problem_id}' for domain '{graph_domain}'")
+                logger.info(
+                    f"Router detected candidate problem '{problem_id}' for domain "
+                    f"'{graph_domain}', but deferring to interviewer to confirm with user."
+                )
             else:
-                # No problem identified - interviewer will ask
-                logger.info(f"Router identified domain '{domain_meta['domain']}' but no specific problem. Interviewer will handle problem identification.")
+                logger.info(
+                    f"Router identified domain '{domain_meta['domain']}' but no specific problem. "
+                    f"Interviewer will handle problem identification."
+                )
 
             # Route based on intent type
             if result.intent_type == "journey":

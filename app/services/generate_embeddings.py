@@ -51,7 +51,9 @@ async def generate_product_embeddings(regenerate: bool = False) -> None:
             attrs = product.attributes or {}
 
             # Ingredients (critical for matching)
-            if "ingredients" in attrs:
+            if "ingredients_text" in attrs:
+                text_parts.append(f"Ingredients: {attrs['ingredients_text']}")
+            elif "ingredients" in attrs:
                 ingredients = attrs["ingredients"]
                 if isinstance(ingredients, list):
                     text_parts.append(f"Ingredients: {', '.join(ingredients)}")

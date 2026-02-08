@@ -49,8 +49,6 @@ nodes:
         - "tired skin"
         - "lackluster skin"
         - "no radiance"
-        - "skin radiance"
-        - "glowing skin"
       severity_levels: [mild, moderate, severe]
       description: "Skin that lacks natural radiance and appears tired or lifeless"
 

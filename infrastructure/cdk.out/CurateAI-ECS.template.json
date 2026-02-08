@@ -322,7 +322,7 @@
        },
        {
         "Name": "BEDROCK_MODEL_ID",
-        "Value": "us.anthropic.claude-3-5-haiku-20241022-v1:0"
+        "Value": "us.amazon.nova-lite-v1:0"
        },
        {
         "Name": "EMBEDDING_MODEL_ID",

@@ -9,7 +9,7 @@ This script:
 5. Inserts products into database
 6. Prints statistics and verification
 
-Run with: python -m scripts.seed_from_scrape
+Run with: python -m pipeline.seed_from_scrape
 """
 
 import asyncio
@@ -26,7 +26,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from app.db.models import Domain, Product
 from app.db.session import async_session_factory
 from app.services.embeddings import generate_embedding_async
-from scripts.scrape_products_v2 import fetch_products_by_collection, transform_product
+from pipeline.scrape_products_v2 import fetch_products_by_collection, transform_product
 
 
 # =============================================================================

@@ -237,7 +237,7 @@ async def main():
     print("=" * 60)
 
     # Load scraped products
-    data_file = Path(__file__).parent.parent / "data" / "scraped_products.json"
+    data_file = Path(__file__).parent / "data" / "scraped_products.json"
 
     if not data_file.exists():
         print(f"Error: {data_file} not found!")

@@ -1,7 +1,7 @@
 """
 Seed script for Skin Health & Radiance products.
 
-Run with: python -m scripts.seed_skin_health_products
+Run with: python -m pipeline.seed_skin_health_products
 
 This script creates sample products for the skin_health_radiance domain
 with ingredients tagged from the knowledge graph.

@@ -131,8 +131,9 @@ async def search_architect_agent(state: AgentState, db: AsyncSession) -> AgentSt
     product_repo = ProductRepository(db)
 
     # Try primary threshold first (0.25 - balanced precision/recall)
+    # Search across all products — domain slugs from scraped data are too broad
+    # to be reliable filters; let semantic similarity do the ranking.
     search_results = await product_repo.hybrid_search(
-        domain_slug=state["domain_slug"],
         query_embedding=query_embedding,
         filters=None,  # Skip JSONB filters, use semantic search + reranker
         limit=20,
@@ -147,7 +148,6 @@ async def search_architect_agent(state: AgentState, db: AsyncSession) -> AgentSt
             f"Attempting fallback with lower threshold (0.15)."
         )
         search_results = await product_repo.hybrid_search(
-            domain_slug=state["domain_slug"],
             query_embedding=query_embedding,
             filters=None,
             limit=10,

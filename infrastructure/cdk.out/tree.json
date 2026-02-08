@@ -1791,7 +1791,7 @@
                           },
                           {
                             "name": "BEDROCK_MODEL_ID",
-                            "value": "us.anthropic.claude-3-5-haiku-20241022-v1:0"
+                            "value": "us.amazon.nova-lite-v1:0"
                           },
                           {
                             "name": "EMBEDDING_MODEL_ID",
@@ -2296,11 +2296,14 @@
                     "corsConfiguration": {
                       "allowHeaders": [
                         "Authorization",
-                        "Content-Type"
+                        "Content-Type",
+                        "X-Amz-Date",
+                        "X-Api-Key"
                       ],
                       "allowMethods": [
                         "GET",
-                        "POST"
+                        "POST",
+                        "OPTIONS"
                       ],
                       "allowOrigins": [
                         "*"
@@ -2365,13 +2368,13 @@
                 "id": "GET--health",
                 "path": "CurateAI-Auth/CurateAI-API/GET--health",
                 "children": {
-                  "BackendIntegration": {
-                    "id": "BackendIntegration",
-                    "path": "CurateAI-Auth/CurateAI-API/GET--health/BackendIntegration",
+                  "HealthIntegration": {
+                    "id": "HealthIntegration",
+                    "path": "CurateAI-Auth/CurateAI-API/GET--health/HealthIntegration",
                     "children": {
                       "Resource": {
                         "id": "Resource",
-                        "path": "CurateAI-Auth/CurateAI-API/GET--health/BackendIntegration/Resource",
+                        "path": "CurateAI-Auth/CurateAI-API/GET--health/HealthIntegration/Resource",
                         "attributes": {
                           "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Integration",
                           "aws:cdk:cloudformation:props": {
@@ -2380,7 +2383,7 @@
                             },
                             "integrationMethod": "ANY",
                             "integrationType": "HTTP_PROXY",
-                            "integrationUri": "http://44.192.40.3:8000",
+                            "integrationUri": "http://35.175.144.102:8000/health",
                             "payloadFormatVersion": "1.0"
                           }
                         },
@@ -2412,7 +2415,76 @@
                             [
                               "integrations/",
                               {
-                                "Ref": "CurateAIAPIGEThealthBackendIntegration293EA684"
+                                "Ref": "CurateAIAPIGEThealthHealthIntegrationAC194E15"
+                              }
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnRoute",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_apigatewayv2.HttpRoute",
+                  "version": "2.120.0"
+                }
+              },
+              "OPTIONS--chat": {
+                "id": "OPTIONS--chat",
+                "path": "CurateAI-Auth/CurateAI-API/OPTIONS--chat",
+                "children": {
+                  "ChatIntegration": {
+                    "id": "ChatIntegration",
+                    "path": "CurateAI-Auth/CurateAI-API/OPTIONS--chat/ChatIntegration",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "CurateAI-Auth/CurateAI-API/OPTIONS--chat/ChatIntegration/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Integration",
+                          "aws:cdk:cloudformation:props": {
+                            "apiId": {
+                              "Ref": "CurateAIAPIBE2DA4B3"
+                            },
+                            "integrationMethod": "ANY",
+                            "integrationType": "HTTP_PROXY",
+                            "integrationUri": "http://35.175.144.102:8000/chat",
+                            "payloadFormatVersion": "1.0"
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnIntegration",
+                          "version": "2.120.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigatewayv2.HttpIntegration",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "CurateAI-Auth/CurateAI-API/OPTIONS--chat/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Route",
+                      "aws:cdk:cloudformation:props": {
+                        "apiId": {
+                          "Ref": "CurateAIAPIBE2DA4B3"
+                        },
+                        "authorizationType": "NONE",
+                        "routeKey": "OPTIONS /chat",
+                        "target": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "integrations/",
+                              {
+                                "Ref": "CurateAIAPIOPTIONSchatChatIntegration5932511A"
                               }
                             ]
                           ]
@@ -2454,7 +2526,7 @@
                             [
                               "integrations/",
                               {
-                                "Ref": "CurateAIAPIGEThealthBackendIntegration293EA684"
+                                "Ref": "CurateAIAPIOPTIONSchatChatIntegration5932511A"
                               }
                             ]
                           ]
@@ -2518,48 +2590,6 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_apigatewayv2.HttpAuthorizer",
-                  "version": "2.120.0"
-                }
-              },
-              "ANY--{proxy+}": {
-                "id": "ANY--{proxy+}",
-                "path": "CurateAI-Auth/CurateAI-API/ANY--{proxy+}",
-                "children": {
-                  "Resource": {
-                    "id": "Resource",
-                    "path": "CurateAI-Auth/CurateAI-API/ANY--{proxy+}/Resource",
-                    "attributes": {
-                      "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Route",
-                      "aws:cdk:cloudformation:props": {
-                        "apiId": {
-                          "Ref": "CurateAIAPIBE2DA4B3"
-                        },
-                        "authorizationType": "JWT",
-                        "authorizerId": {
-                          "Ref": "CurateAIAPICognitoAuthorizerF1F98089"
-                        },
-                        "routeKey": "ANY /{proxy+}",
-                        "target": {
-                          "Fn::Join": [
-                            "",
-                            [
-                              "integrations/",
-                              {
-                                "Ref": "CurateAIAPIGEThealthBackendIntegration293EA684"
-                              }
-                            ]
-                          ]
-                        }
-                      }
-                    },
-                    "constructInfo": {
-                      "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnRoute",
-                      "version": "2.120.0"
-                    }
-                  }
-                },
-                "constructInfo": {
-                  "fqn": "aws-cdk-lib.aws_apigatewayv2.HttpRoute",
                   "version": "2.120.0"
                 }
               }
