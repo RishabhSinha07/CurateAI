@@ -140,38 +140,50 @@ class AuthStack(Stack):
             # CORS configuration
             cors_preflight=apigw.CorsPreflightOptions(
                 allow_origins=["*"],  # TODO: Restrict to your domain
-                allow_methods=[apigw.CorsHttpMethod.GET, apigw.CorsHttpMethod.POST],
-                allow_headers=["Authorization", "Content-Type"],
+                allow_methods=[
+                    apigw.CorsHttpMethod.GET,
+                    apigw.CorsHttpMethod.POST,
+                    apigw.CorsHttpMethod.OPTIONS,
+                ],
+                allow_headers=["Authorization", "Content-Type", "X-Amz-Date", "X-Api-Key"],
                 max_age=Duration.days(1),
             ),
         )
 
-        # Backend Integration - direct to Fargate task
-        self.integration = integrations.HttpUrlIntegration(
-            "BackendIntegration",
-            backend_url,
+        # Backend Integrations - create specific integration for each endpoint with full path
+
+        # Health endpoint integration
+        health_integration = integrations.HttpUrlIntegration(
+            "HealthIntegration",
+            f"{backend_url}/health",
         )
 
-        # Public route (no auth required) - health check
+        # Chat endpoint integration
+        chat_integration = integrations.HttpUrlIntegration(
+            "ChatIntegration",
+            f"{backend_url}/chat",
+        )
+
+        # Public routes (no auth required)
+        # Health check
         self.api.add_routes(
             path="/health",
             methods=[apigw.HttpMethod.GET],
-            integration=self.integration,
+            integration=health_integration,
+        )
+
+        # OPTIONS for CORS preflight - must not have authorizer
+        self.api.add_routes(
+            path="/chat",
+            methods=[apigw.HttpMethod.OPTIONS],
+            integration=chat_integration,
         )
 
         # Protected routes (require Cognito auth)
         self.api.add_routes(
             path="/chat",
             methods=[apigw.HttpMethod.POST],
-            integration=self.integration,
-            authorizer=self.authorizer,
-        )
-
-        # Catch-all route (protected)
-        self.api.add_routes(
-            path="/{proxy+}",
-            methods=[apigw.HttpMethod.ANY],
-            integration=self.integration,
+            integration=chat_integration,
             authorizer=self.authorizer,
         )
 
