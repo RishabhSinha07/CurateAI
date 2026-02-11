@@ -176,7 +176,7 @@ class EcsStack(Stack):
                 # Note: AWS credentials are provided via IAM Task Role (no access keys needed)
                 # Using us-east-2 for Bedrock (infrastructure is in us-east-1)
                 "AWS_REGION": "us-east-2",
-                "BEDROCK_MODEL_ID": "us.amazon.nova-lite-v1:0",
+                "BEDROCK_MODEL_ID": "us.amazon.nova-pro-v1:0",
                 "EMBEDDING_MODEL_ID": "amazon.titan-embed-text-v2:0",
                 "EMBEDDING_DIMENSIONS": "1024",
                 # Database - Phase 2: Neon PostgreSQL
