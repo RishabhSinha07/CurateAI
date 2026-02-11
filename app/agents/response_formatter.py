@@ -67,7 +67,11 @@ def format_product_card(
         lines.append("")
         lines.append("**Why it's a good fit:**")
         for reason in match_reasons:
-            lines.append(f"- {reason}")
+            # Ingredient details (bold name with dash) render as sub-items
+            if reason.startswith("**"):
+                lines.append(f"  - {reason}")
+            else:
+                lines.append(f"- {reason}")
 
     # Usage guidance (for journey bundles)
     if include_usage_guidance and product.get('usage_guidance'):

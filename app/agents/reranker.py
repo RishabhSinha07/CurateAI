@@ -3,6 +3,7 @@ import logging
 
 from app.agents.state import AgentState
 from app.knowledge.query_engine import GraphQueryEngine
+from app.knowledge.graph_loader import get_knowledge_graph
 
 logger = logging.getLogger(__name__)
 
@@ -263,6 +264,26 @@ async def reranker_agent(state: AgentState) -> AgentState:
     # Take top 5 products
     final_products = safe_products[:5]
 
+    # Build treating ingredients list from knowledge graph
+    treating_ingredients: List[Dict[str, Any]] = []
+    problem_display_name = None
+    if graph_domain and graph_state.get("identified_problem"):
+        try:
+            graph = get_knowledge_graph(graph_domain)
+            problem_id = graph_state["identified_problem"]
+            problem_node = graph.get_node(problem_id)
+            problem_display_name = (
+                problem_node.get("display_name", problem_id) if problem_node else problem_id
+            )
+
+            treating_ingredients = graph.get_treating_ingredients(problem_id, min_efficacy=0.0)
+            logger.info(
+                f"Treating ingredients for '{problem_id}': "
+                f"{[i.get('display_name', i.get('name')) for i in treating_ingredients]}"
+            )
+        except Exception as e:
+            logger.warning(f"Could not load treating ingredients from graph: {e}")
+
     # Generate match reasons based on graph data and similarity
     for rank, product in enumerate(final_products, 1):
         product["rank"] = rank
@@ -271,24 +292,39 @@ async def reranker_agent(state: AgentState) -> AgentState:
         # Build match reasons from available data
         match_reasons = []
 
-        # Graph-based matching
-        if graph_domain:
-            match_reasons.append("Matched based on graph-recommended ingredients for your concern")
+        # Search for graph treating ingredients in product text
+        if treating_ingredients:
+            # Build searchable text from product name, description, and ingredients_text
+            product_text = " ".join([
+                product.get("name", ""),
+                product.get("description", ""),
+                product.get("attributes", {}).get("ingredients_text", ""),
+            ]).lower()
 
-        # Similarity score (with low-confidence indicator)
-        similarity = product.get("similarity_score", 0)
-        if similarity >= 0.7:
-            match_reasons.append(f"High semantic similarity ({similarity:.2f})")
-        elif similarity >= 0.5:
-            match_reasons.append(f"Good semantic match ({similarity:.2f})")
-        elif similarity >= 0.25:
-            match_reasons.append(f"Relevant match ({similarity:.2f})")
-        else:
-            # Low similarity (0.15-0.25 range from fallback)
-            if low_confidence_search:
-                match_reasons.append(f"Potentially relevant match ({similarity:.2f}) - broader search used")
-            else:
-                match_reasons.append(f"Related match ({similarity:.2f})")
+            matched = []
+            for ing in treating_ingredients:
+                display_name = ing.get("display_name") or ing.get("name", "")
+                # Build search terms: display name without parenthetical, and the raw name
+                # e.g. "Marine Collagen (Type I & III)" → search for "marine collagen"
+                search_name = display_name.split("(")[0].strip().lower()
+                raw_name = ing.get("name", "").replace("_", " ").lower()
+
+                if search_name in product_text or raw_name in product_text:
+                    mechanism = ing.get("mechanism", "")
+                    if mechanism:
+                        mechanism_text = mechanism[0].lower() + mechanism[1:]
+                        matched.append(f"**{display_name}** — {mechanism_text}")
+                    else:
+                        matched.append(f"**{display_name}**")
+
+            if matched:
+                concern_label = problem_display_name or "your concern"
+                match_reasons.append(f"Key ingredients for {concern_label}:")
+                match_reasons.extend(matched)
+            elif graph_domain:
+                match_reasons.append("Matched based on graph-recommended ingredients for your concern")
+        elif graph_domain:
+            match_reasons.append("Matched based on graph-recommended ingredients for your concern")
 
         # Safety passed
         if user_constraints:
