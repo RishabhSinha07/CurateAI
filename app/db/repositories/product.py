@@ -45,7 +45,12 @@ class ProductRepository:
         # Apply JSONB filters if provided
         if filters:
             for key, value in filters.items():
-                if isinstance(value, (str, int, float, bool)):
+                if isinstance(value, bool):
+                    # JSONB booleans: compare text representation (lowercase)
+                    query = query.where(
+                        Product.attributes[key].as_string() == str(value).lower()
+                    )
+                elif isinstance(value, (str, int, float)):
                     # Exact match for scalar values
                     query = query.where(Product.attributes[key].as_string() == str(value))
                 elif isinstance(value, list):

@@ -33,6 +33,57 @@ def get_search_model():
     return llm.with_structured_output(QueryExpansion)
 
 
+def _build_constraint_filters(extracted_context: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Build JSONB filters for safety-critical product constraints.
+
+    These filters are enforced at the SQL level to guarantee that products
+    violating hard user constraints (vegan diet, fish allergy) are never
+    returned — regardless of semantic similarity score.
+    """
+    filters: Dict[str, Any] = {}
+    graph_state = extracted_context.get("graph_state", {})
+    filled_attrs = graph_state.get("filled_attributes", {})
+
+    # --- Dietary preference ---
+    diet = None
+    if "dietary_preference" in extracted_context:
+        diet = extracted_context["dietary_preference"].lower()
+    # Also check graph_state filled_attributes
+    for attr_cat, attr_data in filled_attrs.items():
+        if attr_cat in ("diet", "dietary_preference"):
+            val = attr_data.get("value", "")
+            if isinstance(val, str):
+                diet = val.lower()
+
+    if diet and "vegan" in diet:
+        filters["is_vegan"] = True
+
+    # --- Fish allergy ---
+    has_fish_allergy = False
+    # From top-level extracted_context
+    allergies = extracted_context.get("allergies", [])
+    if isinstance(allergies, str):
+        allergies = [allergies]
+    for allergy in allergies:
+        if isinstance(allergy, str) and "fish" in allergy.lower():
+            has_fish_allergy = True
+
+    # From graph_state filled_attributes
+    for attr_cat, attr_data in filled_attrs.items():
+        if attr_cat == "allergies":
+            val = attr_data.get("value", "")
+            items = val if isinstance(val, list) else [val]
+            for item in items:
+                if isinstance(item, str) and "fish" in item.lower():
+                    has_fish_allergy = True
+
+    if has_fish_allergy:
+        filters["contains_fish"] = False
+
+    return filters
+
+
 async def search_architect_agent(state: AgentState, db: AsyncSession) -> AgentState:
     """
     Performs intelligent product search using knowledge graph and semantic search.
@@ -127,6 +178,13 @@ async def search_architect_agent(state: AgentState, db: AsyncSession) -> AgentSt
     # Generate embedding for the search query
     query_embedding = await generate_embedding_async(search_query_text)
 
+    # Build hard constraint filters from extracted context
+    # These are safety-critical filters (dietary, allergies) that must be
+    # enforced at the SQL level — semantic similarity alone can't guarantee them.
+    constraint_filters = _build_constraint_filters(extracted_context)
+    if constraint_filters:
+        logger.info(f"Applying constraint filters: {constraint_filters}")
+
     # Perform hybrid search with fallback strategy
     product_repo = ProductRepository(db)
 
@@ -135,7 +193,7 @@ async def search_architect_agent(state: AgentState, db: AsyncSession) -> AgentSt
     # to be reliable filters; let semantic similarity do the ranking.
     search_results = await product_repo.hybrid_search(
         query_embedding=query_embedding,
-        filters=None,  # Skip JSONB filters, use semantic search + reranker
+        filters=constraint_filters or None,
         limit=20,
         min_similarity=0.25
     )
@@ -149,7 +207,7 @@ async def search_architect_agent(state: AgentState, db: AsyncSession) -> AgentSt
         )
         search_results = await product_repo.hybrid_search(
             query_embedding=query_embedding,
-            filters=None,
+            filters=constraint_filters or None,
             limit=10,
             min_similarity=0.15
         )
