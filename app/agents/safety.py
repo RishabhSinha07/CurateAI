@@ -5,8 +5,6 @@ from langchain_aws import ChatBedrock
 from app.config import get_settings
 from app.agents.state import AgentState
 from app.agents.response_formatter import (
-    format_product_recommendations,
-    format_journey_bundle,
     format_intro_with_constraints,
     format_disclaimers,
     format_no_results_message,
@@ -18,10 +16,10 @@ settings = get_settings()
 
 class SafetyResponse(BaseModel):
     """Structured response from the Safety agent."""
-    response: str = Field(description="The final user-facing response with recommendations")
-    disclaimers: List[str] = Field(description="Any safety disclaimers that should be appended")
-    contains_medical_claims: bool = Field(description="Whether the response contains medical claims that need disclaimers")
-    is_safe: bool = Field(description="Whether the response is safe to send")
+    response: str = Field(default="", description="The final user-facing response with recommendations")
+    disclaimers: List[str] = Field(default_factory=list, description="Any safety disclaimers that should be appended")
+    contains_medical_claims: bool = Field(default=False, description="Whether the response contains medical claims that need disclaimers")
+    is_safe: bool = Field(default=True, description="Whether the response is safe to send")
 
 
 def get_safety_model():
@@ -116,12 +114,9 @@ async def safety_agent(state: AgentState) -> AgentState:
     intent_type = state.get("intent_type")
 
     if intent_type == "journey" and journey_bundle:
-        # Format as journey bundle with usage guidance
-        journey_response = format_journey_bundle(
-            journey_name=journey_bundle["journey_name"],
-            journey_description=journey_bundle["journey_description"],
-            products=final_products
-        )
+        # Product cards are rendered by the frontend, so the text response
+        # only needs the journey intro — no product listing.
+        journey_response = f"# {journey_bundle['journey_name']}\n\n{journey_bundle['journey_description']}"
 
         # Add disclaimers
         if safety_disclaimers:
@@ -139,16 +134,9 @@ async def safety_agent(state: AgentState) -> AgentState:
         new_state["next_agent"] = None
         return new_state
 
-    # Regular query flow - format product recommendations
-    # Build intro mentioning constraints if any
+    # Regular query flow — product cards are rendered by the frontend,
+    # so we only build the intro text here.
     intro = format_intro_with_constraints(applied_constraints)
-
-    # Format products as markdown cards
-    products_markdown = format_product_recommendations(
-        products=final_products,
-        include_ranks=True,
-        include_usage_guidance=False
-    )
 
     # Build constraint information for the LLM prompt
     constraint_info = ""
@@ -161,26 +149,32 @@ Safety Constraints Applied:
 IMPORTANT: The intro already mentions these constraints. DO NOT repeat them in your response.
 """
 
-    system_prompt = f"""You are a wellness consultant for CurateAI. Generate a brief, natural intro paragraph for product recommendations.
+    system_prompt = f"""You are a wellness consultant for CurateAI. Generate a brief, well-formatted intro for product recommendations using **Markdown**.
 
 User's Context/Preferences:
 {extracted_context}
 {constraint_info}
 
-The formatted product cards are already prepared. Your job is ONLY to write a SHORT intro paragraph (2-3 sentences max) that:
+The product cards are displayed separately by the UI. Your job is to write a SHORT intro (3-5 sentences) that:
 - Introduces the recommendations naturally
 - DOES NOT repeat constraint information (it's already in the intro)
 - DOES NOT greet the user ("Hey there!", "Hello!")
 - DOES NOT use acknowledgment phrases ("I heard you're looking for...")
+- DOES NOT list individual product names (the product cards handle that)
 - Highlights what makes these products good choices for their needs
+- Summarises the key benefits the user can expect
 
-Keep it very brief - the formatted product cards will appear right after your intro.
+**Formatting rules — you MUST use Markdown:**
+- Use **bold** to emphasise key benefits or ingredients
+- Use short paragraphs (2-3 sentences each) separated by blank lines
+- You may use a short bullet list (2-3 items max) to highlight key benefits
+- Keep the overall response concise — no more than 5 sentences total
 
 Domain-Specific Safety Guidelines:
 {safety_disclaimers}
 
 Your Tasks:
-1. INTRO: Write a 2-3 sentence intro paragraph only
+1. INTRO: Write a Markdown-formatted intro as described above
 2. SAFETY CHECK: Note if you make any medical claims
 3. DISCLAIMERS: List any needed disclaimers based on domain guidelines
 
@@ -193,6 +187,9 @@ Guidelines:
     result: SafetyResponse = await model.ainvoke(system_prompt)
 
     # Build final response with proper sections
+    # NOTE: Product cards are rendered by the frontend from the structured
+    # `products` array, so we only include the intro text here — no markdown
+    # product listing to avoid duplication.
     response_parts = []
 
     # Add intro with constraints if present
@@ -202,9 +199,6 @@ Guidelines:
     # Add LLM-generated intro paragraph
     if result.response:
         response_parts.append(result.response.strip())
-
-    # Add formatted product cards
-    response_parts.append(products_markdown)
 
     final_response = "\n\n".join(response_parts)
 
