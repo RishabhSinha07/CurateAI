@@ -19,7 +19,7 @@ class RouterResponse(BaseModel):
         description="Type of intent: 'query' for specific product search or 'journey' for customer journey bundle"
     )
     confidence: float = Field(description="Confidence score between 0.0 and 1.0")
-    reasoning: str = Field(description="Brief explanation for the classification")
+    reasoning: str = Field(default="", description="Brief explanation for the classification")
     extracted_problem: Optional[str] = Field(
         default=None,
         description="Extracted problem or health goal from user message if clearly stated (e.g., 'low energy', 'poor sleep'). Leave null if unclear - the interviewer will ask."

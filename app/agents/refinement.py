@@ -18,7 +18,7 @@ class RefinementResponse(BaseModel):
         default_factory=dict,
         description="New constraints to add (e.g., budget, format preference)"
     )
-    reasoning: str = Field(description="Brief explanation of the decision")
+    reasoning: str = Field(default="", description="Brief explanation of the decision")
 
 
 def get_refinement_model():

@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 class InterviewerResponse(BaseModel):
     """Structured response from the Interviewer agent."""
     reasoning: str = Field(
+        default="",
         description="Brief internal explanation of extraction and decision logic. Fill this FIRST."
     )
     extracted_values: Dict[str, Any] = Field(
@@ -222,6 +223,7 @@ async def interviewer_agent(state: AgentState) -> AgentState:
                         "Must be one of the problem IDs from the available list."
                     )
                     reasoning: str = Field(
+                        default="",
                         description="Brief explanation of why this problem was selected"
                     )
 

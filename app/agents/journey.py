@@ -26,7 +26,7 @@ class JourneyBundleResponse(BaseModel):
     products: list[JourneyBundleProduct] = Field(
         description="List of products with usage guidance for each"
     )
-    reasoning: str = Field(description="Brief explanation of why these products were selected")
+    reasoning: str = Field(default="", description="Brief explanation of why these products were selected")
 
 
 def get_journey_model():

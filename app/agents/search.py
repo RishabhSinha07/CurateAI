@@ -20,7 +20,7 @@ class QueryExpansion(BaseModel):
     expanded_query: str = Field(description="An expanded version of the user's query with synonyms and related terms")
     search_terms: List[str] = Field(description="Key search terms extracted from the context")
     filters: Dict[str, Any] = Field(description="JSONB filters to apply based on extracted context")
-    reasoning: str = Field(description="Brief explanation of the expansion strategy")
+    reasoning: str = Field(default="", description="Brief explanation of the expansion strategy")
 
 
 def get_search_model():
