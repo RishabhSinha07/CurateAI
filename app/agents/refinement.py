@@ -1,10 +1,10 @@
 from typing import Any, Dict, List
 from pydantic import BaseModel, Field
-from langchain_aws import ChatBedrock
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from app.config import get_settings
 from app.agents.state import AgentState
+from app.agents.llm import get_bedrock_llm
 
 settings = get_settings()
 
@@ -23,12 +23,7 @@ class RefinementResponse(BaseModel):
 
 def get_refinement_model():
     """Initialize the Bedrock model for refinement detection."""
-    llm = ChatBedrock(
-        model_id=settings.bedrock_model_id,
-        region_name=settings.aws_region,
-        model_kwargs={"temperature": 0},
-    )
-    return llm.with_structured_output(RefinementResponse)
+    return get_bedrock_llm(structured_output_schema=RefinementResponse)
 
 
 async def refinement_agent(state: AgentState) -> AgentState:

@@ -1,10 +1,10 @@
 from typing import List, Optional
 import logging
 from pydantic import BaseModel, Field
-from langchain_aws import ChatBedrock
 
 from app.config import get_settings
 from app.agents.state import AgentState
+from app.agents.llm import get_bedrock_llm
 from app.agents.response_formatter import (
     format_intro_with_constraints,
     format_disclaimers,
@@ -27,12 +27,10 @@ class SafetyResponse(BaseModel):
 
 def get_safety_model():
     """Initialize the Bedrock model for safety checking."""
-    llm = ChatBedrock(
-        model_id=settings.bedrock_model_id,
-        region_name=settings.aws_region,
-        model_kwargs={"temperature": 0.3},  # Slightly higher for natural responses
+    return get_bedrock_llm(
+        model_kwargs={"temperature": 0.3},
+        structured_output_schema=SafetyResponse,
     )
-    return llm.with_structured_output(SafetyResponse)
 
 
 async def safety_agent(state: AgentState) -> AgentState:

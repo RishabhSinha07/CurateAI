@@ -1,11 +1,11 @@
 from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
-from langchain_aws import ChatBedrock
 from langchain_core.messages import HumanMessage, SystemMessage
 import logging
 
 from app.config import get_settings
 from app.agents.state import AgentState
+from app.agents.llm import get_bedrock_llm
 from app.knowledge.query_engine import GraphQueryEngine
 from app.knowledge.graph_loader import get_knowledge_graph
 
@@ -57,12 +57,7 @@ class InterviewerResponse(BaseModel):
 
 def get_interviewer_model():
     """Initialize the Bedrock model for interviewing."""
-    llm = ChatBedrock(
-        model_id=settings.bedrock_model_id,
-        region_name=settings.aws_region,
-        model_kwargs={"temperature": 0},
-    )
-    return llm.with_structured_output(InterviewerResponse)
+    return get_bedrock_llm(structured_output_schema=InterviewerResponse)
 
 
 def _build_graph_slot_reference(graph_questions: List[Dict[str, Any]]) -> str:
@@ -193,8 +188,6 @@ async def interviewer_agent(state: AgentState) -> AgentState:
             try:
                 # DYNAMIC PROBLEM CHOICE: Load all available problems from the graph
                 # and ask the LLM to choose the closest match
-                from langchain_aws import ChatBedrock
-                from pydantic import BaseModel, Field
 
                 # Get all available problems from the knowledge graph
                 graph = get_knowledge_graph(domain_slug)
@@ -227,12 +220,7 @@ async def interviewer_agent(state: AgentState) -> AgentState:
                         description="Brief explanation of why this problem was selected"
                     )
 
-                extract_llm = ChatBedrock(
-                    model_id=settings.bedrock_model_id,
-                    region_name=settings.aws_region,
-                    model_kwargs={"temperature": 0},
-                )
-                structured_llm = extract_llm.with_structured_output(ProblemSelection)
+                structured_llm = get_bedrock_llm(structured_output_schema=ProblemSelection)
 
                 selection_prompt = f"""You are helping to identify which health concern best matches what the user is asking about.
 

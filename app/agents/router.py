@@ -1,11 +1,11 @@
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
-from langchain_aws import ChatBedrock
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 
 from app.config import get_settings
 from app.agents.state import AgentState
+from app.agents.llm import get_bedrock_llm
 from app.knowledge.query_engine import GraphQueryEngine
 from app.knowledge.graph_loader import list_available_graphs, get_all_active_domains, get_knowledge_graph
 
@@ -27,12 +27,7 @@ class RouterResponse(BaseModel):
 
 def get_router_model():
     """Initialize the Bedrock model for routing."""
-    llm = ChatBedrock(
-        model_id=settings.bedrock_model_id,
-        region_name=settings.aws_region,
-        model_kwargs={"temperature": 0},
-    )
-    return llm.with_structured_output(RouterResponse)
+    return get_bedrock_llm(structured_output_schema=RouterResponse)
 
 
 def _build_dynamic_problem_reference() -> str:

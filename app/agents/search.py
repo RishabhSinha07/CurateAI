@@ -1,11 +1,11 @@
 from typing import Any, Dict, List
 from pydantic import BaseModel, Field
-from langchain_aws import ChatBedrock
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 
 from app.config import get_settings
 from app.agents.state import AgentState
+from app.agents.llm import get_bedrock_llm
 from app.db.repositories.product import ProductRepository
 from app.services.embeddings import generate_embedding_async
 from app.knowledge.query_engine import GraphQueryEngine
@@ -25,12 +25,7 @@ class QueryExpansion(BaseModel):
 
 def get_search_model():
     """Initialize the Bedrock model for query expansion."""
-    llm = ChatBedrock(
-        model_id=settings.bedrock_model_id,
-        region_name=settings.aws_region,
-        model_kwargs={"temperature": 0},
-    )
-    return llm.with_structured_output(QueryExpansion)
+    return get_bedrock_llm(structured_output_schema=QueryExpansion)
 
 
 def _build_constraint_filters(extracted_context: Dict[str, Any]) -> Dict[str, Any]:

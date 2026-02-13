@@ -21,6 +21,7 @@ dependencies = [
     "langsmith>=0.1.0",
     "networkx>=3.0",
     "pyyaml>=6.0",
+    "tenacity>=8.2.0",
 ]
 
 [project.optional-dependencies]

@@ -8,11 +8,9 @@ ELICITS_QUESTION edges are missing from the knowledge graph.
 import logging
 from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, Field
-from langchain_aws import ChatBedrock
 
-from app.config import get_settings
+from app.agents.llm import get_bedrock_llm
 
-settings = get_settings()
 logger = logging.getLogger(__name__)
 
 # Cache for generated questions to avoid redundant LLM calls
@@ -133,13 +131,11 @@ Example good questions:
 
 Generate the question now."""
 
-        # Initialize LLM with structured output
-        llm = ChatBedrock(
-            model_id=settings.bedrock_model_id,
-            region_name=settings.aws_region,
-            model_kwargs={"temperature": 0.3},  # Slight creativity for natural phrasing
+        # Initialize LLM with structured output and retry logic
+        structured_llm = get_bedrock_llm(
+            model_kwargs={"temperature": 0.3},
+            structured_output_schema=GeneratedQuestion,
         )
-        structured_llm = llm.with_structured_output(GeneratedQuestion)
 
         # Generate question
         result: GeneratedQuestion = structured_llm.invoke(prompt)
