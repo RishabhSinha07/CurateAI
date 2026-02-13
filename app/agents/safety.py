@@ -1,4 +1,5 @@
 from typing import List, Optional
+import logging
 from pydantic import BaseModel, Field
 from langchain_aws import ChatBedrock
 
@@ -10,8 +11,10 @@ from app.agents.response_formatter import (
     format_no_results_message,
     format_out_of_scope_message,
 )
+from app.knowledge.graph_loader import get_knowledge_graph
 
 settings = get_settings()
+logger = logging.getLogger(__name__)
 
 
 class SafetyResponse(BaseModel):
@@ -134,6 +137,72 @@ async def safety_agent(state: AgentState) -> AgentState:
         new_state["next_agent"] = None
         return new_state
 
+    # --- Gather richer context from the knowledge graph ---
+    problem_id = graph_state.get("identified_problem")
+    graph_domain = graph_state.get("graph_domain")
+
+    problem_display_name = ""
+    problem_description = ""
+    treating_ingredients_info = []
+
+    if problem_id and graph_domain:
+        try:
+            graph = get_knowledge_graph(graph_domain)
+
+            # Problem info
+            problem_node = graph.get_node(problem_id)
+            if problem_node:
+                problem_display_name = problem_node.get("display_name", problem_id)
+                problem_description = problem_node.get("description", "")
+
+            # Top treating ingredients
+            raw_ingredients = graph.get_treating_ingredients(problem_id, min_efficacy=0.5)
+            for ing in raw_ingredients[:5]:
+                treating_ingredients_info.append({
+                    "name": ing.get("display_name", ing.get("name", "")),
+                    "mechanism": ing.get("mechanism", ""),
+                    "onset_time": ing.get("onset_time", ""),
+                })
+        except Exception as e:
+            logger.warning(f"Error gathering knowledge graph context for safety agent: {e}")
+
+    # Build user profile summary from filled attributes
+    profile_parts = []
+    for attr_key, attr_val in filled_attrs.items():
+        if attr_key in ("medical_constraints", "allergies"):
+            continue  # Already captured in applied_constraints
+        value = attr_val.get("value", "")
+        display = attr_val.get("display_name", attr_key.replace("_", " ").title())
+        if isinstance(value, list):
+            value = ", ".join(str(v) for v in value)
+        if value:
+            profile_parts.append(f"{display}: {value}")
+    user_profile_summary = "\n".join(f"- {p}" for p in profile_parts) if profile_parts else "No specific profile details collected."
+
+    # Build treating ingredients block for the prompt
+    ingredients_block = ""
+    if treating_ingredients_info:
+        lines = []
+        for ing in treating_ingredients_info:
+            parts = [f"- **{ing['name']}**"]
+            if ing["mechanism"]:
+                parts[0] += f": {ing['mechanism']}"
+            if ing["onset_time"]:
+                parts[0] += f" (onset: {ing['onset_time']})"
+            lines.append(parts[0])
+        ingredients_block = "\n".join(lines)
+    else:
+        ingredients_block = "No specific ingredient data available."
+
+    # Build problem block
+    problem_block = ""
+    if problem_display_name:
+        problem_block = f"{problem_display_name}"
+        if problem_description:
+            problem_block += f" — {problem_description}"
+    else:
+        problem_block = "General wellness query"
+
     # Regular query flow — product cards are rendered by the frontend,
     # so we only build the intro text here.
     intro = format_intro_with_constraints(applied_constraints)
@@ -143,44 +212,71 @@ async def safety_agent(state: AgentState) -> AgentState:
     if applied_constraints:
         constraint_list = "\n".join(f"  - {c}" for c in applied_constraints)
         constraint_info = f"""
-Safety Constraints Applied:
+Applied Constraints:
 {constraint_list}
-
-IMPORTANT: The intro already mentions these constraints. DO NOT repeat them in your response.
 """
 
-    system_prompt = f"""You are a wellness consultant for CurateAI. Generate a brief, well-formatted intro for product recommendations using **Markdown**.
+    system_prompt = f"""You are a wellness consultant for CurateAI. Generate a structured, deeply personalized response using **Markdown**.
 
-User's Context/Preferences:
-{extracted_context}
+The product cards are displayed separately by the UI — do NOT list individual product names.
+
+---
+
+**User Profile:**
+{user_profile_summary}
+
+**Problem:**
+{problem_block}
+
+**Key Treating Ingredients:**
+{ingredients_block}
 {constraint_info}
-
-The product cards are displayed separately by the UI. Your job is to write a SHORT intro (3-5 sentences) that:
-- Introduces the recommendations naturally
-- DOES NOT repeat constraint information (it's already in the intro)
-- DOES NOT greet the user ("Hey there!", "Hello!")
-- DOES NOT use acknowledgment phrases ("I heard you're looking for...")
-- DOES NOT list individual product names (the product cards handle that)
-- Highlights what makes these products good choices for their needs
-- Summarises the key benefits the user can expect
-
-**Formatting rules — you MUST use Markdown:**
-- Use **bold** to emphasise key benefits or ingredients
-- Use short paragraphs (2-3 sentences each) separated by blank lines
-- You may use a short bullet list (2-3 items max) to highlight key benefits
-- Keep the overall response concise — no more than 5 sentences total
-
-Domain-Specific Safety Guidelines:
+**Safety Guidelines:**
 {safety_disclaimers}
 
-Your Tasks:
-1. INTRO: Write a Markdown-formatted intro as described above
-2. SAFETY CHECK: Note if you make any medical claims
-3. DISCLAIMERS: List any needed disclaimers based on domain guidelines
+---
 
-Guidelines:
+Write your response following these 4 layers IN ORDER:
+
+## Understanding Your Needs
+(Layer 1 — Reflect, 2-3 sentences) Restate the user's situation using their profile and concern. Show you understood their specific circumstances. No greetings, no filler, no acknowledgment phrases ("I heard you're looking for...").
+
+## What's Going On
+(Layer 2 — Reframe, 2-3 sentences) Based on the problem description and treating ingredients, explain possible drivers or mechanisms behind the concern. Use hedging language — "may", "often", "could" — never diagnose.
+
+## What Can Help
+(Layer 3 — Recommendations)
+
+**Lifestyle Foundations**
+- 2-3 practical, non-product suggestions relevant to the problem (sleep, hydration, stress, diet tips)
+
+**Key Ingredients to Look For**
+- 2-3 top treating ingredients with their mechanism and onset time. Use the ingredient data provided above. Format each as: **Ingredient Name** — mechanism (onset: timeframe)
+
+(Do NOT list product names — the product cards handle that.)
+
+## Important to Know
+(Layer 4 — Safety, 1-3 bullets) Who should be cautious, what to monitor, when to consult a professional. Base this on the domain safety guidelines and any applied constraints.
+
+---
+
+**Formatting rules:**
+- Use `##` headings exactly as shown above
+- **Bold** key terms and ingredient names
+- Bullets for lists
+- Short paragraphs (2-3 sentences each)
+- Total response: ~150-250 words
+- NEVER list product names (product cards are rendered separately)
+- NEVER greet the user
+
+**Language guidelines:**
 - Use phrases like "may support", "designed to help", "formulated for"
 - Never claim products treat, cure, or prevent any disease
+
+Your Tasks:
+1. RESPONSE: Write the 4-layer response as described
+2. SAFETY CHECK: Note if you make any medical claims
+3. DISCLAIMERS: List any needed disclaimers based on domain guidelines
 """
 
     model = get_safety_model()
@@ -196,7 +292,7 @@ Guidelines:
     if intro:
         response_parts.append(intro.strip())
 
-    # Add LLM-generated intro paragraph
+    # Add LLM-generated structured response
     if result.response:
         response_parts.append(result.response.strip())
 
@@ -207,7 +303,7 @@ Guidelines:
     if optional_slot_hint:
         final_response = f"{optional_slot_hint}\n\n{final_response}"
 
-    # Append disclaimers if needed
+    # Append disclaimers from the LLM if present
     if result.disclaimers:
         final_response += "\n\n" + format_disclaimers(result.disclaimers)
     elif result.contains_medical_claims:
@@ -216,6 +312,10 @@ Guidelines:
             "These statements have not been evaluated by the FDA. These products are not intended to diagnose, treat, cure, or prevent any disease. Please consult with a healthcare professional before starting any new supplement regimen."
         ]
         final_response += "\n\n" + format_disclaimers(default_disclaimer)
+
+    # Layer 5: Append domain-specific disclaimers programmatically
+    if safety_disclaimers:
+        final_response += "\n\n" + format_disclaimers(safety_disclaimers)
 
     # Update state
     new_state = state.copy()
