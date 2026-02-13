@@ -55,6 +55,7 @@ def create_initial_state(
         search_results=[],
         final_products=[],
         response=previous_response,  # Pass previous response for context
+        suggested_replies=[],
         status=existing_status,
         next_agent=None,
         optional_slot_hint=None,

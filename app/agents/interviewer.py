@@ -53,6 +53,15 @@ class InterviewerResponse(BaseModel):
             "Only null when all slots are genuinely filled or user wants to skip."
         ),
     )
+    suggested_replies: List[str] = Field(
+        default_factory=list,
+        description=(
+            "2-6 short reply options the user can tap to answer quickly. "
+            "Base these on the question you're asking. For yes/no questions use "
+            "['Yes', 'No', 'Prefer not to say']. For choice questions use the "
+            "available options. Keep labels short (1-4 words each)."
+        ),
+    )
 
 
 def get_interviewer_model():
@@ -507,12 +516,20 @@ Optional slots available: {unfilled_optional or '(none)'}
 ## SLOTS WE STILL NEED (ask about these if not extracted):
 {missing_slot_reference}
 {previous_question_section}{first_pass_note}
+## SUGGESTED REPLY OPTIONS
+Include suggested_replies in your response — short labels the user can tap.
+Use the options from the graph questions above when applicable.
+For yes/no questions use ['Yes', 'No', 'Prefer not to say'].
+For choice questions use the available options from the slot definitions.
+Keep labels short (1-4 words each), max 6 options.
+
 User's latest message: "{state['user_message']}"
 
 Respond with:
 1. extracted_values: ALL values you can extract from the user's message (not just what we're asking about)
 2. missing_slots: What's still missing AFTER extraction
 3. question: Ask about missing slots (if any remain)
+4. suggested_replies: Short tap-able reply options matching your question
 """
 
     model = get_interviewer_model()
@@ -598,6 +615,7 @@ Respond with:
 
     new_state["extracted_context"] = updated_context
     new_state["missing_slots"] = result.missing_slots
+    new_state["suggested_replies"] = result.suggested_replies
 
     # Determine whether to continue asking or proceed to search.
     # We only keep asking if the LLM actually produced a question.

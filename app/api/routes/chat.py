@@ -42,6 +42,7 @@ class ChatResponse(BaseModel):
     domain_slug: Optional[str] = None  # Identified domain
     intent_type: Optional[str] = None  # "query" or "journey"
     products: list[ProductRecommendation] = []
+    suggested_replies: list[str] = []
     journey_info: Optional[dict] = None  # Journey bundle info if intent_type is "journey"
 
 
@@ -160,6 +161,7 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)) -> Chat
         domain_slug=final_state.get("domain_slug"),
         intent_type=intent_type,
         products=recommendations,
+        suggested_replies=final_state.get("suggested_replies", []),
         journey_info=journey_info
     )
 
