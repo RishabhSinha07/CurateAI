@@ -1,5 +1,5 @@
 from typing import Any, Dict, List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from langchain_core.messages import HumanMessage, SystemMessage
 import logging
 
@@ -62,6 +62,13 @@ class InterviewerResponse(BaseModel):
             "available options. Keep labels short (1-4 words each)."
         ),
     )
+
+    @field_validator("suggested_replies", mode="before")
+    @classmethod
+    def filter_none_replies(cls, v: Any) -> List[str]:
+        if isinstance(v, list):
+            return [item for item in v if item is not None]
+        return v
 
 
 def get_interviewer_model():
