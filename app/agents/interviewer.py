@@ -135,9 +135,11 @@ and ask clarifying questions only when needed.
 5. **IDENTIFY WHAT'S STILL MISSING**: After extraction, determine which required \
    slots are still unfilled.
 
-6. **ASK ABOUT MISSING SLOTS ONLY**: Ask about slots that weren't extracted. \
-   Include a brief reason (1-2 sentences) explaining why each piece of information \
-   helps. Keep it conversational, not an interrogation.
+6. **ASK ONE QUESTION AT A TIME**: Ask about only ONE missing slot per turn. \
+   Pick the highest-priority missing slot and ask a single, focused question. \
+   Include a brief reason (1 sentence) explaining why this information helps. \
+   Do NOT bundle multiple slots into one question — keep it conversational, \
+   not an interrogation.
 
 7. **CONSIDER OPTIONAL SLOTS**: If optional slots would meaningfully improve \
    recommendations given the context, include them in your question.
@@ -520,7 +522,7 @@ STEP 2: After extraction, identify what's still missing:
 Required slots still needed: {missing_required or '(all filled)'}
 Optional slots available: {unfilled_optional or '(none)'}
 
-## SLOTS WE STILL NEED (ask about these if not extracted):
+## SLOTS WE STILL NEED (for extraction reference — ask about only ONE per turn):
 {missing_slot_reference}
 {previous_question_section}{first_pass_note}
 ## SUGGESTED REPLY OPTIONS
@@ -535,8 +537,8 @@ User's latest message: "{state['user_message']}"
 Respond with:
 1. extracted_values: ALL values you can extract from the user's message (not just what we're asking about)
 2. missing_slots: What's still missing AFTER extraction
-3. question: Ask about missing slots (if any remain)
-4. suggested_replies: Short tap-able reply options matching your question
+3. question: Ask about ONE missing slot only — pick the highest priority one
+4. suggested_replies: Short tap-able reply options matching your single question
 """
 
     model = get_interviewer_model()
