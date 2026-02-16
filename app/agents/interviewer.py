@@ -96,6 +96,7 @@ def _build_graph_slot_reference(graph_questions: List[Dict[str, Any]]) -> str:
     return "\n".join(lines)
 
 
+
 SYSTEM_PROMPT = """\
 You are a friendly, knowledgeable wellness consultant helping a user find the \
 right supplement. Your job is to extract information from the user's messages \
@@ -280,9 +281,14 @@ If the match is not obvious, choose the closest related problem."""
                         "graph_domain": graph_domain
                     }
 
-                    # Continue with normal flow (will get questions for this problem below)
-                    logger.info("Problem identified by interviewer, proceeding with slot collection")
-                    # Note: problem_id and graph_domain are now set, so we'll continue to line 245+
+                    # Route to initial_products first so the user sees
+                    # relevant products while we continue slot collection.
+                    logger.info("Problem identified by interviewer, fetching initial products before slot collection")
+                    new_state = state.copy()
+                    new_state["extracted_context"] = extracted_context
+                    new_state["status"] = "collecting_info"
+                    new_state["next_agent"] = "initial_products"
+                    return new_state
                 else:
                     # LLM selected an invalid problem ID (shouldn't happen with constrained selection)
                     logger.warning(
@@ -479,18 +485,7 @@ If the match is not obvious, choose the closest related problem."""
         else "  (none yet)"
     )
 
-    # When initial products are being shown alongside this message, tell the
-    # LLM so it can write a question that flows naturally after the preamble.
     first_pass_note = ""
-    if is_first_pass:
-        first_pass_note = (
-            "\nNOTE: The user is already seeing a few popular products from "
-            "this domain. Your question will appear right below that list. "
-            "Do NOT greet the user or repeat that products are shown — just "
-            "ask your questions directly. Start with something like "
-            '"To narrow things down...", "To find the best match..." or '
-            "similar.\n"
-        )
 
     # Add graph context if available
     graph_context_note = ""
@@ -635,6 +630,21 @@ Respond with:
         or not has_question
     )
 
+    if is_first_pass:
+        # Show initial products with an option to personalise.
+        domain_name = (state.get("domain_slug") or "this category").replace("_", " ").title()
+        new_state["response"] = (
+            f"### {domain_name} — Top Picks for You\n\n"
+            "Here are some recommendations based on your concern.\n\n"
+            "---\n\n"
+            "Want better results? I can personalise these recommendations "
+            "by asking a few quick questions."
+        )
+        new_state["status"] = "awaiting_slot"
+        new_state["suggested_replies"] = ["Personalise for me"]
+        new_state["next_agent"] = None
+        return new_state
+
     if should_search:
         new_state["response"] = None
         new_state["status"] = "collecting_info"
@@ -642,20 +652,6 @@ Respond with:
         new_state["optional_slot_hint"] = None
     else:
         question_text = result.question  # guaranteed non-empty here
-
-        if is_first_pass:
-            # Compact preamble that sits between the product cards and the
-            # interviewer's first question.  The LLM has been told to skip
-            # greetings and start directly with the ask.
-            domain_name = (state.get("domain_slug") or "this category").replace("_", " ").title()
-            preamble = (
-                f"### Popular {domain_name} Products\n\n"
-                f"Here are some popular options to browse while we find the perfect match for you.\n\n"
-                "---\n\n"
-                "**Let me personalize these recommendations with a couple of quick questions:**\n\n"
-            )
-            question_text = preamble + question_text
-
         new_state["response"] = question_text
         new_state["status"] = "awaiting_slot"
         new_state["next_agent"] = None  # End turn — wait for user input

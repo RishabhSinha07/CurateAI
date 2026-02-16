@@ -4,16 +4,16 @@ LangGraph orchestration for the multi-agent consultation system.
 Flow:
                          ┌─ (journey intent) ──→ Journey → Safety ──→ END
                          │
-Entry → Router ──────────┼─ (query + slots missing) ─→ Initial Products → Interviewer ─→ [loop] ─┐
-                         │                                                                         │
+Entry → Router ──────────┼─ (query) ─→ Interviewer ─→ (problem identified) ─→ Initial Products ─→ Interviewer ─→ [loop] ─┐
+                         │                                                                                                  │
                          └─ (query + all filled) ──────→ Interviewer → Search → Reranker → Safety ─→ END
 
 When the Router detects journey intent (e.g., "starting gym"), it routes directly to
 the Journey agent which provides a complete product bundle with usage guidance.
 
-For query intent, the flow continues as before: if there are unfilled slots and the
-domain just changed, show initial products while interviewing. Otherwise proceed
-with search after collecting info.
+For query intent, the Interviewer first asks the user to identify their problem/concern.
+Once the problem is identified, initial products are fetched and shown alongside the
+first slot-filling question.
 
 Subsequent turns (status=awaiting_slot) skip Router entirely and go to the
 Interviewer directly.
@@ -121,30 +121,34 @@ def should_route_to(state: AgentState) -> Literal["router", "interviewer", "refi
     return "router"
 
 
-def after_interviewer(state: AgentState) -> Literal["search", "__end__"]:
+def after_interviewer(state: AgentState) -> Literal["initial_products", "search", "safety", "__end__"]:
     """
     Determine next step after interviewer.
 
+    If problem just identified → fetch initial products before asking slot questions.
     If still missing slots, end turn to wait for user input.
     If all slots filled, proceed to search.
+    If user accepted initial products, skip to safety.
     """
     next_agent = state.get("next_agent")
+    if next_agent == "initial_products":
+        return "initial_products"
     if next_agent == "search":
         return "search"
-    # If next_agent is None or not "search", we're waiting for user input
+    if next_agent == "safety":
+        return "safety"
+    # If next_agent is None, we're waiting for user input
     return END
 
 
-def after_router(state: AgentState) -> Literal["initial_products", "interviewer", "journey", "safety"]:
+def after_router(state: AgentState) -> Literal["interviewer", "journey", "safety"]:
     """
     Determine next step after router.
 
     If out_of_scope → safety.
     If journey intent → journey agent.
-    If query intent and domain just changed AND problem identified →
-        initial_products (show a few products while the interviewer gathers
-        details).
-    Otherwise → interviewer directly (no initial showcase).
+    Otherwise → interviewer (which will fetch initial products after
+        identifying the user's problem).
     """
     next_agent = state.get("next_agent")
 
@@ -153,18 +157,6 @@ def after_router(state: AgentState) -> Literal["initial_products", "interviewer"
 
     if next_agent == "journey":
         return "journey"
-
-    domain_changed = state.get("domain_slug") != state.get("previous_domain_slug")
-
-    # Check if we have a problem identified in the graph
-    extracted_context = state.get("extracted_context", {})
-    graph_state = extracted_context.get("graph_state", {})
-    has_problem = bool(graph_state.get("identified_problem"))
-
-    # If domain just changed and we have a problem, show initial products
-    # while interviewer asks questions
-    if domain_changed and has_problem:
-        return "initial_products"
 
     return "interviewer"
 
@@ -234,7 +226,6 @@ class ConsultationGraph:
             "router",
             after_router,
             {
-                "initial_products": "initial_products",
                 "interviewer": "interviewer",
                 "journey": "journey",
                 "safety": "safety",
@@ -258,7 +249,9 @@ class ConsultationGraph:
             "interviewer",
             after_interviewer,
             {
+                "initial_products": "initial_products",
                 "search": "search",
+                "safety": "safety",
                 END: END,
             }
         )

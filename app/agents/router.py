@@ -229,6 +229,14 @@ Current User Message: "{state['user_message']}"
                     f"Router detected candidate problem '{problem_id}' for domain "
                     f"'{graph_domain}', but deferring to interviewer to confirm with user."
                 )
+                # Store candidate problem so initial_products can use it
+                # for semantic search while the interviewer confirms with user.
+                existing_ctx = new_state.get("extracted_context", {})
+                existing_ctx["candidate_problem"] = {
+                    "problem_id": problem_id,
+                    "graph_domain": graph_domain,
+                }
+                new_state["extracted_context"] = existing_ctx
             else:
                 logger.info(
                     f"Router identified domain '{domain_meta['domain']}' but no specific problem. "
