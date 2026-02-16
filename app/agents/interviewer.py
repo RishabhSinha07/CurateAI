@@ -178,6 +178,42 @@ async def interviewer_agent(state: AgentState) -> AgentState:
     problem_id = graph_state.get("identified_problem")
     graph_domain = graph_state.get("graph_domain")
 
+    # Auto-promote candidate_problem from the router when confidence is high.
+    # The router already validated the problem against the knowledge graph.
+    # - High confidence (>= 0.85): auto-promote, no need to re-ask
+    # - Lower confidence: ask a targeted confirmation question instead of
+    #   a full problem re-selection list
+    candidate = extracted_context.get("candidate_problem")
+    if not problem_id and candidate:
+        confidence = candidate.get("confidence", 0)
+        if confidence >= 0.85:
+            problem_id = candidate["problem_id"]
+            graph_domain = candidate["graph_domain"]
+            extracted_context["graph_state"] = {
+                **graph_state,
+                "identified_problem": problem_id,
+                "problem_source": "router",
+                "graph_domain": graph_domain,
+            }
+            extracted_context.pop("candidate_problem", None)
+            logger.info(
+                f"Auto-promoted candidate_problem '{problem_id}' from router "
+                f"(confidence={confidence:.2f}) to identified_problem"
+            )
+
+            # Route to initial_products so the user sees relevant products
+            # while we continue with slot collection.
+            new_state = state.copy()
+            new_state["extracted_context"] = extracted_context
+            new_state["status"] = "collecting_info"
+            new_state["next_agent"] = "initial_products"
+            return new_state
+        else:
+            logger.info(
+                f"Candidate problem '{candidate['problem_id']}' has low confidence "
+                f"({confidence:.2f}), will ask user to confirm"
+            )
+
     logger.info(f"Interviewer agent called. Extracted context: {extracted_context}")
     logger.info(f"Graph state: {graph_state}, problem_id: {problem_id}, graph_domain: {graph_domain}")
 
@@ -318,41 +354,77 @@ If the match is not obvious, choose the closest related problem."""
             logger.info(f"No problem identified for domain '{domain_slug}'. Asking user.")
             new_state = state.copy()
 
-            # Provide helpful suggestions based on domain
-            # Try to load the graph to get example problems
-            try:
-                graph = get_knowledge_graph(domain_slug)
-                problems = graph.find_nodes_by_type('problem')
+            # If the router detected a low-confidence candidate, ask a
+            # targeted confirmation instead of showing the full list.
+            candidate = extracted_context.get("candidate_problem")
+            if candidate:
+                try:
+                    graph = get_knowledge_graph(domain_slug)
+                    candidate_node = graph.get_node(candidate["problem_id"])
+                    candidate_display = (
+                        candidate_node.get("display_name", candidate_node.get("name", candidate["problem_id"]))
+                        if candidate_node else candidate["problem_id"].replace("_", " ").title()
+                    )
 
-                if problems:
-                    # Get display names for first 6-8 problems as examples
-                    problem_examples = []
-                    for problem in problems[:8]:
-                        display_name = problem.get('display_name', problem.get('name', problem['id']))
-                        problem_examples.append(f"- {display_name}")
-
-                    domain_display = graph.metadata.display_name or domain_slug.replace('_', ' ').title()
-                    examples_text = "\n".join(problem_examples)
+                    # Get a few alternative problems for the suggested replies
+                    all_problems = graph.find_nodes_by_type("problem")
+                    alt_names = [
+                        p.get("display_name", p.get("name", p["id"]))
+                        for p in all_problems
+                        if p["id"] != candidate["problem_id"]
+                    ][:3]
 
                     new_state["response"] = (
-                        f"### {domain_display}\n\n"
-                        f"To give you the best recommendations, could you tell me what specific concern you'd like to address?\n\n"
-                        f"**Common concerns:**\n"
-                        f"{examples_text}"
+                        f"It sounds like you're concerned about **{candidate_display}** — is that right, "
+                        f"or did you have something else in mind?"
                     )
-                else:
-                    # Fallback if no problems found
+                    new_state["suggested_replies"] = [
+                        f"Yes, {candidate_display}",
+                        *alt_names,
+                        "Something else",
+                    ]
+                except Exception as e:
+                    logger.warning(f"Error building confirmation for candidate: {e}")
+                    # Fall through to the normal full-list path below
+                    candidate = None
+
+            if not candidate:
+                # No candidate at all — show full problem list
+                # Provide helpful suggestions based on domain
+                # Try to load the graph to get example problems
+                try:
+                    graph = get_knowledge_graph(domain_slug)
+                    problems = graph.find_nodes_by_type('problem')
+
+                    if problems:
+                        # Get display names for first 6-8 problems as examples
+                        problem_examples = []
+                        for problem in problems[:8]:
+                            display_name = problem.get('display_name', problem.get('name', problem['id']))
+                            problem_examples.append(f"- {display_name}")
+
+                        domain_display = graph.metadata.display_name or domain_slug.replace('_', ' ').title()
+                        examples_text = "\n".join(problem_examples)
+
+                        new_state["response"] = (
+                            f"### {domain_display}\n\n"
+                            f"To give you the best recommendations, could you tell me what specific concern you'd like to address?\n\n"
+                            f"**Common concerns:**\n"
+                            f"{examples_text}"
+                        )
+                    else:
+                        # Fallback if no problems found
+                        new_state["response"] = (
+                            "I'd like to help you find the right product. "
+                            "Could you tell me more specifically about what concern you'd like to address?"
+                        )
+                except Exception as e:
+                    logger.error(f"Error loading problem examples for domain '{domain_slug}': {e}")
+                    # Generic fallback
                     new_state["response"] = (
                         "I'd like to help you find the right product. "
-                        "Could you tell me more specifically about what concern you'd like to address?"
+                        "Could you tell me more specifically about what health goal or concern you'd like to address?"
                     )
-            except Exception as e:
-                logger.error(f"Error loading problem examples for domain '{domain_slug}': {e}")
-                # Generic fallback
-                new_state["response"] = (
-                    "I'd like to help you find the right product. "
-                    "Could you tell me more specifically about what health goal or concern you'd like to address?"
-                )
 
             new_state["status"] = "awaiting_slot"
             new_state["next_agent"] = None
