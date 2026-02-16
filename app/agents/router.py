@@ -235,6 +235,7 @@ Current User Message: "{state['user_message']}"
                 existing_ctx["candidate_problem"] = {
                     "problem_id": problem_id,
                     "graph_domain": graph_domain,
+                    "confidence": result.confidence,
                 }
                 new_state["extracted_context"] = existing_ctx
             else:
