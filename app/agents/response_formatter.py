@@ -281,3 +281,11 @@ def format_out_of_scope_message() -> str:
         "I'm a wellness product consultant specialized in supplements, vitamins, and health products. "
         "\n\nIs there something in that area I can help you with today?"
     )
+
+
+def format_fallback_no_results() -> str:
+    """Format a message when fallback search finds no products."""
+    return (
+        "I couldn't find products matching your request in our catalog. "
+        "Could you try describing what you're looking for differently?"
+    )

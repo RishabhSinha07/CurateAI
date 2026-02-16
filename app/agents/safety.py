@@ -9,7 +9,6 @@ from app.agents.response_formatter import (
     format_intro_with_constraints,
     format_disclaimers,
     format_no_results_message,
-    format_out_of_scope_message,
 )
 from app.knowledge.graph_loader import get_knowledge_graph
 
@@ -92,14 +91,6 @@ async def safety_agent(state: AgentState) -> AgentState:
             value_lower = value.lower()
             if value_lower in ["vegan", "vegetarian"]:
                 applied_constraints.append(f"Diet: {value.capitalize()}")
-
-    # Handle out-of-scope requests
-    if status == "out_of_scope":
-        new_state = state.copy()
-        new_state["response"] = format_out_of_scope_message()
-        new_state["status"] = "completed"
-        new_state["next_agent"] = None
-        return new_state
 
     # Handle no results
     if not final_products:

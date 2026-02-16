@@ -67,7 +67,7 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)) -> Chat
 
     # Get the last assistant message for context (helps with slot extraction)
     previous_response = None
-    if chat_session.status == "awaiting_slot":
+    if chat_session.status in ("awaiting_slot", "fallback_conversation"):
         # Get last few messages to find the most recent assistant message
         history = await session_repo.get_history(chat_session.id, limit=5)
         # Find the last assistant message (history is in chronological order)

@@ -33,6 +33,7 @@ from app.agents.reranker import reranker_agent
 from app.agents.safety import safety_agent
 from app.agents.refinement import refinement_agent
 from app.agents.journey import journey_agent
+from app.agents.fallback import fallback_agent
 
 
 def create_initial_state(
@@ -105,17 +106,25 @@ async def journey_node(state: AgentState, db: AsyncSession) -> AgentState:
     return await journey_agent(state, db)
 
 
-def should_route_to(state: AgentState) -> Literal["router", "interviewer", "refinement"]:
+async def fallback_node(state: AgentState, db: AsyncSession) -> AgentState:
+    """Fallback agent node - handles out-of-domain queries with catalog-wide search."""
+    return await fallback_agent(state, db)
+
+
+def should_route_to(state: AgentState) -> Literal["router", "interviewer", "refinement", "fallback"]:
     """
     Determine the entry point based on session status.
 
     - awaiting_slot: Go to interviewer (answering a question)
+    - fallback_conversation: Go to fallback (continuing out-of-domain conversation)
     - completed: Go to refinement (might be refining results or new topic)
     - Otherwise: Go to router for intent classification
     """
     status = state.get("status")
     if status == "awaiting_slot":
         return "interviewer"
+    if status == "fallback_conversation":
+        return "fallback"
     if status == "completed":
         return "refinement"
     return "router"
@@ -141,16 +150,19 @@ def after_interviewer(state: AgentState) -> Literal["initial_products", "search"
     return END
 
 
-def after_router(state: AgentState) -> Literal["interviewer", "journey", "safety"]:
+def after_router(state: AgentState) -> Literal["interviewer", "journey", "safety", "fallback"]:
     """
     Determine next step after router.
 
-    If out_of_scope → safety.
+    If fallback → fallback agent (out-of-domain catalog search).
     If journey intent → journey agent.
     Otherwise → interviewer (which will fetch initial products after
         identifying the user's problem).
     """
     next_agent = state.get("next_agent")
+
+    if next_agent == "fallback":
+        return "fallback"
 
     if next_agent == "safety":
         return "safety"
@@ -210,6 +222,7 @@ class ConsultationGraph:
         builder.add_node("safety", self._safety_wrapper)
         builder.add_node("refinement", self._refinement_wrapper)
         builder.add_node("journey", self._journey_wrapper)
+        builder.add_node("fallback", self._fallback_wrapper)
 
         # Set conditional entry point
         builder.set_conditional_entry_point(
@@ -218,6 +231,7 @@ class ConsultationGraph:
                 "router": "router",
                 "interviewer": "interviewer",
                 "refinement": "refinement",
+                "fallback": "fallback",
             }
         )
 
@@ -229,6 +243,7 @@ class ConsultationGraph:
                 "interviewer": "interviewer",
                 "journey": "journey",
                 "safety": "safety",
+                "fallback": "fallback",
             }
         )
 
@@ -264,6 +279,9 @@ class ConsultationGraph:
                 "router": "router",
             }
         )
+
+        # Fallback always ends the turn (asked a question or completed with products)
+        builder.add_edge("fallback", END)
 
         # Linear edges
         builder.add_edge("search", "reranker")
@@ -307,6 +325,11 @@ class ConsultationGraph:
         """Wrapper to inject db session into journey agent."""
         db = self._current_db
         return await journey_node(state, db)
+
+    async def _fallback_wrapper(self, state: AgentState) -> AgentState:
+        """Wrapper to inject db session into fallback agent."""
+        db = self._current_db
+        return await fallback_node(state, db)
 
     async def run(self, state: AgentState, db: AsyncSession) -> AgentState:
         """

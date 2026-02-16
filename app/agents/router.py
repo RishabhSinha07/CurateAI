@@ -211,8 +211,8 @@ Current User Message: "{state['user_message']}"
     if result.domain_slug == "out_of_scope":
         new_state["domain_slug"] = "out_of_scope"
         new_state["intent_type"] = "query"
-        new_state["status"] = "out_of_scope"
-        new_state["next_agent"] = "safety"
+        new_state["status"] = "fallback_conversation"
+        new_state["next_agent"] = "fallback"
     else:
         # Resolve slug to domain metadata
         domain_meta = next((d for d in domains if d['domain'] == result.domain_slug), None)
@@ -251,9 +251,9 @@ Current User Message: "{state['user_message']}"
         else:
             # Fallback if AI hallucinates a slug
             logger.warning(f"Router classified to unknown domain '{result.domain_slug}'")
-            new_state["status"] = "out_of_scope"
+            new_state["status"] = "fallback_conversation"
             new_state["intent_type"] = "query"
-            new_state["next_agent"] = "safety"
+            new_state["next_agent"] = "fallback"
 
     logger.info(
         f"Router decision: domain={new_state.get('domain_slug')}, "
