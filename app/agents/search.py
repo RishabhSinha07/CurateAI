@@ -1,5 +1,7 @@
 from typing import Any, Dict, List
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+from app.agents.validators import parse_dict, parse_list
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 
@@ -21,6 +23,16 @@ class QueryExpansion(BaseModel):
     search_terms: List[str] = Field(description="Key search terms extracted from the context")
     filters: Dict[str, Any] = Field(description="JSONB filters to apply based on extracted context")
     reasoning: str = Field(default="", description="Brief explanation of the expansion strategy")
+
+    @field_validator("search_terms", mode="before")
+    @classmethod
+    def parse_search_terms(cls, v: Any) -> List[Any]:
+        return parse_list(v)
+
+    @field_validator("filters", mode="before")
+    @classmethod
+    def parse_filters(cls, v: Any) -> Dict[str, Any]:
+        return parse_dict(v)
 
 
 def get_search_model():

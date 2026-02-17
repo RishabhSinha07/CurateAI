@@ -6,8 +6,10 @@ ELICITS_QUESTION edges are missing from the knowledge graph.
 """
 
 import logging
-from typing import Dict, List, Optional, Any
-from pydantic import BaseModel, Field
+from typing import Any, Dict, List, Optional
+from pydantic import BaseModel, Field, field_validator
+
+from app.agents.validators import parse_list
 
 from app.agents.llm import get_bedrock_llm
 
@@ -32,6 +34,11 @@ class GeneratedQuestion(BaseModel):
     reasoning: str = Field(
         description="Brief explanation of why this question was generated this way"
     )
+
+    @field_validator("options", mode="before")
+    @classmethod
+    def parse_options(cls, v: Any) -> List[Any]:
+        return parse_list(v)
 
 
 def generate_question_for_attribute(

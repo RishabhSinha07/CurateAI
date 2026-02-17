@@ -3,6 +3,8 @@ from pydantic import BaseModel, Field, field_validator
 from langchain_core.messages import HumanMessage, SystemMessage
 import logging
 
+from app.agents.validators import parse_dict, parse_list, parse_bool
+
 from app.config import get_settings
 from app.agents.state import AgentState
 from app.agents.llm import get_bedrock_llm
@@ -63,12 +65,23 @@ class InterviewerResponse(BaseModel):
         ),
     )
 
-    @field_validator("suggested_replies", mode="before")
+    @field_validator("extracted_values", mode="before")
     @classmethod
-    def filter_none_replies(cls, v: Any) -> List[str]:
+    def parse_extracted_values(cls, v: Any) -> Dict[str, Any]:
+        return parse_dict(v)
+
+    @field_validator("missing_slots", "suggested_optional_slots", "suggested_replies", mode="before")
+    @classmethod
+    def parse_list_fields(cls, v: Any) -> List[Any]:
+        v = parse_list(v)
         if isinstance(v, list):
             return [item for item in v if item is not None]
         return v
+
+    @field_validator("ready_to_search", mode="before")
+    @classmethod
+    def parse_ready_to_search(cls, v: Any) -> bool:
+        return parse_bool(v)
 
 
 def get_interviewer_model():
@@ -95,6 +108,39 @@ def _build_graph_slot_reference(graph_questions: List[Dict[str, Any]]) -> str:
 
     return "\n".join(lines)
 
+
+def _compute_search_impact(
+    graph,
+    problem_id: str,
+    question: Dict[str, Any],
+) -> float:
+    """Score a question by how much its attribute affects search results.
+
+    The score combines:
+    - RECOMMENDED_FOR edge count: how many treating ingredients have
+      RECOMMENDED_FOR edges pointing to attributes in this category.
+    - Hard-filter bonus: attribute categories that create SQL filters
+      (diet, allergies) get a flat bonus.
+    """
+    attr_category = question['attribute_category']
+
+    # 1. Count RECOMMENDED_FOR edges from treating ingredients to this category
+    treating_ingredients = graph.get_treating_ingredients(problem_id, min_efficacy=0.5)
+    all_attrs = graph.find_nodes_by_type('attribute')
+    category_attr_ids = {a['id'] for a in all_attrs if a.get('category') == attr_category}
+
+    recommendation_count = 0
+    for ing in treating_ingredients:
+        for attr_id in category_attr_ids:
+            recs = graph.get_recommended_ingredients_for_attribute(attr_id, min_strength=0.0)
+            if any(r['id'] == ing['id'] for r in recs):
+                recommendation_count += 1
+
+    # 2. Hard filter bonus for diet/allergies
+    hard_filter_categories = {'diet', 'dietary_preference', 'allergies', 'medical_constraints_allergy'}
+    hard_filter_bonus = 5.0 if attr_category in hard_filter_categories else 0.0
+
+    return recommendation_count + hard_filter_bonus
 
 
 SYSTEM_PROMPT = """\
@@ -434,47 +480,71 @@ If the match is not obvious, choose the closest related problem."""
     try:
         logger.info(f"Using knowledge graph to get questions for problem '{problem_id}'")
 
-        # STEP 1: Get global safety constraint questions (ALWAYS ask these first)
+        # STEP 1: Collect ALL questions into one pool
         graph = get_knowledge_graph(graph_domain)
         all_attrs = graph.find_nodes_by_type('attribute')
 
-        safety_critical_questions = []
-        for attr in all_attrs:
-            if attr.get('is_global', False):
-                # Find question for this attribute
-                question = graph.get_question_for_attribute(attr['id'])
-                if question:
-                    # Check if it's safety critical
-                    edges = graph.get_outgoing_edges(attr['id'], relation='ELICITS_QUESTION')
-                    is_safety_critical = any(
-                        edge.get('is_safety_critical', False) for edge in edges
-                    )
+        all_questions: List[Dict[str, Any]] = []
 
-                    # Only include safety-critical constraints (medical, allergies)
-                    if is_safety_critical:
-                        safety_critical_questions.append({
-                            'attribute_id': attr['id'],
-                            'attribute_category': attr.get('category'),
-                            'priority': 0,  # Highest priority
-                            'is_optional': False,
-                            'is_safety_critical': is_safety_critical,
-                            'reason': 'Safety screening to exclude contraindicated products',
-                            'question': question
-                        })
-
-        logger.info(f"Retrieved {len(safety_critical_questions)} safety-critical constraint questions")
-
-        # STEP 2: Get problem-specific questions
+        # Problem-specific questions
         problem_questions = GraphQueryEngine.get_interview_questions(
             domain=graph_domain,
             problem_id=problem_id
         )
+        all_questions.extend(problem_questions)
         logger.info(f"Retrieved {len(problem_questions)} problem-specific questions")
 
-        # STEP 3: Combine - safety-critical constraints FIRST, then problem-specific
-        # Note: Problem-specific questions may include other global attrs like age/diet
-        graph_questions = safety_critical_questions + problem_questions
-        logger.info(f"Total questions: {len(graph_questions)} (safety: {len(safety_critical_questions)}, problem: {len(problem_questions)})")
+        # Global safety questions (collected but NOT force-prepended)
+        existing_categories = {q['attribute_category'] for q in all_questions}
+        safety_count = 0
+        for attr in all_attrs:
+            if attr.get('is_global', False):
+                question = graph.get_question_for_attribute(attr['id'])
+                if question:
+                    attr_category = attr.get('category')
+                    # Skip if already covered by problem-specific questions
+                    if attr_category in existing_categories:
+                        continue
+                    edges = graph.get_outgoing_edges(attr['id'], relation='ELICITS_QUESTION')
+                    is_safety_critical = any(
+                        edge.get('is_safety_critical', False) for edge in edges
+                    )
+                    # Get priority from edges if available
+                    attr_edge_priority = min(
+                        (edge.get('priority', 99) for edge in edges), default=99
+                    )
+                    all_questions.append({
+                        'attribute_id': attr['id'],
+                        'attribute_category': attr_category,
+                        'priority': attr_edge_priority,
+                        'is_optional': False,
+                        'is_safety_critical': is_safety_critical,
+                        'reason': 'Safety screening',
+                        'question': question
+                    })
+                    existing_categories.add(attr_category)
+                    safety_count += 1
+
+        logger.info(f"Retrieved {safety_count} global safety questions")
+
+        # STEP 2: Deduplicate by attribute_category (keep first occurrence)
+        seen_categories: set = set()
+        deduped: List[Dict[str, Any]] = []
+        for q in all_questions:
+            if q['attribute_category'] not in seen_categories:
+                seen_categories.add(q['attribute_category'])
+                deduped.append(q)
+
+        # STEP 3: Score and sort by search impact (highest first)
+        for q in deduped:
+            q['search_impact'] = _compute_search_impact(graph, problem_id, q)
+        deduped.sort(key=lambda x: x['search_impact'], reverse=True)
+
+        graph_questions = deduped
+        logger.info(
+            f"Total questions after dedup: {len(graph_questions)}, "
+            f"search_impact scores: {[(q['attribute_category'], q['search_impact']) for q in graph_questions]}"
+        )
 
         # Extract attribute categories as "slots"
         required_slots = [
@@ -514,6 +584,20 @@ If the match is not obvious, choose the closest related problem."""
     missing_required = [s for s in required_slots if s not in already_filled]
     unfilled_optional = [s for s in optional_slots if s not in already_filled]
 
+    # Cap personalisation questions at 2 — proceed to search after that
+    MAX_PERSONALISATION_QUESTIONS = 2
+    questions_asked = graph_state.get("questions_asked", 0)
+
+    if questions_asked >= MAX_PERSONALISATION_QUESTIONS:
+        logger.info(
+            f"Reached question limit ({questions_asked}/{MAX_PERSONALISATION_QUESTIONS}), "
+            f"proceeding to search with collected info"
+        )
+        new_state = state.copy()
+        new_state["next_agent"] = "search"
+        new_state["status"] = "collecting_info"
+        return new_state
+
     # Fast path: nothing missing and we're not waiting for a slot answer
     if not missing_required and state["status"] != "awaiting_slot":
         new_state = state.copy()
@@ -534,12 +618,15 @@ If the match is not obvious, choose the closest related problem."""
 
     slot_reference_for_extraction = _build_graph_slot_reference(unfilled_graph_questions)
 
-    # Also build a focused reference for what we still need
+    # Build a focused reference for what we still need.
+    # Limit to just the NEXT question to ask (the top-ranked unfilled slot by
+    # search_impact) so the LLM doesn't pick a lower-impact slot instead.
+    remaining_budget = MAX_PERSONALISATION_QUESTIONS - questions_asked
     all_relevant_slots = list(dict.fromkeys(missing_required + unfilled_optional))
     relevant_graph_questions = [
         q for q in unfilled_graph_questions
         if q['attribute_category'] in all_relevant_slots
-    ]
+    ][:remaining_budget]
     missing_slot_reference = _build_graph_slot_reference(relevant_graph_questions)
     logger.info(f"Total slots: {len(graph_questions)}, Already filled: {len(already_filled)}, Still needed: {len(relevant_graph_questions)}")
 
@@ -727,5 +814,12 @@ Respond with:
         new_state["response"] = question_text
         new_state["status"] = "awaiting_slot"
         new_state["next_agent"] = None  # End turn — wait for user input
+
+        # Increment question counter
+        current_count = updated_context.get("graph_state", {}).get("questions_asked", 0)
+        if "graph_state" not in updated_context:
+            updated_context["graph_state"] = {}
+        updated_context["graph_state"]["questions_asked"] = current_count + 1
+        new_state["extracted_context"] = updated_context
 
     return new_state

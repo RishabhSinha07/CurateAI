@@ -6,8 +6,10 @@ conversationally discovers what the user wants and searches the
 entire product catalog (no domain filter).
 """
 
-from typing import Literal, Optional
-from pydantic import BaseModel, Field
+from typing import Any, Literal, Optional
+from pydantic import BaseModel, Field, field_validator
+
+from app.agents.validators import parse_list, parse_literal_lower
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 
@@ -24,6 +26,7 @@ MAX_FALLBACK_TURNS = 2
 class FallbackResponse(BaseModel):
     """Structured response from the Fallback agent."""
     action: Literal["ask", "search"] = Field(
+        default="search",
         description="Whether to ask a clarifying question or search the catalog"
     )
     search_query: Optional[str] = Field(
@@ -38,6 +41,16 @@ class FallbackResponse(BaseModel):
         default_factory=list,
         description="Quick-tap reply options for the user"
     )
+
+    @field_validator("action", mode="before")
+    @classmethod
+    def normalise_action(cls, v: Any) -> Any:
+        return parse_literal_lower(v)
+
+    @field_validator("suggested_replies", mode="before")
+    @classmethod
+    def parse_suggested_replies(cls, v: Any) -> list:
+        return parse_list(v)
 
 
 def get_fallback_model():
