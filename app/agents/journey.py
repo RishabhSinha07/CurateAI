@@ -1,5 +1,7 @@
 from typing import Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+from app.agents.validators import parse_list
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import get_settings
@@ -27,6 +29,11 @@ class JourneyBundleResponse(BaseModel):
         description="List of products with usage guidance for each"
     )
     reasoning: str = Field(default="", description="Brief explanation of why these products were selected")
+
+    @field_validator("products", mode="before")
+    @classmethod
+    def parse_products(cls, v: Any) -> list:
+        return parse_list(v)
 
 
 def get_journey_model():

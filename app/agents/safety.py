@@ -1,6 +1,8 @@
-from typing import List, Optional
+from typing import Any, List, Optional
 import logging
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+from app.agents.validators import parse_list, parse_bool
 
 from app.config import get_settings
 from app.agents.state import AgentState
@@ -22,6 +24,16 @@ class SafetyResponse(BaseModel):
     disclaimers: List[str] = Field(default_factory=list, description="Any safety disclaimers that should be appended")
     contains_medical_claims: bool = Field(default=False, description="Whether the response contains medical claims that need disclaimers")
     is_safe: bool = Field(default=True, description="Whether the response is safe to send")
+
+    @field_validator("disclaimers", mode="before")
+    @classmethod
+    def parse_disclaimers(cls, v: Any) -> List[Any]:
+        return parse_list(v)
+
+    @field_validator("contains_medical_claims", "is_safe", mode="before")
+    @classmethod
+    def parse_bools(cls, v: Any) -> bool:
+        return parse_bool(v)
 
 
 def get_safety_model():

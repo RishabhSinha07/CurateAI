@@ -1,5 +1,7 @@
 from typing import Any, Dict, List
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+from app.agents.validators import parse_dict, parse_bool
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from app.config import get_settings
@@ -19,6 +21,16 @@ class RefinementResponse(BaseModel):
         description="New constraints to add (e.g., budget, format preference)"
     )
     reasoning: str = Field(default="", description="Brief explanation of the decision")
+
+    @field_validator("is_refinement", mode="before")
+    @classmethod
+    def parse_is_refinement(cls, v: Any) -> bool:
+        return parse_bool(v)
+
+    @field_validator("new_constraints", mode="before")
+    @classmethod
+    def parse_new_constraints(cls, v: Any) -> Dict[str, Any]:
+        return parse_dict(v)
 
 
 def get_refinement_model():
@@ -51,13 +63,21 @@ REFINEMENT indicators (user wants to filter/adjust current results):
 - Price/budget mentions: "cheaper", "under $X", "more affordable", "budget"
 - Format changes: "in powder form", "capsules instead", "liquid version"
 - Ingredient filters: "without fish", "vegan option", "no allergens"
+- Allergy mentions: "I have a fish allergy", "allergic to dairy"
 - Quantity: "show more", "other options", "alternatives"
 
 NEW TOPIC indicators (user wants something different):
 - Different health goal: "what about sleep?", "energy instead"
 - Different product category: "do you have vitamins?"
 - Ending conversation: "thanks", "that's all", "goodbye"
-- Completely unrelated: weather, general questions"""
+- Completely unrelated: weather, general questions
+
+When extracting new_constraints, use these EXACT key names so downstream filters work:
+- "allergies": list of allergy strings, e.g. ["fish", "dairy"]
+- "dietary_preference": string, e.g. "vegan", "vegetarian"
+- "budget_max": number, e.g. 30
+- "format_preference": string, e.g. "capsule", "powder", "liquid"
+"""
 
     user_prompt = f"""Current domain: {domain_slug}
 Current preferences: {extracted_context}
@@ -85,8 +105,13 @@ If refinement, extract the new constraints (budget, format, ingredients, etc.)."
         # New topic - go through router
         new_state["status"] = "active"
         new_state["next_agent"] = "router"
-        # Clear previous results but keep session
+        # Clear previous results and graph state so the new consultation
+        # starts fresh (avoids stale questions_asked counter, filled_attributes, etc.)
         new_state["search_results"] = []
         new_state["final_products"] = []
+        updated_context = {**extracted_context}
+        updated_context.pop("graph_state", None)
+        updated_context.pop("candidate_problem", None)
+        new_state["extracted_context"] = updated_context
 
     return new_state
