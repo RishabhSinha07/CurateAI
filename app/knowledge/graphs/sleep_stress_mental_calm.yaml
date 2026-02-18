@@ -678,70 +678,7 @@ nodes:
     - 50mg
     - 100mg
     description: Flavonoid from chamomile that binds GABA receptors
-  constraints:
-  - id: pregnancy
-    type: medical
-    value: Pregnancy
-    severity: hard
-    name: pregnancy
-    display_name: Pregnancy
-    description: Currently pregnant
-  - id: breastfeeding
-    type: medical
-    value: Breastfeeding
-    severity: soft
-    name: breastfeeding
-    display_name: Breastfeeding
-    description: Currently breastfeeding
-  - id: depression
-    type: medical
-    value: Clinical Depression
-    severity: hard
-    name: depression
-    display_name: Clinical Depression
-    description: Diagnosed depression requiring medical treatment
-  - id: bipolar_disorder
-    type: medical
-    value: Bipolar Disorder
-    severity: hard
-    name: bipolar_disorder
-    display_name: Bipolar Disorder
-    description: Bipolar disorder
-  - id: sleep_medication
-    type: medical
-    value: Prescription Sleep Medication
-    severity: hard
-    name: sleep_medication
-    display_name: Prescription Sleep Medication
-    description: Currently taking prescription sleep aids
-  - id: anxiety_medication
-    type: medical
-    value: Prescription Anxiety Medication
-    severity: hard
-    name: anxiety_medication
-    display_name: Prescription Anxiety Medication
-    description: Currently taking prescription anti-anxiety medication
-  - id: antidepressants
-    type: medical
-    value: Antidepressant Medication
-    severity: hard
-    name: antidepressants
-    display_name: Antidepressant Medication
-    description: Currently taking antidepressants
-  - id: sedatives
-    type: medical
-    value: Sedative Medications
-    severity: hard
-    name: sedatives
-    display_name: Sedative Medications
-    description: Taking sedatives or CNS depressants
-  - id: autoimmune_disease
-    type: medical
-    value: Autoimmune Disease
-    severity: soft
-    name: autoimmune_disease
-    display_name: Autoimmune Disease
-    description: Autoimmune condition
+  constraints: []
   questions: []
   products: []
   domains: []
@@ -1103,41 +1040,6 @@ edges:
   target: racing_thoughts
   relation: RECOMMENDED_FOR
   properties: {}
-- source: melatonin
-  target: pregnancy
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: caution
-- source: melatonin
-  target: autoimmune_disease
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: caution
-- source: ashwagandha_sleep
-  target: pregnancy
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: avoid
-- source: valerian_root
-  target: pregnancy
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: caution
-- source: valerian_root
-  target: sedatives
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: caution
-- source: 5_htp_sleep
-  target: antidepressants
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: avoid
-- source: 5_htp_sleep
-  target: pregnancy
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: avoid
 - source: difficulty_falling_asleep
   target: racing_thoughts
   relation: SIMILAR_TO

@@ -331,53 +331,6 @@ nodes:
       elicitation_priority: 4
       is_global: false
 
-    # ============================================================================
-    # SAFETY CONSTRAINTS - Global hard constraints (ALWAYS ask these first)
-    # ============================================================================
-
-    # Medical Constraints
-    - id: medical_constraint_pregnancy
-      category: medical_constraints
-      value: "no"
-      data_type: boolean
-      elicitation_priority: 1
-      is_global: true
-
-    - id: medical_constraint_breastfeeding
-      category: medical_constraints
-      value: "no"
-      data_type: boolean
-      elicitation_priority: 1
-      is_global: true
-
-    - id: medical_constraint_ibd
-      category: medical_constraints
-      value: "no"
-      data_type: boolean
-      elicitation_priority: 1
-      is_global: true
-
-    - id: medical_constraint_crohns
-      category: medical_constraints
-      value: "no"
-      data_type: boolean
-      elicitation_priority: 1
-      is_global: true
-
-    - id: medical_constraint_ulcerative_colitis
-      category: medical_constraints
-      value: "no"
-      data_type: boolean
-      elicitation_priority: 1
-      is_global: true
-
-    - id: medical_constraint_diabetes
-      category: medical_constraints
-      value: "no"
-      data_type: boolean
-      elicitation_priority: 1
-      is_global: true
-
     # Allergy Constraints
     - id: allergy_constraint_dairy
       category: allergies
@@ -689,36 +642,6 @@ nodes:
   # CONSTRAINTS - User limitations that exclude certain products
   # ============================================================================
   constraints:
-    - id: pregnancy
-      type: "medical"
-      value: "true"
-      severity: "hard"
-
-    - id: breastfeeding
-      type: "medical"
-      value: "true"
-      severity: "hard"
-
-    - id: ibd_condition
-      type: "medical"
-      value: "ibd"
-      severity: "hard"
-
-    - id: crohns_condition
-      type: "medical"
-      value: "crohns"
-      severity: "hard"
-
-    - id: ulcerative_colitis_condition
-      type: "medical"
-      value: "ulcerative_colitis"
-      severity: "hard"
-
-    - id: diabetes_condition
-      type: "medical"
-      value: "diabetes"
-      severity: "soft"
-
     - id: allergy_dairy
       type: "allergy"
       value: "dairy"
@@ -833,21 +756,6 @@ nodes:
       options:
         - "Yes"
         - "No"
-
-    # Safety Constraint Questions (asked first for all users)
-    - id: q_medical_constraints
-      text: "Do any of these medical conditions apply to you?"
-      response_type: "multi_choice"
-      options:
-        - "Pregnancy"
-        - "Breastfeeding"
-        - "Inflammatory Bowel Disease (IBD)"
-        - "Crohn's disease"
-        - "Ulcerative colitis"
-        - "Diabetes"
-        - "None of the above"
-      validation_rules:
-        allow_none: true
 
     - id: q_allergies
       text: "Do you have any of these allergies?"
@@ -1064,31 +972,6 @@ edges:
     properties:
       condition: "if_diarrhea_or_dysbiosis"
       timing: "immediate"
-
-  # Global Safety Constraint Questions (asked FIRST for everyone)
-  - source: medical_constraint_pregnancy
-    target: q_medical_constraints
-    relation: ELICITS_QUESTION
-    properties:
-      condition: "always"
-      timing: "immediate"
-      is_safety_critical: true
-
-  - source: medical_constraint_breastfeeding
-    target: q_medical_constraints
-    relation: ELICITS_QUESTION
-    properties:
-      condition: "always"
-      timing: "immediate"
-      is_safety_critical: true
-
-  - source: medical_constraint_ibd
-    target: q_medical_constraints
-    relation: ELICITS_QUESTION
-    properties:
-      condition: "always"
-      timing: "immediate"
-      is_safety_critical: true
 
   - source: allergy_constraint_dairy
     target: q_allergies
@@ -1597,27 +1480,6 @@ edges:
       severity: "caution"
       alternative_ingredients:
         - "vegan_probiotic_strains"
-
-  # High-dose Magnesium with Diabetes
-  - source: magnesium_oxide
-    target: diabetes_condition
-    relation: CONTRAINDICATED_FOR
-    properties:
-      reason: "May affect blood sugar; monitor levels closely"
-      severity: "caution"
-      alternative_ingredients:
-        - "magnesium_citrate"
-
-  # Fiber during IBD Flare
-  - source: psyllium_husk
-    target: ibd_condition
-    relation: CONTRAINDICATED_FOR
-    properties:
-      reason: "May worsen symptoms during active IBD flare"
-      severity: "caution"
-      alternative_ingredients:
-        - "l_glutamine"
-        - "butyrate"
 
   # Betaine HCl with Acidity
   - source: betaine_hcl

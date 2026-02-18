@@ -361,19 +361,7 @@ nodes:
     category: adaptogen
     strength_levels:
     - 200-600mg
-  constraints:
-  - id: blood_thinner_interaction_aging
-    type: medical
-    value: blood thinner interaction aging
-    severity: hard
-  - id: chemotherapy_interaction
-    type: medical
-    value: chemotherapy interaction
-    severity: hard
-  - id: autoimmune_caution
-    type: medical
-    value: autoimmune caution
-    severity: soft
+  constraints: []
   questions: []
   products: []
   domains: []
@@ -784,23 +772,3 @@ edges:
   relation: OFTEN_PAIRED_WITH
   properties:
     mechanism: Work together for bone health and calcium metabolism
-- source: resveratrol
-  target: blood_thinner_interaction_aging
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: moderate
-- source: curcumin_aging
-  target: blood_thinner_interaction_aging
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: moderate
-- source: glutathione_aging
-  target: chemotherapy_interaction
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: high
-- source: nac_aging
-  target: chemotherapy_interaction
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: high
