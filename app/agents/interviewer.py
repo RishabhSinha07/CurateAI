@@ -584,8 +584,8 @@ If the match is not obvious, choose the closest related problem."""
     missing_required = [s for s in required_slots if s not in already_filled]
     unfilled_optional = [s for s in optional_slots if s not in already_filled]
 
-    # Cap personalisation questions at 2 — proceed to search after that
-    MAX_PERSONALISATION_QUESTIONS = 2
+    # Cap personalisation questions at 3 — proceed to search after that
+    MAX_PERSONALISATION_QUESTIONS = 3
     questions_asked = graph_state.get("questions_asked", 0)
 
     if questions_asked >= MAX_PERSONALISATION_QUESTIONS:
