@@ -311,23 +311,7 @@ nodes:
     category: antioxidant
     strength_levels:
     - 100-300mg
-  constraints:
-  - id: pregnancy_contraindication
-    type: medical
-    value: pregnancy contraindication
-    severity: hard
-  - id: breastfeeding_caution
-    type: medical
-    value: breastfeeding caution
-    severity: soft
-  - id: hormone_sensitive_conditions
-    type: medical
-    value: hormone sensitive conditions
-    severity: hard
-  - id: thyroid_medication_interaction
-    type: medical
-    value: thyroid medication interaction
-    severity: soft
+  constraints: []
   questions: []
   products: []
   domains: []
@@ -645,23 +629,3 @@ edges:
   relation: OFTEN_PAIRED_WITH
   properties:
     mechanism: Both support reproductive health and hormone balance
-- source: vitex
-  target: pregnancy_contraindication
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: high
-- source: black_cohosh
-  target: pregnancy_contraindication
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: high
-- source: ashwagandha_hormonal
-  target: thyroid_medication_interaction
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: moderate
-- source: maca
-  target: hormone_sensitive_conditions
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: moderate

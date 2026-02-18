@@ -619,49 +619,7 @@ nodes:
     - 200mg
     - 400mg
     description: Enhances mental performance and reduces fatigue
-  constraints:
-  - id: pregnancy
-    type: medical
-    value: Pregnancy
-    severity: hard
-    name: pregnancy
-    display_name: Pregnancy
-    description: Currently pregnant
-  - id: breastfeeding
-    type: medical
-    value: Breastfeeding
-    severity: soft
-    name: breastfeeding
-    display_name: Breastfeeding
-    description: Currently breastfeeding
-  - id: blood_thinners
-    type: medical
-    value: Blood Thinning Medication
-    severity: hard
-    name: blood_thinners
-    display_name: Blood Thinning Medication
-    description: Taking anticoagulants or blood thinners
-  - id: high_blood_pressure
-    type: medical
-    value: High Blood Pressure
-    severity: soft
-    name: high_blood_pressure
-    display_name: High Blood Pressure
-    description: Hypertension
-  - id: anxiety_disorder
-    type: medical
-    value: Anxiety Disorder
-    severity: soft
-    name: anxiety_disorder
-    display_name: Anxiety Disorder
-    description: Diagnosed anxiety disorder
-  - id: caffeine_sensitivity
-    type: medical
-    value: Caffeine Sensitivity
-    severity: soft
-    name: caffeine_sensitivity
-    display_name: Caffeine Sensitivity
-    description: Sensitivity to caffeine
+  constraints: []
   questions: []
   products: []
   domains: []
@@ -951,21 +909,6 @@ edges:
   target: cognitive_demand_high
   relation: RECOMMENDED_FOR
   properties: {}
-- source: ginkgo_biloba
-  target: blood_thinners
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: caution
-- source: caffeine_focus
-  target: anxiety_disorder
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: caution
-- source: caffeine_focus
-  target: high_blood_pressure
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: caution
 - source: brain_fog
   target: lack_mental_clarity
   relation: SIMILAR_TO

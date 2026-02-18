@@ -337,23 +337,7 @@ nodes:
     category: herb
     strength_levels:
     - 300-500mg
-  constraints:
-  - id: blood_pressure_medication_interaction
-    type: medical
-    value: blood pressure medication interaction
-    severity: hard
-  - id: pregnancy_unsafe_sexual
-    type: medical
-    value: pregnancy unsafe sexual
-    severity: hard
-  - id: hormone_sensitive_cancer_risk
-    type: medical
-    value: hormone sensitive cancer risk
-    severity: hard
-  - id: antidepressant_interaction
-    type: medical
-    value: antidepressant interaction
-    severity: soft
+  constraints: []
   questions: []
   products: []
   domains: []
@@ -716,28 +700,3 @@ edges:
   relation: OFTEN_PAIRED_WITH
   properties:
     mechanism: Complementary adaptogenic effects on libido and stress
-- source: l_arginine
-  target: blood_pressure_medication_interaction
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: high
-- source: korean_red_ginseng
-  target: blood_pressure_medication_interaction
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: moderate
-- source: tribulus_terrestris
-  target: pregnancy_unsafe_sexual
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: high
-- source: dhea
-  target: hormone_sensitive_cancer_risk
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: high
-- source: saffron_sexual
-  target: antidepressant_interaction
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: moderate

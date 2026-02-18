@@ -820,69 +820,27 @@ nodes:
     - 10B CFU
     description: Enhances protein absorption and gut health
   constraints:
-  - id: kidney_disease
-    type: medical
-    value: Kidney Disease
-    severity: hard
-    name: kidney_disease
-    display_name: Kidney Disease
-    description: Chronic kidney disease or impaired kidney function
-  - id: liver_disease
-    type: medical
-    value: Liver Disease
-    severity: hard
-    name: liver_disease
-    display_name: Liver Disease
-    description: Chronic liver disease or impaired liver function
-  - id: pregnancy
-    type: medical
-    value: Pregnancy
-    severity: hard
-    name: pregnancy
-    display_name: Pregnancy
-    description: Currently pregnant
-  - id: breastfeeding
-    type: medical
-    value: Breastfeeding
-    severity: soft
-    name: breastfeeding
-    display_name: Breastfeeding
-    description: Currently breastfeeding
   - id: dairy_allergy
-    type: medical
+    type: allergy
     value: Dairy/Lactose Allergy
     severity: hard
     name: dairy_allergy
     display_name: Dairy/Lactose Allergy
     description: Allergy or intolerance to dairy products
   - id: soy_allergy
-    type: medical
+    type: allergy
     value: Soy Allergy
     severity: hard
     name: soy_allergy
     display_name: Soy Allergy
     description: Allergy to soy products
   - id: shellfish_allergy
-    type: medical
+    type: allergy
     value: Shellfish Allergy
     severity: hard
     name: shellfish_allergy
     display_name: Shellfish Allergy
     description: Allergy to shellfish (relevant for marine collagen)
-  - id: high_blood_pressure
-    type: medical
-    value: High Blood Pressure
-    severity: soft
-    name: high_blood_pressure
-    display_name: High Blood Pressure
-    description: Hypertension or elevated blood pressure
-  - id: diabetes
-    type: medical
-    value: Diabetes
-    severity: soft
-    name: diabetes
-    display_name: Diabetes
-    description: Type 1 or Type 2 diabetes
   questions: []
   products: []
   domains: []
@@ -1482,16 +1440,6 @@ edges:
   relation: CONTRAINDICATED_FOR
   properties:
     severity: avoid
-- source: creatine_monohydrate
-  target: kidney_disease
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: avoid
-- source: creatine_hcl
-  target: kidney_disease
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: avoid
 - source: collagen_peptides_marine
   target: shellfish_allergy
   relation: CONTRAINDICATED_FOR
@@ -1502,11 +1450,6 @@ edges:
   relation: CONTRAINDICATED_FOR
   properties:
     severity: caution
-- source: ashwagandha
-  target: pregnancy
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: avoid
 - source: muscle_soreness
   target: slow_muscle_recovery
   relation: SIMILAR_TO

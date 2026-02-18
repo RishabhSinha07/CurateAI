@@ -351,46 +351,6 @@ nodes:
       elicitation_priority: 5
       is_global: false
 
-    # ============================================================================
-    # SAFETY CONSTRAINTS - Global hard constraints
-    # ============================================================================
-
-    # Medical Constraints
-    - id: medical_constraint_pregnancy
-      category: medical_constraints
-      value: "no"
-      data_type: boolean
-      elicitation_priority: 1
-      is_global: true
-
-    - id: medical_constraint_breastfeeding
-      category: medical_constraints
-      value: "no"
-      data_type: boolean
-      elicitation_priority: 1
-      is_global: true
-
-    - id: medical_constraint_kidney_disease
-      category: medical_constraints
-      value: "no"
-      data_type: boolean
-      elicitation_priority: 1
-      is_global: true
-
-    - id: medical_constraint_liver_disease
-      category: medical_constraints
-      value: "no"
-      data_type: boolean
-      elicitation_priority: 1
-      is_global: true
-
-    - id: medical_constraint_heart_condition
-      category: medical_constraints
-      value: "no"
-      data_type: boolean
-      elicitation_priority: 1
-      is_global: true
-
     # Allergy Constraints
     - id: allergy_constraint_dairy
       category: allergies
@@ -653,31 +613,6 @@ nodes:
   # CONSTRAINTS - User limitations that exclude certain products
   # ============================================================================
   constraints:
-    - id: pregnancy
-      type: "medical"
-      value: "true"
-      severity: "hard"
-
-    - id: breastfeeding
-      type: "medical"
-      value: "true"
-      severity: "hard"
-
-    - id: kidney_disease
-      type: "medical"
-      value: "kidney"
-      severity: "hard"
-
-    - id: liver_disease
-      type: "medical"
-      value: "liver"
-      severity: "hard"
-
-    - id: heart_condition
-      type: "medical"
-      value: "heart"
-      severity: "soft"
-
     - id: allergy_dairy
       type: "allergy"
       value: "dairy"
@@ -789,20 +724,6 @@ nodes:
         - "Regular meals (3+ meals daily)"
         - "Irregular timing"
         - "Skip meals often"
-
-    # Safety Constraint Questions
-    - id: q_medical_constraints
-      text: "Do any of these medical conditions apply to you?"
-      response_type: "multi_choice"
-      options:
-        - "Pregnancy"
-        - "Breastfeeding"
-        - "Kidney disease"
-        - "Liver disease"
-        - "Heart condition"
-        - "None of the above"
-      validation_rules:
-        allow_none: true
 
     - id: q_allergies
       text: "Do you have any of these allergies?"
@@ -992,15 +913,6 @@ edges:
     properties:
       condition: "if_energy_crash"
       timing: "immediate"
-
-  # Safety Questions
-  - source: medical_constraint_pregnancy
-    target: q_medical_constraints
-    relation: ELICITS_QUESTION
-    properties:
-      condition: "always"
-      timing: "immediate"
-      is_safety_critical: true
 
   - source: allergy_constraint_dairy
     target: q_allergies
@@ -1404,35 +1316,6 @@ edges:
       severity: "avoid"
       alternative_ingredients:
         - "vegan_protein"
-
-  # High Protein with Kidney Disease
-  - source: whey_protein_isolate
-    target: kidney_disease
-    relation: CONTRAINDICATED_FOR
-    properties:
-      reason: "High protein intake may strain kidneys"
-      severity: "avoid"
-      alternative_ingredients: []
-
-  - source: creatine_monohydrate
-    target: kidney_disease
-    relation: CONTRAINDICATED_FOR
-    properties:
-      reason: "May affect kidney function"
-      severity: "avoid"
-      alternative_ingredients:
-        - "beta_alanine"
-
-  # Ashwagandha during Pregnancy
-  - source: ashwagandha
-    target: pregnancy
-    relation: CONTRAINDICATED_FOR
-    properties:
-      reason: "May cause hormonal effects; safety not established"
-      severity: "avoid"
-      alternative_ingredients:
-        - "magnesium"
-        - "vitamin_b_complex"
 
   # --------------------------------------------------------------------------
   # PROBLEM → SIMILAR_TO → PROBLEM

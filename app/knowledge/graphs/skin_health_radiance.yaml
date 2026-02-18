@@ -283,25 +283,6 @@ nodes:
       elicitation_priority: 6
       is_global: false
 
-    # ============================================================================
-    # SAFETY CONSTRAINTS - Global hard constraints (ALWAYS ask these first)
-    # ============================================================================
-
-    # Medical Constraints
-    - id: medical_constraint_pregnancy
-      category: medical_constraints
-      value: "no"
-      data_type: boolean
-      elicitation_priority: 1
-      is_global: true
-
-    - id: medical_constraint_breastfeeding
-      category: medical_constraints
-      value: "no"
-      data_type: boolean
-      elicitation_priority: 1
-      is_global: true
-
     # Allergy Constraints
     - id: allergy_constraint_fish
       category: allergies
@@ -459,16 +440,6 @@ nodes:
   # CONSTRAINTS - User limitations that exclude certain products
   # ============================================================================
   constraints:
-    - id: pregnancy
-      type: "medical"
-      value: "true"
-      severity: "hard"
-
-    - id: breastfeeding
-      type: "medical"
-      value: "true"
-      severity: "hard"
-
     - id: allergy_shellfish
       type: "allergy"
       value: "shellfish"
@@ -565,17 +536,6 @@ nodes:
         - "Female"
         - "Male"
         - "Prefer not to say"
-
-    # Safety Constraint Questions (asked first for all users)
-    - id: q_medical_constraints
-      text: "Do any of these medical conditions apply to you?"
-      response_type: "multi_choice"
-      options:
-        - "Pregnancy"
-        - "Breastfeeding"
-        - "None of the above"
-      validation_rules:
-        allow_none: true
 
     - id: q_allergies
       text: "Do you have any of these allergies?"
@@ -752,23 +712,6 @@ edges:
     properties:
       condition: "if_problem_includes_oxidative_stress"
       timing: "immediate"
-
-  # Global Safety Constraint Questions (asked FIRST for everyone)
-  - source: medical_constraint_pregnancy
-    target: q_medical_constraints
-    relation: ELICITS_QUESTION
-    properties:
-      condition: "always"
-      timing: "immediate"
-      is_safety_critical: true
-
-  - source: medical_constraint_breastfeeding
-    target: q_medical_constraints
-    relation: ELICITS_QUESTION
-    properties:
-      condition: "always"
-      timing: "immediate"
-      is_safety_critical: true
 
   - source: allergy_constraint_fish
     target: q_allergies
@@ -1190,17 +1133,6 @@ edges:
       severity: "avoid"
       alternative_ingredients:
         - "vegan_collagen_builder"
-
-  # Vitamin A during pregnancy
-  - source: vitamin_a
-    target: pregnancy
-    relation: CONTRAINDICATED_FOR
-    properties:
-      reason: "High doses may cause birth defects"
-      severity: "avoid"
-      alternative_ingredients:
-        - "vitamin_c"
-        - "vitamin_e"
 
   # --------------------------------------------------------------------------
   # PROBLEM → SIMILAR_TO → PROBLEM

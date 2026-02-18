@@ -570,42 +570,7 @@ nodes:
     - 250mg
     - 500mg
     description: Natural anti-inflammatory for joint comfort
-  constraints:
-  - id: kidney_stones
-    type: medical
-    value: History of Kidney Stones
-    severity: hard
-    name: kidney_stones
-    display_name: History of Kidney Stones
-    description: Calcium supplementation risk
-  - id: hypercalcemia
-    type: medical
-    value: High Blood Calcium
-    severity: hard
-    name: hypercalcemia
-    display_name: High Blood Calcium
-    description: Elevated calcium levels
-  - id: shellfish_allergy
-    type: medical
-    value: Shellfish Allergy
-    severity: hard
-    name: shellfish_allergy
-    display_name: Shellfish Allergy
-    description: Glucosamine often derived from shellfish
-  - id: blood_thinners
-    type: medical
-    value: Blood Thinning Medication
-    severity: hard
-    name: blood_thinners
-    display_name: Blood Thinning Medication
-    description: Interactions with vitamin K, omega-3, ginger
-  - id: pregnancy
-    type: medical
-    value: Pregnancy
-    severity: soft
-    name: pregnancy
-    display_name: Pregnancy
-    description: Currently pregnant
+  constraints: []
   questions: []
   products: []
   domains: []
@@ -899,31 +864,6 @@ edges:
   target: age_group_46_55
   relation: RECOMMENDED_FOR
   properties: {}
-- source: calcium_carbonate
-  target: kidney_stones
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: caution
-- source: calcium_carbonate
-  target: hypercalcemia
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: avoid
-- source: glucosamine
-  target: shellfish_allergy
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: caution
-- source: vitamin_k2_mk7
-  target: blood_thinners
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: caution
-- source: omega_3_joint
-  target: blood_thinners
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: caution
 - source: low_bone_density
   target: osteoporosis
   relation: SIMILAR_TO

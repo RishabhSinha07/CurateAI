@@ -767,63 +767,7 @@ nodes:
     - 250mg
     - 500mg
     description: Reduces stress eating and supports energy during calorie deficit
-  constraints:
-  - id: pregnancy
-    type: medical
-    value: Pregnancy
-    severity: hard
-    name: pregnancy
-    display_name: Pregnancy
-    description: Currently pregnant
-  - id: breastfeeding
-    type: medical
-    value: Breastfeeding
-    severity: soft
-    name: breastfeeding
-    display_name: Breastfeeding
-    description: Currently breastfeeding
-  - id: diabetes
-    type: medical
-    value: Diabetes
-    severity: hard
-    name: diabetes
-    display_name: Diabetes
-    description: Type 1 or Type 2 diabetes
-  - id: high_blood_pressure
-    type: medical
-    value: High Blood Pressure
-    severity: hard
-    name: high_blood_pressure
-    display_name: High Blood Pressure
-    description: Hypertension
-  - id: heart_disease
-    type: medical
-    value: Heart Disease
-    severity: hard
-    name: heart_disease
-    display_name: Heart Disease
-    description: Cardiovascular disease
-  - id: eating_disorder
-    type: medical
-    value: Eating Disorder History
-    severity: hard
-    name: eating_disorder
-    display_name: Eating Disorder History
-    description: History of anorexia, bulimia, or other eating disorders
-  - id: thyroid_disorder
-    type: medical
-    value: Thyroid Disorder
-    severity: soft
-    name: thyroid_disorder
-    display_name: Thyroid Disorder
-    description: Hypothyroidism or hyperthyroidism
-  - id: caffeine_sensitivity
-    type: medical
-    value: Caffeine Sensitivity
-    severity: soft
-    name: caffeine_sensitivity
-    display_name: Caffeine Sensitivity
-    description: Sensitivity or adverse reactions to caffeine
+  constraints: []
   questions: []
   products: []
   domains: []
@@ -1165,46 +1109,6 @@ edges:
   target: emotional_eating
   relation: RECOMMENDED_FOR
   properties: {}
-- source: caffeine
-  target: pregnancy
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: caution
-- source: caffeine
-  target: high_blood_pressure
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: caution
-- source: caffeine
-  target: heart_disease
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: caution
-- source: green_tea_extract
-  target: pregnancy
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: caution
-- source: berberine
-  target: pregnancy
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: avoid
-- source: berberine
-  target: diabetes
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: caution
-- source: garcinia_cambogia
-  target: diabetes
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: caution
-- source: 5_htp
-  target: pregnancy
-  relation: CONTRAINDICATED_FOR
-  properties:
-    severity: avoid
 - source: difficulty_losing_weight
   target: slow_metabolism
   relation: SIMILAR_TO
