@@ -364,7 +364,7 @@ nodes:
     - id: diet_non_veg_constraint
       type: "dietary"
       value: "non_vegetarian"
-      severity: "none"
+      severity: "soft"
 
   # ============================================================================
   # QUESTIONS - Templates for eliciting information
@@ -631,7 +631,7 @@ edges:
       condition: "always"
       timing: "immediate"
 
-  - source: allergy_constraint_fish
+  - source: allergy_fish
     target: q_allergies
     relation: ELICITS_QUESTION
     properties:
@@ -639,7 +639,7 @@ edges:
       timing: "immediate"
       is_safety_critical: true
 
-  - source: allergy_constraint_shellfish
+  - source: allergy_shellfish
     target: q_allergies
     relation: ELICITS_QUESTION
     properties:

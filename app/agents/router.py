@@ -173,7 +173,15 @@ Current User Message: "{state['user_message']}"
         available_graphs = list_available_graphs()
         logger.info(f"Router extracted problem '{result.extracted_problem}', validating against graphs")
 
-        for graph_name in available_graphs:
+        # Validate against the router's chosen domain FIRST to avoid
+        # cross-domain false matches (e.g., "dull skin" matching "dull_hair"
+        # in hair graph instead of "dull_skin" in skin graph)
+        ordered_graphs = sorted(
+            available_graphs,
+            key=lambda g: (0 if g == result.domain_slug else 1)
+        )
+
+        for graph_name in ordered_graphs:
             try:
                 problem = GraphQueryEngine.extract_problem_from_text(
                     domain=graph_name,
