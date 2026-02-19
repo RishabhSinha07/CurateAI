@@ -435,42 +435,11 @@ If the match is not obvious, choose the closest related problem."""
                     candidate = None
 
             if not candidate:
-                # No candidate at all — show full problem list
-                # Provide helpful suggestions based on domain
-                # Try to load the graph to get example problems
-                try:
-                    graph = get_knowledge_graph(domain_slug)
-                    problems = graph.find_nodes_by_type('problem')
-
-                    if problems:
-                        # Get display names for first 6-8 problems as examples
-                        problem_examples = []
-                        for problem in problems[:8]:
-                            display_name = problem.get('display_name', problem.get('name', problem['id']))
-                            problem_examples.append(f"- {display_name}")
-
-                        domain_display = graph.metadata.display_name or domain_slug.replace('_', ' ').title()
-                        examples_text = "\n".join(problem_examples)
-
-                        new_state["response"] = (
-                            f"### {domain_display}\n\n"
-                            f"To give you the best recommendations, could you tell me what specific concern you'd like to address?\n\n"
-                            f"**Common concerns:**\n"
-                            f"{examples_text}"
-                        )
-                    else:
-                        # Fallback if no problems found
-                        new_state["response"] = (
-                            "I'd like to help you find the right product. "
-                            "Could you tell me more specifically about what concern you'd like to address?"
-                        )
-                except Exception as e:
-                    logger.error(f"Error loading problem examples for domain '{domain_slug}': {e}")
-                    # Generic fallback
-                    new_state["response"] = (
-                        "I'd like to help you find the right product. "
-                        "Could you tell me more specifically about what health goal or concern you'd like to address?"
-                    )
+                # No candidate — ask conversationally without listing problems.
+                new_state["response"] = (
+                    "To give you the best recommendations, could you tell me "
+                    "what specific concern you'd like to address?"
+                )
 
             new_state["status"] = "awaiting_slot"
             new_state["next_agent"] = None
