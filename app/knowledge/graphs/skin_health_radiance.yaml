@@ -443,10 +443,10 @@ nodes:
 edges:
   # --------------------------------------------------------------------------
   # PROBLEM → REQUIRES_KNOWING → ATTRIBUTE
-  # Defines which attributes are needed to recommend solutions for a problem
+  # All problems require knowing age, skin type, and sun exposure
   # --------------------------------------------------------------------------
 
-  # Poor Elasticity requires knowing age
+  # Poor Elasticity
   - source: poor_elasticity
     target: age_group_18_25
     relation: REQUIRES_KNOWING
@@ -455,43 +455,75 @@ edges:
       is_optional: false
       reason: "Age determines collagen loss severity and appropriate dosage"
 
-  # Dull Skin
-  - source: dull_skin
-    target: age_group_26_35
+  - source: poor_elasticity
+    target: skin_type_dry
     relation: REQUIRES_KNOWING
     properties:
       priority: 2
-      is_optional: true
+      is_optional: false
+      reason: "Skin type influences product format and hydration needs"
+
+  - source: poor_elasticity
+    target: sun_exposure_minimal
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 3
+      is_optional: false
+      reason: "Sun exposure accelerates collagen breakdown"
+
+  # Dull Skin
+  - source: dull_skin
+    target: age_group_18_25
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
       reason: "Age affects skin cell turnover rate"
 
   - source: dull_skin
     target: skin_type_dry
     relation: REQUIRES_KNOWING
     properties:
+      priority: 2
+      is_optional: false
+      reason: "Skin type determines hydration and radiance strategy"
+
+  - source: dull_skin
+    target: sun_exposure_minimal
+    relation: REQUIRES_KNOWING
+    properties:
       priority: 3
-      is_optional: true
-      reason: "Dry skin may need additional hydration support"
+      is_optional: false
+      reason: "Sun exposure affects antioxidant and brightening needs"
 
   # Dry Skin
   - source: dry_skin
-    target: skin_type_dry
+    target: age_group_18_25
     relation: REQUIRES_KNOWING
     properties:
       priority: 1
       is_optional: false
-      reason: "Skin type determines hydration strategy"
+      reason: "Aging affects skin's moisture retention capacity"
 
   - source: dry_skin
-    target: age_group_36_45
+    target: skin_type_dry
     relation: REQUIRES_KNOWING
     properties:
       priority: 2
-      is_optional: true
-      reason: "Aging affects skin's moisture retention capacity"
+      is_optional: false
+      reason: "Skin type determines hydration strategy"
 
-  # Fine Lines & Wrinkles
+  - source: dry_skin
+    target: sun_exposure_minimal
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 3
+      is_optional: false
+      reason: "Sun exposure contributes to moisture loss"
+
+  # Fine Lines
   - source: fine_lines
-    target: age_group_26_35
+    target: age_group_18_25
     relation: REQUIRES_KNOWING
     properties:
       priority: 1
@@ -499,20 +531,70 @@ edges:
       reason: "Age determines appropriate anti-aging intervention"
 
   - source: fine_lines
-    target: sun_exposure_minimal
+    target: skin_type_dry
     relation: REQUIRES_KNOWING
     properties:
       priority: 2
-      is_optional: true
-      reason: "Sun exposure affects antioxidant needs"
+      is_optional: false
+      reason: "Dry skin accentuates fine lines"
 
+  - source: fine_lines
+    target: sun_exposure_minimal
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 3
+      is_optional: false
+      reason: "Sun exposure accelerates fine line formation"
+
+  # Wrinkles
   - source: wrinkles
-    target: age_group_36_45
+    target: age_group_18_25
     relation: REQUIRES_KNOWING
     properties:
       priority: 1
       is_optional: false
       reason: "Age determines collagen supplementation approach"
+
+  - source: wrinkles
+    target: skin_type_dry
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: false
+      reason: "Skin type affects wrinkle depth and treatment approach"
+
+  - source: wrinkles
+    target: sun_exposure_minimal
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 3
+      is_optional: false
+      reason: "Sun exposure is a primary cause of deep wrinkles"
+
+  # Uneven Tone
+  - source: uneven_tone
+    target: age_group_18_25
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 1
+      is_optional: false
+      reason: "Age influences pigmentation patterns and treatment options"
+
+  - source: uneven_tone
+    target: skin_type_dry
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 2
+      is_optional: false
+      reason: "Skin type affects pigmentation and brightening approach"
+
+  - source: uneven_tone
+    target: sun_exposure_minimal
+    relation: REQUIRES_KNOWING
+    properties:
+      priority: 3
+      is_optional: false
+      reason: "Sun exposure is a primary driver of hyperpigmentation"
 
   # --------------------------------------------------------------------------
   # ATTRIBUTE → ELICITS_QUESTION → QUESTION
@@ -530,7 +612,7 @@ edges:
     target: q_skin_type
     relation: ELICITS_QUESTION
     properties:
-      condition: "if_problem_includes_dry_skin"
+      condition: "always"
       timing: "immediate"
 
   - source: sun_exposure_minimal
@@ -805,7 +887,7 @@ edges:
       strength: 0.90
       evidence: "proven"
 
-  # Higher doses for older age groups
+  # Collagen recommended for older age groups
   - source: collagen_type_1_3_marine
     target: age_group_36_45
     relation: RECOMMENDED_FOR
@@ -818,6 +900,34 @@ edges:
     relation: RECOMMENDED_FOR
     properties:
       strength: 1.0
+      evidence: "proven"
+
+  - source: collagen_type_1_3_bovine
+    target: age_group_36_45
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.95
+      evidence: "proven"
+
+  - source: collagen_type_1_3_bovine
+    target: age_group_46_plus
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 1.0
+      evidence: "proven"
+
+  - source: vegan_collagen_builder
+    target: age_group_36_45
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.85
+      evidence: "proven"
+
+  - source: vegan_collagen_builder
+    target: age_group_46_plus
+    relation: RECOMMENDED_FOR
+    properties:
+      strength: 0.90
       evidence: "proven"
 
   # Astaxanthin for high sun exposure
