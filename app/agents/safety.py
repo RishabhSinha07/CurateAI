@@ -251,10 +251,7 @@ Write your response following these 4 layers IN ORDER:
 **Lifestyle Foundations**
 - 2-3 practical, non-product suggestions relevant to the problem (sleep, hydration, stress, diet tips)
 
-**Key Ingredients to Look For**
-- 2-3 top treating ingredients with their mechanism and onset time. Use the ingredient data provided above. Format each as: **Ingredient Name** — mechanism (onset: timeframe)
-
-(Do NOT list product names — the product cards handle that.)
+(Do NOT list product names or specific ingredients — the product cards handle that.)
 
 ## Important to Know
 (Layer 4 — Safety, 1-3 bullets) Who should be cautious, what to monitor, when to consult a professional. Base this on the domain safety guidelines and any applied constraints.

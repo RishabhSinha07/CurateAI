@@ -261,8 +261,8 @@ async def reranker_agent(state: AgentState) -> AgentState:
         return new_state
 
     # Trust search ranking (graph boosting + vector similarity already applied)
-    # Take top 5 products
-    final_products = safe_products[:5]
+    # Take top 10 products
+    final_products = safe_products[:10]
 
     # Build treating ingredients list from knowledge graph
     treating_ingredients: List[Dict[str, Any]] = []
