@@ -41,31 +41,6 @@ nodes:
     - moderate
     - severe
     description: Low quality, non-restorative sleep
-  - id: night_waking
-    name: night_waking
-    display_name: Frequent Night Waking (Sleep Maintenance)
-    synonyms:
-    - wake up during night
-    - can't stay asleep
-    - middle insomnia
-    - sleep maintenance insomnia
-    severity_levels:
-    - mild
-    - moderate
-    - severe
-    description: Waking up multiple times during the night
-  - id: early_morning_waking
-    name: early_morning_waking
-    display_name: Early Morning Waking
-    synonyms:
-    - wake up too early
-    - can't sleep past 5am
-    - terminal insomnia
-    severity_levels:
-    - mild
-    - moderate
-    - severe
-    description: Waking up too early and unable to return to sleep
   - id: chronic_stress
     name: chronic_stress
     display_name: Chronic Stress
@@ -134,36 +109,6 @@ nodes:
     - severe
     description: Physical tension and inability to relax
   attributes:
-  - id: sleep_duration_less_than_5_hours
-    category: sleep_duration
-    value: less_than_5_hours
-    data_type: single_choice
-    elicitation_priority: 1
-    is_global: false
-  - id: sleep_duration_5_6_hours
-    category: sleep_duration
-    value: 5_6_hours
-    data_type: single_choice
-    elicitation_priority: 1
-    is_global: false
-  - id: sleep_duration_6_7_hours
-    category: sleep_duration
-    value: 6_7_hours
-    data_type: single_choice
-    elicitation_priority: 1
-    is_global: false
-  - id: sleep_duration_7_8_hours
-    category: sleep_duration
-    value: 7_8_hours
-    data_type: single_choice
-    elicitation_priority: 1
-    is_global: false
-  - id: sleep_duration_more_than_8_hours
-    category: sleep_duration
-    value: more_than_8_hours
-    data_type: single_choice
-    elicitation_priority: 1
-    is_global: false
   - id: sleep_schedule_very_irregular
     category: sleep_schedule
     value: very_irregular
@@ -187,30 +132,6 @@ nodes:
     value: very_regular
     data_type: single_choice
     elicitation_priority: 1
-    is_global: false
-  - id: bedtime_before_10pm
-    category: bedtime
-    value: before_10pm
-    data_type: single_choice
-    elicitation_priority: 3
-    is_global: false
-  - id: bedtime_10pm_11pm
-    category: bedtime
-    value: 10pm_11pm
-    data_type: single_choice
-    elicitation_priority: 3
-    is_global: false
-  - id: bedtime_11pm_12am
-    category: bedtime
-    value: 11pm_12am
-    data_type: single_choice
-    elicitation_priority: 3
-    is_global: false
-  - id: bedtime_after_12am
-    category: bedtime
-    value: after_12am
-    data_type: single_choice
-    elicitation_priority: 3
     is_global: false
   - id: stress_level_low
     category: stress_level
@@ -265,54 +186,6 @@ nodes:
     value: multiple_sources
     data_type: single_choice
     elicitation_priority: 3
-    is_global: false
-  - id: anxiety_frequency_rarely
-    category: anxiety_frequency
-    value: rarely
-    data_type: single_choice
-    elicitation_priority: 3
-    is_global: false
-  - id: anxiety_frequency_occasionally
-    category: anxiety_frequency
-    value: occasionally
-    data_type: single_choice
-    elicitation_priority: 3
-    is_global: false
-  - id: anxiety_frequency_frequently
-    category: anxiety_frequency
-    value: frequently
-    data_type: single_choice
-    elicitation_priority: 3
-    is_global: false
-  - id: anxiety_frequency_daily
-    category: anxiety_frequency
-    value: daily
-    data_type: single_choice
-    elicitation_priority: 3
-    is_global: false
-  - id: caffeine_intake_none
-    category: caffeine_intake
-    value: none
-    data_type: single_choice
-    elicitation_priority: 1
-    is_global: false
-  - id: caffeine_intake_low
-    category: caffeine_intake
-    value: low
-    data_type: single_choice
-    elicitation_priority: 1
-    is_global: false
-  - id: caffeine_intake_moderate
-    category: caffeine_intake
-    value: moderate
-    data_type: single_choice
-    elicitation_priority: 1
-    is_global: false
-  - id: caffeine_intake_high
-    category: caffeine_intake
-    value: high
-    data_type: single_choice
-    elicitation_priority: 1
     is_global: false
   - id: screen_time_before_bed_none_1_hour_before
     category: screen_time_before_bed
@@ -457,6 +330,25 @@ nodes:
     value: variable_schedule
     data_type: single_choice
     elicitation_priority: 3
+    is_global: false
+  # Sleep quality - secondary attribute for stress/anxiety problems
+  - id: sleep_quality_good
+    category: sleep_quality
+    value: good
+    data_type: single_choice
+    elicitation_priority: 2
+    is_global: false
+  - id: sleep_quality_fair
+    category: sleep_quality
+    value: fair
+    data_type: single_choice
+    elicitation_priority: 2
+    is_global: false
+  - id: sleep_quality_poor
+    category: sleep_quality
+    value: poor
+    data_type: single_choice
+    elicitation_priority: 2
     is_global: false
   ingredients:
   - id: melatonin
@@ -684,102 +576,129 @@ nodes:
   domains: []
   subdomains: []
 edges:
+# --------------------------------------------------------------------------
+# PROBLEM → REQUIRES_KNOWING → ATTRIBUTE
+# --------------------------------------------------------------------------
+
+# Difficulty Falling Asleep - requires sleep schedule, shift work, stress level
 - source: difficulty_falling_asleep
   target: sleep_schedule_very_irregular
   relation: REQUIRES_KNOWING
-  properties: {}
+  properties:
+    priority: 1
+    is_optional: false
+    reason: "Irregular sleep schedule disrupts circadian rhythm"
 - source: difficulty_falling_asleep
-  target: bedtime_before_10pm
+  target: shift_work_night_shift
   relation: REQUIRES_KNOWING
-  properties: {}
-- source: difficulty_falling_asleep
-  target: caffeine_intake_none
-  relation: REQUIRES_KNOWING
-  properties: {}
+  properties:
+    priority: 1
+    is_optional: false
+    reason: "Night shift work disrupts natural sleep-wake cycle"
 - source: difficulty_falling_asleep
   target: screen_time_before_bed_none_1_hour_before
   relation: REQUIRES_KNOWING
-  properties: {}
+  properties:
+    priority: 2
+    is_optional: true
+    reason: "Screen time before bed affects melatonin production"
 - source: difficulty_falling_asleep
   target: stress_level_low
   relation: REQUIRES_KNOWING
-  properties: {}
-- source: poor_sleep_quality
-  target: sleep_duration_less_than_5_hours
-  relation: REQUIRES_KNOWING
-  properties: {}
-- source: poor_sleep_quality
-  target: caffeine_intake_none
-  relation: REQUIRES_KNOWING
-  properties: {}
+  properties:
+    priority: 1
+    is_optional: false
+    reason: "Stress level affects ability to fall asleep"
+
+# Poor Sleep Quality - requires stress level, sleep quality
 - source: poor_sleep_quality
   target: alcohol_consumption_none
   relation: REQUIRES_KNOWING
-  properties: {}
+  properties:
+    priority: 2
+    is_optional: true
+    reason: "Alcohol disrupts sleep architecture"
 - source: poor_sleep_quality
   target: stress_level_low
   relation: REQUIRES_KNOWING
-  properties: {}
-- source: night_waking
-  target: sleep_duration_less_than_5_hours
-  relation: REQUIRES_KNOWING
-  properties: {}
-- source: night_waking
-  target: stress_level_low
-  relation: REQUIRES_KNOWING
-  properties: {}
-- source: night_waking
-  target: caffeine_intake_none
-  relation: REQUIRES_KNOWING
-  properties: {}
-- source: night_waking
-  target: age_group_18_25
-  relation: REQUIRES_KNOWING
-  properties: {}
+  properties:
+    priority: 1
+    is_optional: false
+    reason: "Stress level directly impacts sleep quality"
+
+# Chronic Stress - requires stress level, stress source, sleep quality
 - source: chronic_stress
   target: stress_level_low
   relation: REQUIRES_KNOWING
-  properties: {}
+  properties:
+    priority: 1
+    is_optional: false
+    reason: "Stress level determines intervention intensity"
 - source: chronic_stress
   target: stress_source_work
   relation: REQUIRES_KNOWING
-  properties: {}
-- source: chronic_stress
-  target: sleep_duration_less_than_5_hours
-  relation: REQUIRES_KNOWING
-  properties: {}
+  properties:
+    priority: 2
+    is_optional: true
+    reason: "Stress source helps tailor recommendations"
 - source: chronic_stress
   target: exercise_timing_morning
   relation: REQUIRES_KNOWING
-  properties: {}
-- source: anxiety
-  target: anxiety_frequency_rarely
+  properties:
+    priority: 3
+    is_optional: true
+    reason: "Exercise timing affects stress management"
+- source: chronic_stress
+  target: sleep_quality_poor
   relation: REQUIRES_KNOWING
-  properties: {}
+  properties:
+    priority: 1
+    is_optional: false
+    reason: "Poor sleep quality often accompanies chronic stress and may need additional support"
+
+# Anxiety - requires stress level, sleep quality
 - source: anxiety
   target: stress_level_low
   relation: REQUIRES_KNOWING
-  properties: {}
+  properties:
+    priority: 1
+    is_optional: false
+    reason: "Stress level compounds anxiety symptoms"
 - source: anxiety
-  target: caffeine_intake_none
+  target: sleep_quality_poor
   relation: REQUIRES_KNOWING
-  properties: {}
-- source: anxiety
-  target: sleep_duration_less_than_5_hours
-  relation: REQUIRES_KNOWING
-  properties: {}
+  properties:
+    priority: 1
+    is_optional: false
+    reason: "Poor sleep quality worsens anxiety and may need additional support"
+
+# Burnout - requires stress level, stress source, sleep quality
 - source: burnout
   target: stress_level_low
   relation: REQUIRES_KNOWING
-  properties: {}
+  properties:
+    priority: 1
+    is_optional: false
+    reason: "Stress level determines burnout severity"
 - source: burnout
   target: stress_source_work
   relation: REQUIRES_KNOWING
-  properties: {}
+  properties:
+    priority: 2
+    is_optional: true
+    reason: "Stress source helps tailor recovery recommendations"
 - source: burnout
-  target: sleep_duration_less_than_5_hours
+  target: sleep_quality_poor
   relation: REQUIRES_KNOWING
-  properties: {}
+  properties:
+    priority: 1
+    is_optional: false
+    reason: "Poor sleep quality compounds burnout and may need additional support"
+
+# --------------------------------------------------------------------------
+# INGREDIENT → TREATS → PROBLEM
+# --------------------------------------------------------------------------
+
 - source: melatonin
   target: difficulty_falling_asleep
   relation: TREATS
@@ -996,50 +915,74 @@ edges:
     mechanism: Lowers core body temperature for better sleep
     evidence_level: clinical_trial
     onset: 1-3 days
-- source: melatonin
-  target: shift_work_no_shift_work
-  relation: RECOMMENDED_FOR
-  properties: {}
-- source: melatonin
-  target: bedtime_after_12am
-  relation: RECOMMENDED_FOR
-  properties: {}
+
+# --------------------------------------------------------------------------
+# INGREDIENT → RECOMMENDED_FOR → ATTRIBUTE
+# Conditional recommendations based on user attributes
+# --------------------------------------------------------------------------
+
+# Melatonin recommended for irregular sleep schedule and night shift
 - source: melatonin
   target: sleep_schedule_very_irregular
   relation: RECOMMENDED_FOR
-  properties: {}
+  properties:
+    reason: "Irregular schedule disrupts circadian rhythm; melatonin helps reset it"
+- source: melatonin
+  target: shift_work_night_shift
+  relation: RECOMMENDED_FOR
+  properties:
+    reason: "Night shift workers need melatonin to regulate disrupted sleep-wake cycle"
+- source: melatonin
+  target: shift_work_rotating_shifts
+  relation: RECOMMENDED_FOR
+  properties:
+    reason: "Rotating shifts disrupt circadian rhythm; melatonin helps adaptation"
+
+# Ashwagandha recommended for high stress
 - source: ashwagandha_sleep
   target: stress_level_high
   relation: RECOMMENDED_FOR
-  properties: {}
+  properties:
+    reason: "High stress increases cortisol; ashwagandha is clinically proven to reduce it"
 - source: ashwagandha_sleep
   target: stress_level_very_high
   relation: RECOMMENDED_FOR
-  properties: {}
+  properties:
+    reason: "Very high stress requires strong adaptogenic support"
 - source: ashwagandha_sleep
   target: burnout
   relation: RECOMMENDED_FOR
-  properties: {}
+  properties:
+    reason: "Burnout benefits from ashwagandha's energy and stress resilience restoration"
+
+# Magnesium recommended for poor sleep quality
+- source: magnesium_glycinate_sleep
+  target: sleep_quality_poor
+  relation: RECOMMENDED_FOR
+  properties:
+    reason: "Poor sleep quality benefits from magnesium's GABA activation and muscle relaxation"
 - source: magnesium_glycinate_sleep
   target: restlessness
   relation: RECOMMENDED_FOR
-  properties: {}
+  properties:
+    reason: "Magnesium promotes muscle relaxation and reduces restlessness"
 - source: magnesium_glycinate_sleep
   target: stress_level_high
   relation: RECOMMENDED_FOR
-  properties: {}
-- source: l_theanine
-  target: anxiety_frequency_frequently
-  relation: RECOMMENDED_FOR
-  properties: {}
-- source: l_theanine
-  target: anxiety_frequency_daily
-  relation: RECOMMENDED_FOR
-  properties: {}
+  properties:
+    reason: "High stress depletes magnesium; supplementation supports nervous system"
+
+# L-Theanine for racing thoughts
 - source: l_theanine
   target: racing_thoughts
   relation: RECOMMENDED_FOR
-  properties: {}
+  properties:
+    reason: "L-Theanine promotes alpha brain waves to calm mental chatter"
+
+# --------------------------------------------------------------------------
+# PROBLEM → SIMILAR_TO → PROBLEM
+# --------------------------------------------------------------------------
+
 - source: difficulty_falling_asleep
   target: racing_thoughts
   relation: SIMILAR_TO
@@ -1048,10 +991,11 @@ edges:
   target: anxiety
   relation: SIMILAR_TO
   properties: {}
-- source: poor_sleep_quality
-  target: night_waking
-  relation: SIMILAR_TO
-  properties: {}
+
+# --------------------------------------------------------------------------
+# PROBLEM → OFTEN_PAIRED_WITH → PROBLEM
+# --------------------------------------------------------------------------
+
 - source: chronic_stress
   target: difficulty_falling_asleep
   relation: OFTEN_PAIRED_WITH
