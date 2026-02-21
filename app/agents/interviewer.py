@@ -114,11 +114,14 @@ def _compute_search_impact(
     problem_id: str,
     question: Dict[str, Any],
 ) -> float:
-    """Score a question by how much its attribute affects search results.
+    """Score a question by how much its attribute/constraint affects search results.
 
     The score combines:
     - RECOMMENDED_FOR edge count: how many treating ingredients have
       RECOMMENDED_FOR edges pointing to attributes in this category.
+    - CONTRAINDICATED_FOR edge count: how many treating ingredients have
+      CONTRAINDICATED_FOR edges pointing to constraints in this category.
+      Knowing constraints helps filter out dangerous products.
     - Hard-filter bonus: attribute categories that create SQL filters
       (diet, allergies) get a flat bonus.
     """
@@ -136,11 +139,23 @@ def _compute_search_impact(
             if any(r['id'] == ing['id'] for r in recs):
                 recommendation_count += 1
 
-    # 2. Hard filter bonus for diet/allergies
-    hard_filter_categories = {'diet', 'dietary_preference', 'allergies', 'medical_constraints_allergy'}
+    # 2. Count CONTRAINDICATED_FOR edges from treating ingredients to constraints
+    #    in this category. Knowing about allergies/diet helps filter out unsafe products.
+    all_constraints = graph.find_nodes_by_type('constraint')
+    category_constraint_ids = {c['id'] for c in all_constraints if c.get('type') == attr_category}
+
+    contraindication_count = 0
+    for ing in treating_ingredients:
+        edges = graph.get_outgoing_edges(ing['id'], relation='CONTRAINDICATED_FOR')
+        for edge in edges:
+            if edge['target'] in category_constraint_ids:
+                contraindication_count += 1
+
+    # 3. Hard filter bonus for diet/allergies
+    hard_filter_categories = {'diet', 'dietary_preference', 'allergies', 'allergy', 'dietary'}
     hard_filter_bonus = 5.0 if attr_category in hard_filter_categories else 0.0
 
-    return recommendation_count + hard_filter_bonus
+    return recommendation_count + contraindication_count + hard_filter_bonus
 
 
 SYSTEM_PROMPT = """\
@@ -614,6 +629,60 @@ If the match is not obvious, choose the closest related problem."""
                         safety_count += 1
 
             logger.info(f"Retrieved {safety_count} global safety questions")
+
+            # Constraint-based safety questions (allergies, dietary restrictions)
+            # Constraints are a separate node type from attributes and need
+            # their own scan to enter the question pool.
+            # Track question IDs already in the pool to avoid duplicate questions
+            # (e.g., attribute with category "allergies" and constraint with
+            # type "allergy" may both point to the same q_allergies question).
+            existing_question_ids = {
+                q['question'].get('id') for q in all_questions if q.get('question')
+            }
+            all_constraints = graph.find_nodes_by_type('constraint')
+            constraint_count = 0
+            for constraint in all_constraints:
+                constraint_type = constraint.get('type')  # e.g., 'allergy', 'dietary'
+                # Skip if this constraint type is already covered
+                if constraint_type in existing_categories:
+                    continue
+                # Check if this constraint has an ELICITS_QUESTION edge
+                edges = graph.get_outgoing_edges(constraint['id'], relation='ELICITS_QUESTION')
+                if not edges:
+                    continue
+                edge = edges[0]
+                question_id = edge['target']
+                # Skip if this question is already in the pool via an attribute
+                if question_id in existing_question_ids:
+                    continue
+                question_node = graph.get_node(question_id)
+                if not question_node:
+                    continue
+                is_safety_critical = any(
+                    e.get('is_safety_critical', False) for e in edges
+                )
+                edge_priority = min(
+                    (e.get('priority', 99) for e in edges), default=99
+                )
+                question = {
+                    **question_node,
+                    'condition': edge.get('condition', 'always'),
+                    'timing': edge.get('timing', 'immediate')
+                }
+                all_questions.append({
+                    'attribute_id': constraint['id'],
+                    'attribute_category': constraint_type,
+                    'priority': edge_priority,
+                    'is_optional': False,
+                    'is_safety_critical': is_safety_critical,
+                    'reason': 'Safety screening — constraint',
+                    'question': question
+                })
+                existing_categories.add(constraint_type)
+                existing_question_ids.add(question_id)
+                constraint_count += 1
+
+            logger.info(f"Retrieved {constraint_count} constraint safety questions")
 
             # STEP 2: Deduplicate by attribute_category (keep first occurrence)
             seen_categories: set = set()
