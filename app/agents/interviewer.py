@@ -508,6 +508,7 @@ If the match is not obvious, choose the closest related problem."""
         for q in deduped:
             q['search_impact'] = _compute_search_impact(graph, problem_id, q)
         deduped.sort(key=lambda x: x['search_impact'], reverse=True)
+        deduped = [q for q in deduped if q['search_impact'] > 0 or q.get('is_safety_critical', False)]
 
         graph_questions = deduped
         logger.info(
