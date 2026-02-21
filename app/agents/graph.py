@@ -150,12 +150,13 @@ def after_interviewer(state: AgentState) -> Literal["initial_products", "search"
     return END
 
 
-def after_router(state: AgentState) -> Literal["interviewer", "journey", "safety", "fallback"]:
+def after_router(state: AgentState) -> Literal["interviewer", "journey", "safety", "search", "fallback"]:
     """
     Determine next step after router.
 
     If fallback → fallback agent (out-of-domain catalog search).
     If journey intent → journey agent.
+    If direct_product → search agent (bypass interviewer).
     Otherwise → interviewer (which will fetch initial products after
         identifying the user's problem).
     """
@@ -166,6 +167,9 @@ def after_router(state: AgentState) -> Literal["interviewer", "journey", "safety
 
     if next_agent == "safety":
         return "safety"
+
+    if next_agent == "search":
+        return "search"
 
     if next_agent == "journey":
         return "journey"
@@ -243,6 +247,7 @@ class ConsultationGraph:
                 "interviewer": "interviewer",
                 "journey": "journey",
                 "safety": "safety",
+                "search": "search",
                 "fallback": "fallback",
             }
         )

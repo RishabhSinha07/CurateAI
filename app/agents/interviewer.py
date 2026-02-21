@@ -263,12 +263,130 @@ async def interviewer_agent(state: AgentState) -> AgentState:
     logger.info(f"Interviewer agent called. Extracted context: {extracted_context}")
     logger.info(f"Graph state: {graph_state}, problem_id: {problem_id}, graph_domain: {graph_domain}")
 
-    # Get graph-based questions (required for graph-first workflow)
-    graph_questions = []
-    required_slots = []
-    optional_slots = []
+    # --- Direct product personalization mode ---
+    # If the user did a direct product search and wants to personalise,
+    # skip problem identification and ask only global safety questions.
+    direct_search_term = extracted_context.get("direct_search_term")
+    if direct_search_term and not problem_id:
+        domain_slug = state.get("domain_slug", "")
+        logger.info(
+            f"Direct product mode: direct_search_term='{direct_search_term}', "
+            f"domain_slug='{domain_slug}'"
+        )
 
-    if not problem_id or not graph_domain:
+        try:
+            # Search across ALL knowledge graphs for global safety questions,
+            # since the user's domain may not define them (e.g., sleep_stress
+            # has no global attrs but energy/gut/hair do).
+            from app.knowledge.graph_loader import list_available_graphs
+            available_graphs = list_available_graphs()
+
+            # Prioritize the current domain's graph
+            graph_order = sorted(
+                available_graphs,
+                key=lambda g: (0 if g == domain_slug else 1)
+            )
+
+            global_questions: list[dict] = []
+            seen_categories: set = set()
+
+            for graph_name in graph_order:
+                try:
+                    graph = get_knowledge_graph(graph_name)
+                    all_attrs = graph.find_nodes_by_type('attribute')
+
+                    for attr in all_attrs:
+                        if attr.get('is_global', False):
+                            attr_category = attr.get('category')
+                            if attr_category in seen_categories:
+                                continue
+
+                            question = graph.get_question_for_attribute(attr['id'])
+                            if question:
+                                seen_categories.add(attr_category)
+
+                                edges = graph.get_outgoing_edges(attr['id'], relation='ELICITS_QUESTION')
+                                is_safety_critical = any(
+                                    edge.get('is_safety_critical', False) for edge in edges
+                                )
+                                attr_edge_priority = min(
+                                    (edge.get('priority', 99) for edge in edges), default=99
+                                )
+                                global_questions.append({
+                                    'attribute_id': attr['id'],
+                                    'attribute_category': attr_category,
+                                    'priority': attr_edge_priority,
+                                    'is_optional': False,
+                                    'is_safety_critical': is_safety_critical,
+                                    'reason': 'Safety screening',
+                                    'question': question,
+                                })
+                except Exception as e:
+                    logger.warning(f"Error loading global attrs from graph '{graph_name}': {e}")
+                    continue
+
+            if global_questions:
+                logger.info(
+                    f"Direct product mode: {len(global_questions)} global safety questions available"
+                )
+                # Check which are already filled
+                filled_attrs = graph_state.get("filled_attributes", {})
+                already_filled = set(k for k in extracted_context.keys() if k != "graph_state")
+                already_filled.update(filled_attrs.keys())
+
+                unfilled = [q for q in global_questions if q['attribute_category'] not in already_filled]
+
+                # Cap at 3 questions
+                questions_asked = graph_state.get("questions_asked", 0)
+                MAX_SAFETY_QUESTIONS = 3
+
+                if not unfilled or questions_asked >= MAX_SAFETY_QUESTIONS:
+                    # All safety questions answered (or limit reached) — proceed to search
+                    logger.info("Direct product mode: safety questions done, routing to search")
+                    new_state = state.copy()
+                    new_state["next_agent"] = "search"
+                    new_state["status"] = "collecting_info"
+                    return new_state
+
+                # Use the normal interviewer LLM to ask the next safety question
+                # by falling through to the slot-filling logic below with
+                # these global questions as the graph_questions.
+                # We set graph_questions/required_slots so the rest of the
+                # function works seamlessly.
+                graph_questions = unfilled
+                required_slots = [q['attribute_category'] for q in unfilled]
+                optional_slots = []
+
+                # Skip the "no problem identified" block and the normal
+                # graph question loading — jump directly to the slot-filling
+                # logic below (line ~545 in the original).
+                # We'll use a flag to signal this.
+                _direct_product_safety_mode = True
+            else:
+                # No safety questions available — proceed to search directly
+                logger.info("Direct product mode: no global safety questions, routing to search")
+                new_state = state.copy()
+                new_state["next_agent"] = "search"
+                new_state["status"] = "collecting_info"
+                return new_state
+
+        except Exception as e:
+            logger.warning(f"Direct product mode: error loading safety questions: {e}")
+            # No safety questions available — proceed to search directly
+            new_state = state.copy()
+            new_state["next_agent"] = "search"
+            new_state["status"] = "collecting_info"
+            return new_state
+    else:
+        _direct_product_safety_mode = False
+
+    # Get graph-based questions (required for graph-first workflow)
+    if not _direct_product_safety_mode:
+        graph_questions = []
+        required_slots = []
+        optional_slots = []
+
+    if not _direct_product_safety_mode and (not problem_id or not graph_domain):
         # No problem identified yet
         domain_slug = state.get("domain_slug", "")
         status = state.get("status")
@@ -445,102 +563,103 @@ If the match is not obvious, choose the closest related problem."""
             new_state["next_agent"] = None
             return new_state
 
-    # Get questions from knowledge graph
-    try:
-        logger.info(f"Using knowledge graph to get questions for problem '{problem_id}'")
+    # Get questions from knowledge graph (skip if already loaded in direct product mode)
+    if not _direct_product_safety_mode:
+        try:
+            logger.info(f"Using knowledge graph to get questions for problem '{problem_id}'")
 
-        # STEP 1: Collect ALL questions into one pool
-        graph = get_knowledge_graph(graph_domain)
-        all_attrs = graph.find_nodes_by_type('attribute')
+            # STEP 1: Collect ALL questions into one pool
+            graph = get_knowledge_graph(graph_domain)
+            all_attrs = graph.find_nodes_by_type('attribute')
 
-        all_questions: List[Dict[str, Any]] = []
+            all_questions: List[Dict[str, Any]] = []
 
-        # Problem-specific questions
-        problem_questions = GraphQueryEngine.get_interview_questions(
-            domain=graph_domain,
-            problem_id=problem_id
-        )
-        all_questions.extend(problem_questions)
-        logger.info(f"Retrieved {len(problem_questions)} problem-specific questions")
+            # Problem-specific questions
+            problem_questions = GraphQueryEngine.get_interview_questions(
+                domain=graph_domain,
+                problem_id=problem_id
+            )
+            all_questions.extend(problem_questions)
+            logger.info(f"Retrieved {len(problem_questions)} problem-specific questions")
 
-        # Global safety questions (collected but NOT force-prepended)
-        existing_categories = {q['attribute_category'] for q in all_questions}
-        safety_count = 0
-        for attr in all_attrs:
-            if attr.get('is_global', False):
-                question = graph.get_question_for_attribute(attr['id'])
-                if question:
-                    attr_category = attr.get('category')
-                    # Skip if already covered by problem-specific questions
-                    if attr_category in existing_categories:
-                        continue
-                    edges = graph.get_outgoing_edges(attr['id'], relation='ELICITS_QUESTION')
-                    is_safety_critical = any(
-                        edge.get('is_safety_critical', False) for edge in edges
-                    )
-                    # Get priority from edges if available
-                    attr_edge_priority = min(
-                        (edge.get('priority', 99) for edge in edges), default=99
-                    )
-                    all_questions.append({
-                        'attribute_id': attr['id'],
-                        'attribute_category': attr_category,
-                        'priority': attr_edge_priority,
-                        'is_optional': False,
-                        'is_safety_critical': is_safety_critical,
-                        'reason': 'Safety screening',
-                        'question': question
-                    })
-                    existing_categories.add(attr_category)
-                    safety_count += 1
+            # Global safety questions (collected but NOT force-prepended)
+            existing_categories = {q['attribute_category'] for q in all_questions}
+            safety_count = 0
+            for attr in all_attrs:
+                if attr.get('is_global', False):
+                    question = graph.get_question_for_attribute(attr['id'])
+                    if question:
+                        attr_category = attr.get('category')
+                        # Skip if already covered by problem-specific questions
+                        if attr_category in existing_categories:
+                            continue
+                        edges = graph.get_outgoing_edges(attr['id'], relation='ELICITS_QUESTION')
+                        is_safety_critical = any(
+                            edge.get('is_safety_critical', False) for edge in edges
+                        )
+                        # Get priority from edges if available
+                        attr_edge_priority = min(
+                            (edge.get('priority', 99) for edge in edges), default=99
+                        )
+                        all_questions.append({
+                            'attribute_id': attr['id'],
+                            'attribute_category': attr_category,
+                            'priority': attr_edge_priority,
+                            'is_optional': False,
+                            'is_safety_critical': is_safety_critical,
+                            'reason': 'Safety screening',
+                            'question': question
+                        })
+                        existing_categories.add(attr_category)
+                        safety_count += 1
 
-        logger.info(f"Retrieved {safety_count} global safety questions")
+            logger.info(f"Retrieved {safety_count} global safety questions")
 
-        # STEP 2: Deduplicate by attribute_category (keep first occurrence)
-        seen_categories: set = set()
-        deduped: List[Dict[str, Any]] = []
-        for q in all_questions:
-            if q['attribute_category'] not in seen_categories:
-                seen_categories.add(q['attribute_category'])
-                deduped.append(q)
+            # STEP 2: Deduplicate by attribute_category (keep first occurrence)
+            seen_categories: set = set()
+            deduped: List[Dict[str, Any]] = []
+            for q in all_questions:
+                if q['attribute_category'] not in seen_categories:
+                    seen_categories.add(q['attribute_category'])
+                    deduped.append(q)
 
-        # STEP 3: Score and sort by search impact (highest first)
-        for q in deduped:
-            q['search_impact'] = _compute_search_impact(graph, problem_id, q)
-        deduped.sort(key=lambda x: x['search_impact'], reverse=True)
-        deduped = [q for q in deduped if q['search_impact'] > 0 or q.get('is_safety_critical', False)]
+            # STEP 3: Score and sort by search impact (highest first)
+            for q in deduped:
+                q['search_impact'] = _compute_search_impact(graph, problem_id, q)
+            deduped.sort(key=lambda x: x['search_impact'], reverse=True)
+            deduped = [q for q in deduped if q['search_impact'] > 0 or q.get('is_safety_critical', False)]
 
-        graph_questions = deduped
-        logger.info(
-            f"Total questions after dedup: {len(graph_questions)}, "
-            f"search_impact scores: {[(q['attribute_category'], q['search_impact']) for q in graph_questions]}"
-        )
+            graph_questions = deduped
+            logger.info(
+                f"Total questions after dedup: {len(graph_questions)}, "
+                f"search_impact scores: {[(q['attribute_category'], q['search_impact']) for q in graph_questions]}"
+            )
 
-        # Extract attribute categories as "slots"
-        required_slots = [
-            q['attribute_category']
-            for q in graph_questions
-            if not q.get('is_optional', False)
-        ]
-        optional_slots = [
-            q['attribute_category']
-            for q in graph_questions
-            if q.get('is_optional', False)
-        ]
+            # Extract attribute categories as "slots"
+            required_slots = [
+                q['attribute_category']
+                for q in graph_questions
+                if not q.get('is_optional', False)
+            ]
+            optional_slots = [
+                q['attribute_category']
+                for q in graph_questions
+                if q.get('is_optional', False)
+            ]
 
-        logger.info(f"Graph-based slots - Required: {required_slots}, Optional: {optional_slots}")
+            logger.info(f"Graph-based slots - Required: {required_slots}, Optional: {optional_slots}")
 
-    except Exception as e:
-        logger.error(f"Error getting graph questions: {e}", exc_info=True)
-        # Cannot proceed without graph questions in graph-first workflow
-        new_state = state.copy()
-        new_state["response"] = (
-            "I'm having trouble understanding your request. "
-            "Could you rephrase what you're looking for?"
-        )
-        new_state["status"] = "awaiting_slot"
-        new_state["next_agent"] = None
-        return new_state
+        except Exception as e:
+            logger.error(f"Error getting graph questions: {e}", exc_info=True)
+            # Cannot proceed without graph questions in graph-first workflow
+            new_state = state.copy()
+            new_state["response"] = (
+                "I'm having trouble understanding your request. "
+                "Could you rephrase what you're looking for?"
+            )
+            new_state["status"] = "awaiting_slot"
+            new_state["next_agent"] = None
+            return new_state
 
     # Identify what we still need (excluding graph_state from filled slots)
     # Check both top-level extracted_context AND graph_state.filled_attributes
@@ -625,6 +744,13 @@ If the match is not obvious, choose the closest related problem."""
             f"  - The questions below are dynamically generated based on what information "
             f"is most relevant for this specific problem.\n"
         )
+    elif _direct_product_safety_mode:
+        graph_context_note = (
+            f"\n**Direct Product Mode:**\n"
+            f"  - The user asked for '{direct_search_term}' directly.\n"
+            f"  - We are only asking safety screening questions (allergies, pregnancy, diet).\n"
+            f"  - Do NOT ask about their health problem or concern — they already know what they want.\n"
+        )
 
     user_message = f"""\
 Domain: {state.get('domain_slug')}
@@ -699,7 +825,8 @@ Respond with:
                 # The matching_question['attribute_id'] is just a template attribute
                 # We need to find the actual attribute node that matches the user's value
                 try:
-                    graph = get_knowledge_graph(graph_domain)
+                    effective_domain = graph_domain or state.get("domain_slug", "")
+                    graph = get_knowledge_graph(effective_domain)
                     all_attrs = graph.find_nodes_by_type('attribute')
 
                     # Find attribute with matching category and value

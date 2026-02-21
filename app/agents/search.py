@@ -110,7 +110,13 @@ async def search_architect_agent(state: AgentState, db: AsyncSession) -> AgentSt
     search_query_text = None
     graph_ingredients = []
 
-    if problem_id and graph_domain:
+    # Direct product search — use the explicit product/ingredient name
+    direct_search_term = extracted_context.get("direct_search_term")
+    if direct_search_term:
+        search_query_text = f"{direct_search_term} supplement"
+        logger.info(f"Direct product search: '{search_query_text}'")
+
+    elif problem_id and graph_domain:
         try:
             # Load the knowledge graph
             graph = get_knowledge_graph(graph_domain)

@@ -117,6 +117,28 @@ async def safety_agent(state: AgentState) -> AgentState:
     journey_bundle = state.get("journey_bundle")
     intent_type = state.get("intent_type")
 
+    # Direct product intent — simplified template response (no LLM call)
+    if intent_type == "direct_product":
+        direct_search_term = extracted_context.get("direct_search_term", "your search")
+        response = f"Here are products matching **{direct_search_term}**."
+
+        # Append default disclaimer
+        default_disclaimer = [
+            "These statements have not been evaluated by the FDA. These products are not intended to diagnose, treat, cure, or prevent any disease. Please consult with a healthcare professional before starting any new supplement regimen."
+        ]
+        response += "\n\n" + format_disclaimers(default_disclaimer)
+
+        # Append domain-specific disclaimers if available
+        if safety_disclaimers:
+            response += "\n\n" + format_disclaimers(safety_disclaimers)
+
+        new_state = state.copy()
+        new_state["response"] = response
+        new_state["status"] = "awaiting_slot"  # Next turn goes to interviewer for personalization
+        new_state["suggested_replies"] = ["Personalise for me"]
+        new_state["next_agent"] = None
+        return new_state
+
     if intent_type == "journey" and journey_bundle:
         # Product cards are rendered by the frontend, so the text response
         # only needs the journey intro — no product listing.

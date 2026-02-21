@@ -16,13 +16,17 @@ class RouterResponse(BaseModel):
     """Structured response from the Router agent."""
     domain_slug: str = Field(description="The slug of the identified domain or 'out_of_scope'")
     intent_type: str = Field(
-        description="Type of intent: 'query' for specific product search or 'journey' for customer journey bundle"
+        description="Type of intent: 'query' for specific product search, 'journey' for customer journey bundle, or 'direct_product' for explicit product/ingredient requests"
     )
     confidence: float = Field(description="Confidence score between 0.0 and 1.0")
     reasoning: str = Field(default="", description="Brief explanation for the classification")
     extracted_problem: Optional[str] = Field(
         default=None,
         description="Extracted problem or health goal from user message if clearly stated (e.g., 'low energy', 'poor sleep'). Leave null if unclear - the interviewer will ask."
+    )
+    direct_search_term: Optional[str] = Field(
+        default=None,
+        description="The specific product or ingredient name the user asked for. Only set when intent_type is 'direct_product'."
     )
 
 def get_router_model():
@@ -116,8 +120,21 @@ Intent Types:
    - Keywords: "starting", "new to", "beginner", "getting into", "beginning", "first time", "just started"
    - Examples: "I'm starting gym", "new to skincare", "beginning my fitness journey", "getting into running"
 
-2. **query**: The user has a specific need, problem, or is looking for particular product types.
-   - Examples: "I need protein powder", "looking for moisturizer for dry skin", "best pre-workout for energy"
+2. **query**: The user has a specific need, problem, or symptom and needs help finding the right product.
+   - Examples: "I'm so tired all the time", "looking for moisturizer for dry skin", "I can't sleep well"
+
+3. **direct_product**: The user explicitly asks for a specific product or ingredient BY NAME. They already know what they want — no interview needed.
+   - The user names a specific supplement, ingredient, or product type
+   - Examples: "I want melatonin" → direct_search_term: "melatonin"
+   - "show me vitamin C" → direct_search_term: "vitamin C"
+   - "do you have collagen?" → direct_search_term: "collagen"
+   - "I need iron supplements" → direct_search_term: "iron"
+   - "looking for magnesium" → direct_search_term: "magnesium"
+   - IMPORTANT: Only use direct_product for explicit product/ingredient names, NOT for symptoms or problems.
+     - "I'm tired" → query (symptom, not a product name)
+     - "I need help with sleep" → query (problem, not a product name)
+     - "I want melatonin" → direct_product (melatonin is an ingredient name)
+     - "show me protein powder" → direct_product (protein powder is a product type)
 
 Available Problems by Domain (for reference only):
 
@@ -153,6 +170,18 @@ User: "My skin looks dull and tired"
 Example 5 - Journey intent:
 User: "I'm starting a new gym routine"
 → domain_slug: "wellness", extracted_problem: null, intent_type: "journey", confidence: 0.95
+
+Example 6 - Direct product request:
+User: "I want melatonin"
+→ domain_slug: "wellness", extracted_problem: null, intent_type: "direct_product", direct_search_term: "melatonin", confidence: 0.95
+
+Example 7 - Direct product request:
+User: "show me vitamin C"
+→ domain_slug: "wellness", extracted_problem: null, intent_type: "direct_product", direct_search_term: "vitamin C", confidence: 0.9
+
+Example 8 - NOT direct_product (symptom, not product name):
+User: "I'm so tired"
+→ domain_slug: "wellness", extracted_problem: "low_energy", intent_type: "query", confidence: 0.9
 
 Current User Message: "{state['user_message']}"
 """
@@ -253,7 +282,18 @@ Current User Message: "{state['user_message']}"
                 )
 
             # Route based on intent type
-            if result.intent_type == "journey":
+            if result.intent_type == "direct_product" and result.direct_search_term:
+                # Direct product request — bypass interviewer, go straight to search
+                existing_ctx = new_state.get("extracted_context", {})
+                existing_ctx["direct_search_term"] = result.direct_search_term
+                new_state["extracted_context"] = existing_ctx
+                new_state["intent_type"] = "direct_product"
+                new_state["next_agent"] = "search"
+                logger.info(
+                    f"Direct product request detected: '{result.direct_search_term}'. "
+                    f"Bypassing interviewer, routing to search."
+                )
+            elif result.intent_type == "journey":
                 new_state["next_agent"] = "journey"
             else:
                 new_state["next_agent"] = "interviewer"
