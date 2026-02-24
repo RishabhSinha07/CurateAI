@@ -54,6 +54,7 @@ self.task_role.add_to_policy(
 
 Your application code in `app/agents/` and `app/services/` already uses boto3 correctly:
 
+
 ```python
 import boto3
 
