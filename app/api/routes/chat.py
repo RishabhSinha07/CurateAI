@@ -31,6 +31,7 @@ class ProductRecommendation(BaseModel):
     currency: str
     product_url: Optional[str]
     image_url: Optional[str]
+    description: Optional[str] = None
     match_reasons: list[str]
 
 
@@ -147,6 +148,7 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)) -> Chat
             currency=p.get("currency", "USD"),
             product_url=p.get("product_url"),
             image_url=p.get("image_url"),
+            description=p.get("description"),
             match_reasons=p.get("match_reasons", [])
         ))
 

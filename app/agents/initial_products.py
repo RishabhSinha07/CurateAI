@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 INITIAL_PRODUCT_LIMIT = 10
 
 
-def _serialize_products(products, match_reason: str) -> list[dict]:
+def _serialize_products(products) -> list[dict]:
     """Convert ORM product objects into JSON-safe dicts."""
     return [
         {
@@ -38,7 +38,7 @@ def _serialize_products(products, match_reason: str) -> list[dict]:
             "currency": p.currency,
             "product_url": p.product_url,
             "image_url": p.image_url,
-            "match_reasons": [match_reason],
+            "match_reasons": [p.description] if p.description else [],
         }
         for p in products
     ]
@@ -101,10 +101,7 @@ async def _semantic_search(
         if results:
             # hybrid_search returns list[tuple[Product, float]]
             products = [product for product, _score in results]
-            return _serialize_products(
-                products,
-                match_reason=f"Relevant to {problem_display}",
-            )
+            return _serialize_products(products)
 
     except Exception as e:
         logger.warning(f"Semantic search failed for initial products: {e}")
@@ -164,20 +161,14 @@ async def initial_products_agent(state: AgentState, db: AsyncSession) -> AgentSt
                 )
                 if results:
                     products = [product for product, _score in results]
-                    products_data = _serialize_products(
-                        products,
-                        match_reason=f"Popular in {domain_slug}",
-                    )
+                    products_data = _serialize_products(products)
         except Exception as e:
             logger.warning(f"Fallback semantic search failed: {e}")
 
     # --- Last resort: newest products from wellness ---
     if not products_data:
         products = await product_repo.get_by_domain("wellness", limit=INITIAL_PRODUCT_LIMIT)
-        products_data = _serialize_products(
-            products,
-            match_reason=f"Popular in {domain_slug}",
-        )
+        products_data = _serialize_products(products)
 
     # Preserve extracted_context when copying state, but remove
     # candidate_problem — it was only needed for this node's semantic
