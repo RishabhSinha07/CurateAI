@@ -112,6 +112,43 @@ class PipelineStack(Stack):
         ecr_repository.grant_pull_push(self.build_project)
 
         # ============================================
+        # UpdateAPIGateway CodeBuild Project
+        # ============================================
+
+        self.update_api_gw_project = codebuild.PipelineProject(
+            self,
+            "CurateAI-UpdateAPIGW",
+            project_name="CurateAI-UpdateAPIGW",
+            description="Update API Gateway integrations with new Fargate task IP",
+            environment=codebuild.BuildEnvironment(
+                build_image=codebuild.LinuxBuildImage.STANDARD_7_0,
+                compute_type=codebuild.ComputeType.SMALL,
+            ),
+            environment_variables={
+                "CLUSTER_NAME": codebuild.BuildEnvironmentVariable(value="CurateAI-Cluster"),
+                "SERVICE_NAME": codebuild.BuildEnvironmentVariable(value="CurateAI-Service"),
+                "API_NAME":     codebuild.BuildEnvironmentVariable(value="CurateAI-API"),
+            },
+            build_spec=codebuild.BuildSpec.from_source_filename("buildspecs/update_api_gateway.yml"),
+        )
+
+        self.update_api_gw_project.add_to_role_policy(iam.PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=["ecs:ListTasks", "ecs:DescribeTasks"],
+            resources=["*"],
+        ))
+        self.update_api_gw_project.add_to_role_policy(iam.PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=["ec2:DescribeNetworkInterfaces"],
+            resources=["*"],
+        ))
+        self.update_api_gw_project.add_to_role_policy(iam.PolicyStatement(
+            effect=iam.Effect.ALLOW,
+            actions=["apigatewayv2:GetApis", "apigatewayv2:GetIntegrations", "apigatewayv2:UpdateIntegration"],
+            resources=["*"],
+        ))
+
+        # ============================================
         # Pipeline Artifacts
         # ============================================
 
@@ -147,6 +184,13 @@ class PipelineStack(Stack):
             input=build_output,
         )
 
+        # UpdateAPIGateway stage - patch integrations with new Fargate task IP
+        update_api_gw_action = cpactions.CodeBuildAction(
+            action_name="Update-APIGateway",
+            project=self.update_api_gw_project,
+            input=source_output,
+        )
+
         # ============================================
         # Pipeline
         # ============================================
@@ -167,6 +211,10 @@ class PipelineStack(Stack):
                 codepipeline.StageProps(
                     stage_name="Deploy",
                     actions=[deploy_action],
+                ),
+                codepipeline.StageProps(
+                    stage_name="UpdateAPIGateway",
+                    actions=[update_api_gw_action],
                 ),
             ],
         )
