@@ -788,11 +788,15 @@ If the match is not obvious, choose the closest related problem."""
     missing_slot_reference = _build_graph_slot_reference(relevant_graph_questions)
     logger.info(f"Total slots: {len(graph_questions)}, Already filled: {len(already_filled)}, Still needed: {len(relevant_graph_questions)}")
 
-    # Previous question context for short-answer mapping
+    # Previous question context for short-answer mapping.
+    # Use the stored pending_slot_question rather than state["response"] so
+    # that the context survives an ingredient_info detour (which overwrites
+    # state["response"] with the ingredient explanation).
+    pending_slot_q = extracted_context.get("pending_slot_question")
     previous_question_section = ""
-    if previous_response and state.get("status") == "awaiting_slot":
+    if pending_slot_q:
         previous_question_section = (
-            f'\nPrevious question you asked the user:\n  "{previous_response}"\n'
+            f'\nPrevious question you asked the user:\n  "{pending_slot_q}"\n'
             "The user's message below is likely answering this question.\n"
         )
 
@@ -958,6 +962,7 @@ Respond with:
     if is_first_pass:
         # Show initial products with an option to personalise.
         domain_name = (state.get("domain_slug") or "this category").replace("_", " ").title()
+        personalise_prompt = "Would you like me to personalise these recommendations for you?"
         new_state["response"] = (
             f"### {domain_name} — Top Picks for You\n\n"
             "Here are some recommendations based on your concern.\n\n"
@@ -968,6 +973,11 @@ Respond with:
         new_state["status"] = "awaiting_slot"
         new_state["suggested_replies"] = ["Personalise for me"]
         new_state["next_agent"] = None
+        # Store the pending interaction so the router has context on the next
+        # turn — without this, messages like "yes, personalise it" look like
+        # a new out-of-scope query.
+        updated_context["pending_slot_question"] = personalise_prompt
+        new_state["extracted_context"] = updated_context
         return new_state
 
     if should_search:
@@ -975,11 +985,17 @@ Respond with:
         new_state["status"] = "collecting_info"
         new_state["next_agent"] = "search"
         new_state["optional_slot_hint"] = None
+        # Clear the pending slot question — interview is done
+        updated_context.pop("pending_slot_question", None)
+        new_state["extracted_context"] = updated_context
     else:
         question_text = result.question  # guaranteed non-empty here
         new_state["response"] = question_text
         new_state["status"] = "awaiting_slot"
         new_state["next_agent"] = None  # End turn — wait for user input
+
+        # Persist the slot question so it survives any ingredient_info detour
+        updated_context["pending_slot_question"] = question_text
 
         # Increment question counter
         current_count = updated_context.get("graph_state", {}).get("questions_asked", 0)

@@ -16,7 +16,13 @@ class RouterResponse(BaseModel):
     """Structured response from the Router agent."""
     domain_slug: str = Field(description="The slug of the identified domain or 'out_of_scope'")
     intent_type: str = Field(
-        description="Type of intent: 'query' for specific product search, 'journey' for customer journey bundle, or 'direct_product' for explicit product/ingredient requests"
+        description=(
+            "Type of intent: "
+            "'query' for specific product search, "
+            "'journey' for customer journey bundle, "
+            "'direct_product' for explicit product/ingredient purchase requests, "
+            "'ingredient_info' for educational questions about how an ingredient or supplement works"
+        )
     )
     confidence: float = Field(description="Confidence score between 0.0 and 1.0")
     reasoning: str = Field(default="", description="Brief explanation for the classification")
@@ -123,7 +129,7 @@ Intent Types:
 2. **query**: The user has a specific need, problem, or symptom and needs help finding the right product.
    - Examples: "I'm so tired all the time", "looking for moisturizer for dry skin", "I can't sleep well"
 
-3. **direct_product**: The user explicitly asks for a specific product or ingredient BY NAME. They already know what they want — no interview needed.
+3. **direct_product**: The user explicitly asks for a specific product or ingredient BY NAME to purchase or see. They already know what they want — no interview needed.
    - The user names a specific supplement, ingredient, or product type
    - Examples: "I want melatonin" → direct_search_term: "melatonin"
    - "show me vitamin C" → direct_search_term: "vitamin C"
@@ -135,6 +141,22 @@ Intent Types:
      - "I need help with sleep" → query (problem, not a product name)
      - "I want melatonin" → direct_product (melatonin is an ingredient name)
      - "show me protein powder" → direct_product (protein powder is a product type)
+
+4. **ingredient_info**: The user is asking an EDUCATIONAL question about how an ingredient or supplement works. They want to learn, not necessarily buy.
+   - Key signals: "how does X work", "why should I use/take X", "what does X do", "tell me about X", "explain X", "benefits of X", "what is X", "how does it work"
+   - Examples:
+     - "How does collagen work?" → ingredient_info
+     - "Why should I use vitamin C?" → ingredient_info
+     - "What does magnesium do for sleep?" → ingredient_info
+     - "Tell me about hyaluronic acid" → ingredient_info
+     - "Benefits of zinc for skin" → ingredient_info
+     - "Explain how collagen helps skin" → ingredient_info
+   - IMPORTANT: Distinguish from direct_product:
+     - "How does collagen work?" → ingredient_info (wants explanation)
+     - "Show me collagen products" → direct_product (wants to buy)
+     - "Do you have collagen?" → direct_product (wants to buy)
+     - "Why should I use collagen?" → ingredient_info (wants explanation)
+   - For ingredient_info, set domain_slug to the most relevant domain if determinable, otherwise 'wellness'.
 
 Available Problems by Domain (for reference only):
 
@@ -184,10 +206,52 @@ User: "I'm so tired"
 → domain_slug: "wellness", extracted_problem: "low_energy", intent_type: "query", confidence: 0.9
 
 Current User Message: "{state['user_message']}"
-"""
+{f'''
+Session context: The user is in an active consultation.
+  Current domain: {state.get("domain_slug") or "unknown"}
+  Pending prompt: "{state.get('extracted_context', {}).get('pending_slot_question')}"
+
+If the user's message is responding to this prompt (e.g. "yes", "no", "personalise", "sure", "oily skin", "28", "vegan"), you MUST classify as:
+  intent_type="query", domain_slug="{state.get("domain_slug") or "wellness"}"
+The interviewer will handle it from there.
+
+If they are asking an educational question about an ingredient or supplement, classify as intent_type="ingredient_info".
+''' if state.get("status") == "awaiting_slot" and state.get("extracted_context", {}).get("pending_slot_question") else ""}"""
 
     model = get_router_model()
     result: RouterResponse = await model.ainvoke(system_prompt)
+
+    # --- Awaiting-Slot Safety Override ---
+    # When the user is answering a slot question (e.g. "Vegetarian", "Yes", "No",
+    # "Oily skin"), single-word answers can be misclassified as out_of_scope or
+    # a wrong domain by the LLM even with the context block.  If the session was
+    # genuinely awaiting a slot answer (status + pending question + valid domain),
+    # we NEVER let the router send the user to fallback — override to query in the
+    # current session domain so the interviewer can process the answer.
+    _original_status = state.get("status")
+    _pending_q = (state.get("extracted_context") or {}).get("pending_slot_question")
+    _session_domain = state.get("domain_slug")
+    _known_domain_slugs = {d["domain"] for d in domains}
+
+    if (
+        _original_status == "awaiting_slot"
+        and _pending_q
+        and _session_domain
+        and _session_domain not in ("out_of_scope", None)
+        and (
+            result.domain_slug == "out_of_scope"
+            or result.domain_slug not in _known_domain_slugs
+        )
+    ):
+        logger.warning(
+            f"Awaiting-slot safety override: LLM classified "
+            f"'{state.get('user_message')!r}' as domain='{result.domain_slug}' "
+            f"but session is awaiting_slot in '{_session_domain}'. "
+            f"Overriding to session domain with intent_type='query'."
+        )
+        result.domain_slug = _session_domain
+        result.intent_type = "query"
+        result.extracted_problem = None  # slot answer, not a new problem
 
     # Update state based on result
     new_state = state.copy()
@@ -256,7 +320,10 @@ Current User Message: "{state['user_message']}"
         if domain_meta:
             new_state["domain_slug"] = domain_meta['domain']
             new_state["intent_type"] = result.intent_type
-            new_state["status"] = "collecting_info"
+            # ingredient_info preserves the caller's status so the interrupted
+            # interview (awaiting_slot) can resume correctly after the answer.
+            if result.intent_type != "ingredient_info":
+                new_state["status"] = "collecting_info"
 
             # Never auto-assign the problem from the router.
             # The interviewer should always ask the user to confirm/specify
@@ -282,7 +349,14 @@ Current User Message: "{state['user_message']}"
                 )
 
             # Route based on intent type
-            if result.intent_type == "direct_product" and result.direct_search_term:
+            if result.intent_type == "ingredient_info":
+                new_state["intent_type"] = "ingredient_info"
+                new_state["next_agent"] = "ingredient_info"
+                logger.info(
+                    f"Ingredient info request detected. "
+                    f"Routing to ingredient_info agent (status preserved)."
+                )
+            elif result.intent_type == "direct_product" and result.direct_search_term:
                 # Direct product request — bypass interviewer, go straight to search
                 existing_ctx = new_state.get("extracted_context", {})
                 existing_ctx["direct_search_term"] = result.direct_search_term

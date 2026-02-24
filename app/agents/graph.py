@@ -34,6 +34,7 @@ from app.agents.safety import safety_agent
 from app.agents.refinement import refinement_agent
 from app.agents.journey import journey_agent
 from app.agents.fallback import fallback_agent
+from app.agents.ingredient_info import ingredient_info_agent
 
 
 def create_initial_state(
@@ -111,18 +112,25 @@ async def fallback_node(state: AgentState, db: AsyncSession) -> AgentState:
     return await fallback_agent(state, db)
 
 
+async def ingredient_info_node(state: AgentState) -> AgentState:
+    """Ingredient info agent node - answers educational questions about ingredients."""
+    return await ingredient_info_agent(state)
+
+
 def should_route_to(state: AgentState) -> Literal["router", "interviewer", "refinement", "fallback"]:
     """
     Determine the entry point based on session status.
 
-    - awaiting_slot: Go to interviewer (answering a question)
+    - awaiting_slot: Go to router so the LLM can decide whether the message
+      is a slot answer (routes on to interviewer) or an ingredient question
+      (routes to ingredient_info). The router receives the pending question as
+      context so short answers like "yes" or "oily" are classified correctly.
     - fallback_conversation: Go to fallback (continuing out-of-domain conversation)
     - completed: Go to refinement (might be refining results or new topic)
     - Otherwise: Go to router for intent classification
     """
     status = state.get("status")
-    if status == "awaiting_slot":
-        return "interviewer"
+
     if status == "fallback_conversation":
         return "fallback"
     if status == "completed":
@@ -150,13 +158,14 @@ def after_interviewer(state: AgentState) -> Literal["initial_products", "search"
     return END
 
 
-def after_router(state: AgentState) -> Literal["interviewer", "journey", "safety", "search", "fallback"]:
+def after_router(state: AgentState) -> Literal["interviewer", "journey", "safety", "search", "fallback", "ingredient_info"]:
     """
     Determine next step after router.
 
     If fallback → fallback agent (out-of-domain catalog search).
     If journey intent → journey agent.
     If direct_product → search agent (bypass interviewer).
+    If ingredient_info → ingredient_info agent (educational explanation).
     Otherwise → interviewer (which will fetch initial products after
         identifying the user's problem).
     """
@@ -173,6 +182,9 @@ def after_router(state: AgentState) -> Literal["interviewer", "journey", "safety
 
     if next_agent == "journey":
         return "journey"
+
+    if next_agent == "ingredient_info":
+        return "ingredient_info"
 
     return "interviewer"
 
@@ -227,6 +239,7 @@ class ConsultationGraph:
         builder.add_node("refinement", self._refinement_wrapper)
         builder.add_node("journey", self._journey_wrapper)
         builder.add_node("fallback", self._fallback_wrapper)
+        builder.add_node("ingredient_info", self._ingredient_info_wrapper)
 
         # Set conditional entry point
         builder.set_conditional_entry_point(
@@ -239,6 +252,11 @@ class ConsultationGraph:
             }
         )
 
+        # Ingredient info: always end the turn.
+        # Status is preserved by the agent, so the next user message
+        # routes correctly (back to interviewer, refinement, etc.)
+        builder.add_edge("ingredient_info", END)
+
         # Add edges
         builder.add_conditional_edges(
             "router",
@@ -249,6 +267,7 @@ class ConsultationGraph:
                 "safety": "safety",
                 "search": "search",
                 "fallback": "fallback",
+                "ingredient_info": "ingredient_info",
             }
         )
 
@@ -335,6 +354,10 @@ class ConsultationGraph:
         """Wrapper to inject db session into fallback agent."""
         db = self._current_db
         return await fallback_node(state, db)
+
+    async def _ingredient_info_wrapper(self, state: AgentState) -> AgentState:
+        """Wrapper for ingredient info agent (no db needed)."""
+        return await ingredient_info_node(state)
 
     async def run(self, state: AgentState, db: AsyncSession) -> AgentState:
         """
