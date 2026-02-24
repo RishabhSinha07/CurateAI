@@ -2,15 +2,15 @@ version: 0.2
 phases:
   build:
     commands:
-      - echo "Getting ECS task IP..."
+      - echo "Getting ECS task IP"
       - TASK_ARN=$(aws ecs list-tasks --cluster $CLUSTER_NAME --service-name $SERVICE_NAME --desired-status RUNNING --region $AWS_DEFAULT_REGION --query 'taskArns[0]' --output text)
       - test "$TASK_ARN" != "None" && test -n "$TASK_ARN" || (echo "No running tasks found!" && exit 1)
-      - ENI_ID=$(aws ecs describe-tasks --cluster $CLUSTER_NAME --tasks $TASK_ARN --region $AWS_DEFAULT_REGION --query 'tasks[0].attachments[0].details[?name==`networkInterfaceId`].value' --output text)
+      - ENI_ID=$(aws ecs describe-tasks --cluster $CLUSTER_NAME --tasks $TASK_ARN --region $AWS_DEFAULT_REGION --output json | jq -r '.tasks[0].attachments[0].details[] | select(.name=="networkInterfaceId") | .value')
       - IP=$(aws ec2 describe-network-interfaces --network-interface-ids $ENI_ID --region $AWS_DEFAULT_REGION --query 'NetworkInterfaces[0].Association.PublicIp' --output text)
-      - echo "New task IP: $IP"
-      - API_ID=$(aws apigatewayv2 get-apis --region $AWS_DEFAULT_REGION --query "Items[?Name=='${API_NAME}'].ApiId" --output text)
+      - echo "New task IP $IP"
+      - API_ID=$(aws apigatewayv2 get-apis --region $AWS_DEFAULT_REGION --output json | jq -r --arg name "$API_NAME" '.Items[] | select(.Name==$name) | .ApiId')
       - test -n "$API_ID" || (echo "API Gateway not found, skipping update" && exit 0)
-      - echo "API ID: $API_ID"
+      - echo "API ID $API_ID"
       - |
         INTEGRATIONS=$(aws apigatewayv2 get-integrations --api-id "$API_ID" --region "$AWS_DEFAULT_REGION")
         HEALTH_IDS=$(echo "$INTEGRATIONS" | jq -r '.Items[] | select(.IntegrationUri | test("/health")) | .IntegrationId')
@@ -23,4 +23,4 @@ phases:
           aws apigatewayv2 update-integration --api-id "$API_ID" --integration-id "$ID" --region "$AWS_DEFAULT_REGION" --integration-uri "http://$IP:8000/chat"
           echo "Updated chat integration $ID"
         done
-      - echo "Done — API Gateway now points to http://$IP:8000"
+      - echo "Done - API Gateway now points to http://$IP:8000"
