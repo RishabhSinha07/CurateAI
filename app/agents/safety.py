@@ -337,10 +337,48 @@ Your Tasks:
     if safety_disclaimers:
         final_response += "\n\n" + format_disclaimers(safety_disclaimers)
 
+    # Build context-aware filter suggestions for post-completion refinement
+    filter_suggestions = []
+
+    # Budget: only suggest if user hasn't set one yet
+    if not extracted_context.get("budget_max") and not extracted_context.get("budget"):
+        # Detect currency from the returned products so the label matches the DB
+        _currency_config = {
+            "INR": ("₹", 1000),
+            "USD": ("$", 50),
+            "GBP": ("£", 40),
+            "EUR": ("€", 45),
+            "AUD": ("A$", 70),
+            "CAD": ("C$", 65),
+        }
+        _currency = "USD"
+        for _p in final_products:
+            if _p.get("currency"):
+                _currency = _p["currency"].upper()
+                break
+        _symbol, _threshold = _currency_config.get(_currency, ("$", 50))
+        filter_suggestions.append(f"Under {_symbol}{_threshold}")
+
+    # Dietary: only suggest vegan if user isn't already vegan/vegetarian
+    # Check multiple possible keys the LLM may have used
+    diet_pref = " ".join([
+        str(extracted_context.get("dietary_preference") or ""),
+        str(extracted_context.get("diet") or ""),
+        str(extracted_context.get("dietary") or ""),
+        *[str(v.get("value", "")) for v in filled_attrs.values() if isinstance(v, dict)],
+    ]).lower()
+    if "vegan" not in diet_pref:
+        filter_suggestions.append("Vegan options")
+
+    # Format: only suggest if user hasn't specified a format preference
+    if not extracted_context.get("format_preference"):
+        filter_suggestions.append("Capsule form")
+
     # Update state
     new_state = state.copy()
     new_state["response"] = final_response
     new_state["status"] = "completed"
+    new_state["suggested_replies"] = filter_suggestions
     new_state["next_agent"] = None
 
     return new_state

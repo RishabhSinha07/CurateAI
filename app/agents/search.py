@@ -198,6 +198,16 @@ async def search_architect_agent(state: AgentState, db: AsyncSession) -> AgentSt
     if constraint_filters:
         logger.info(f"Applying constraint filters: {constraint_filters}")
 
+    # Extract budget constraint for SQL-level price filtering
+    budget_max_raw = extracted_context.get("budget_max") or extracted_context.get("budget")
+    max_price: float | None = None
+    if budget_max_raw is not None:
+        try:
+            max_price = float(budget_max_raw)
+            logger.info(f"Applying SQL price filter: max_price={max_price}")
+        except (ValueError, TypeError):
+            logger.warning(f"Invalid budget value: {budget_max_raw}, skipping price filter")
+
     # Perform hybrid search with fallback strategy
     product_repo = ProductRepository(db)
 
@@ -208,7 +218,8 @@ async def search_architect_agent(state: AgentState, db: AsyncSession) -> AgentSt
         query_embedding=query_embedding,
         filters=constraint_filters or None,
         limit=20,
-        min_similarity=0.25
+        min_similarity=0.25,
+        max_price=max_price,
     )
 
     # Fallback to lower threshold if we got too few results
@@ -222,7 +233,8 @@ async def search_architect_agent(state: AgentState, db: AsyncSession) -> AgentSt
             query_embedding=query_embedding,
             filters=constraint_filters or None,
             limit=10,
-            min_similarity=0.15
+            min_similarity=0.15,
+            max_price=max_price,
         )
         low_confidence_search = True
 

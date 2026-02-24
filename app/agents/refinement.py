@@ -60,7 +60,7 @@ async def refinement_agent(state: AgentState) -> AgentState:
     system_message = """You are analyzing if a user wants to refine their product search or start a new topic.
 
 REFINEMENT indicators (user wants to filter/adjust current results):
-- Price/budget mentions: "cheaper", "under $X", "more affordable", "budget"
+- Price/budget mentions: "cheaper", "under $X", "under ₹X", "more affordable", "budget"
 - Format changes: "in powder form", "capsules instead", "liquid version"
 - Ingredient filters: "without fish", "vegan option", "no allergens"
 - Allergy mentions: "I have a fish allergy", "allergic to dairy"
@@ -75,7 +75,7 @@ NEW TOPIC indicators (user wants something different):
 When extracting new_constraints, use these EXACT key names so downstream filters work:
 - "allergies": list of allergy strings, e.g. ["fish", "dairy"]
 - "dietary_preference": string, e.g. "vegan", "vegetarian"
-- "budget_max": number, e.g. 30
+- "budget_max": number (the numeric value only, strip any currency symbol), e.g. 1000 for "under ₹1000" or 30 for "under $30"
 - "format_preference": string, e.g. "capsule", "powder", "liquid"
 """
 

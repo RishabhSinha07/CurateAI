@@ -236,7 +236,8 @@ async def reranker_agent(state: AgentState) -> AgentState:
     )
 
     # Apply simple budget filter if present
-    budget = extracted_context.get("budget")
+    # Support both "budget_max" (set by refinement agent) and legacy "budget" key
+    budget = extracted_context.get("budget_max") or extracted_context.get("budget")
     if budget:
         try:
             budget_value = float(budget)
@@ -258,6 +259,22 @@ async def reranker_agent(state: AgentState) -> AgentState:
         new_state["status"] = "ranked"
         new_state["next_agent"] = "safety"
         return new_state
+
+    # Apply format preference filter if present
+    format_pref = extracted_context.get("format_preference")
+    if format_pref:
+        format_lower = format_pref.lower()
+        filtered_by_format = [
+            p for p in safe_products
+            if format_lower in str(p.get("attributes", {}).get("product_format", "")).lower()
+            or format_lower in p.get("name", "").lower()
+            or format_lower in p.get("description", "").lower()
+        ]
+        if filtered_by_format:
+            safe_products = filtered_by_format
+            logger.info(f"Format preference filter: {len(safe_products)} products match '{format_pref}'")
+        else:
+            logger.info(f"No products match format '{format_pref}', keeping all {len(safe_products)} products")
 
     # Trust search ranking (graph boosting + vector similarity already applied)
     # Take top 10 products

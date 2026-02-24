@@ -1,6 +1,6 @@
 import uuid
 from typing import Optional, Any
-from sqlalchemy import select, and_
+from sqlalchemy import select, and_, or_
 from sqlalchemy.sql import literal
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.models import Product
@@ -19,7 +19,8 @@ class ProductRepository:
         domain_slug: Optional[str] = None,
         filters: Optional[dict[str, Any]] = None,
         limit: int = 5,
-        min_similarity: float = 0.5
+        min_similarity: float = 0.5,
+        max_price: Optional[float] = None,
     ) -> list[tuple[Product, float]]:
         """
         Perform hybrid search using vector similarity and JSONB filters.
@@ -57,6 +58,12 @@ class ProductRepository:
                     # For lists, check if any of the values intersect (using JSONB ?| operator)
                     # Note: SQLAlchemy's postgresql.JSONB has support for ?|
                     query = query.where(Product.attributes[key].has_any(value))
+
+        # Apply price filter if specified (NULL prices pass through)
+        if max_price is not None:
+            query = query.where(
+                or_(Product.price.is_(None), Product.price <= max_price)
+            )
 
         # Filter by minimum similarity and order by score
         query = query.where(similarity >= min_similarity).order_by(similarity.desc()).limit(limit)

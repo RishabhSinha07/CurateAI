@@ -89,11 +89,46 @@ def get_interviewer_model():
     return get_bedrock_llm(structured_output_schema=InterviewerResponse)
 
 
+def _cat_str(cat) -> str:
+    """Return the canonical string for an attribute/constraint category.
+
+    Knowledge-graph constraint types are ConstraintType enum instances
+    (e.g. ConstraintType.ALLERGY with value "allergy").  Using str() on
+    them produces the ugly "<ConstraintType.ALLERGY: 'allergy'>" repr.
+    This helper always returns the clean lowercase value string.
+    """
+    if hasattr(cat, 'value'):
+        return str(cat.value).lower()
+    return str(cat).lower()
+
+
+def _slot_is_filled(slot_cat, already_filled: set) -> bool:
+    """Check if a slot category is covered by already_filled.
+
+    The LLM extracts slot values using natural plural / compound names
+    (e.g. "allergies", "dietary_preference") while knowledge-graph
+    constraint types use singular lowercase values ("allergy", "dietary").
+    This helper normalises both sides so the comparison is robust.
+    """
+    slot_str = _cat_str(slot_cat)
+    for key in already_filled:
+        key_str = str(key).lower()
+        if key_str == slot_str:
+            return True
+        # "allergies" covers "allergy", "diets" covers "diet"
+        if key_str.rstrip('s') == slot_str.rstrip('s') and len(slot_str) > 2:
+            return True
+        # "dietary_preference" covers "dietary"; "diet_type" covers "diet"
+        if key_str.startswith(slot_str) or slot_str.startswith(key_str):
+            return True
+    return False
+
+
 def _build_graph_slot_reference(graph_questions: List[Dict[str, Any]]) -> str:
     """Build a readable reference block from knowledge graph questions."""
     lines = []
     for q in graph_questions:
-        attr_category = q['attribute_category']
+        attr_category = _cat_str(q['attribute_category'])  # clean string, no enum repr
         reason = q.get('reason', '')
         question_text = q['question'].get('text', '')
         options = q['question'].get('options', [])
@@ -349,7 +384,7 @@ async def interviewer_agent(state: AgentState) -> AgentState:
                 already_filled = set(k for k in extracted_context.keys() if k != "graph_state")
                 already_filled.update(filled_attrs.keys())
 
-                unfilled = [q for q in global_questions if q['attribute_category'] not in already_filled]
+                unfilled = [q for q in global_questions if not _slot_is_filled(q['attribute_category'], already_filled)]
 
                 # Cap at 3 questions
                 questions_asked = graph_state.get("questions_asked", 0)
@@ -739,8 +774,8 @@ If the match is not obvious, choose the closest related problem."""
     filled_attrs = graph_state.get("filled_attributes", {})
     already_filled.update(filled_attrs.keys())
 
-    missing_required = [s for s in required_slots if s not in already_filled]
-    unfilled_optional = [s for s in optional_slots if s not in already_filled]
+    missing_required = [s for s in required_slots if not _slot_is_filled(s, already_filled)]
+    unfilled_optional = [s for s in optional_slots if not _slot_is_filled(s, already_filled)]
 
     # Cap personalisation questions at 3 — proceed to search after that
     MAX_PERSONALISATION_QUESTIONS = 3
@@ -771,7 +806,7 @@ If the match is not obvious, choose the closest related problem."""
     # We only want the LLM to extract from unfilled slots to avoid re-asking
     unfilled_graph_questions = [
         q for q in graph_questions
-        if q['attribute_category'] not in already_filled
+        if not _slot_is_filled(q['attribute_category'], already_filled)
     ]
 
     slot_reference_for_extraction = _build_graph_slot_reference(unfilled_graph_questions)
@@ -783,7 +818,7 @@ If the match is not obvious, choose the closest related problem."""
     all_relevant_slots = list(dict.fromkeys(missing_required + unfilled_optional))
     relevant_graph_questions = [
         q for q in unfilled_graph_questions
-        if q['attribute_category'] in all_relevant_slots
+        if any(_slot_is_filled(q['attribute_category'], {s}) for s in all_relevant_slots)
     ][:remaining_budget]
     missing_slot_reference = _build_graph_slot_reference(relevant_graph_questions)
     logger.info(f"Total slots: {len(graph_questions)}, Already filled: {len(already_filled)}, Still needed: {len(relevant_graph_questions)}")
@@ -889,7 +924,7 @@ Respond with:
         for attr_category, value in result.extracted_values.items():
             # Find the corresponding graph question to get attribute metadata
             matching_question = next(
-                (q for q in graph_questions if q['attribute_category'] == attr_category),
+                (q for q in graph_questions if _slot_is_filled(q['attribute_category'], {attr_category})),
                 None
             )
 
