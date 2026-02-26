@@ -144,8 +144,8 @@ class PipelineStack(Stack):
         ))
         self.update_api_gw_project.add_to_role_policy(iam.PolicyStatement(
             effect=iam.Effect.ALLOW,
-            actions=["apigatewayv2:GetApis", "apigatewayv2:GetIntegrations", "apigatewayv2:UpdateIntegration"],
-            resources=["*"],
+            actions=["apigateway:GET", "apigateway:PATCH"],
+            resources=["arn:aws:apigateway:*::/*"],
         ))
 
         # ============================================
