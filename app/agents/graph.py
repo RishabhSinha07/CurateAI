@@ -201,16 +201,19 @@ def after_journey(state: AgentState) -> Literal["safety", "interviewer"]:
     return "safety"
 
 
-def after_refinement(state: AgentState) -> Literal["search", "router"]:
+def after_refinement(state: AgentState) -> Literal["search", "router", "interviewer"]:
     """
     Determine next step after refinement detection.
 
     If refinement, go to search with updated constraints.
+    If re_personalize, go to interviewer to restart slot-filling for the same domain.
     If new topic, go to router for fresh classification.
     """
     next_agent = state.get("next_agent")
     if next_agent == "search":
         return "search"
+    if next_agent == "interviewer":
+        return "interviewer"
     return "router"
 
 
@@ -301,6 +304,7 @@ class ConsultationGraph:
             {
                 "search": "search",
                 "router": "router",
+                "interviewer": "interviewer",
             }
         )
 

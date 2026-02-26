@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict
 from pydantic import BaseModel, Field, field_validator
 
 from app.agents.validators import parse_dict, parse_bool
@@ -13,19 +13,24 @@ settings = get_settings()
 
 class RefinementResponse(BaseModel):
     """Structured response from the Refinement detection agent."""
-    is_refinement: bool = Field(
-        description="True if user wants to refine/filter existing results, False if new topic"
+    intent: str = Field(
+        description=(
+            "One of: "
+            "'refinement' if user wants to filter/adjust current results, "
+            "'re_personalize' if user wants to restart the personalization interview for the same domain, "
+            "'new_topic' if user wants something completely different"
+        )
     )
     new_constraints: Dict[str, Any] = Field(
         default_factory=dict,
-        description="New constraints to add (e.g., budget, format preference)"
+        description="New constraints to add (e.g., budget, format preference). Only for refinement intent."
     )
     reasoning: str = Field(default="", description="Brief explanation of the decision")
 
-    @field_validator("is_refinement", mode="before")
-    @classmethod
-    def parse_is_refinement(cls, v: Any) -> bool:
-        return parse_bool(v)
+    # Keep is_refinement as a computed property for backward compatibility
+    @property
+    def is_refinement(self) -> bool:
+        return self.intent == "refinement"
 
     @field_validator("new_constraints", mode="before")
     @classmethod
@@ -57,26 +62,33 @@ async def refinement_agent(state: AgentState) -> AgentState:
     extracted_context = state.get("extracted_context", {})
     domain_slug = state.get("domain_slug")
 
-    system_message = """You are analyzing if a user wants to refine their product search or start a new topic.
+    system_message = """You are analyzing what a user wants to do after seeing product recommendations.
 
-REFINEMENT indicators (user wants to filter/adjust current results):
-- Price/budget mentions: "cheaper", "under $X", "under ₹X", "more affordable", "budget"
-- Format changes: "in powder form", "capsules instead", "liquid version"
+Classify into ONE of three intents:
+
+RE_PERSONALIZE — user wants to restart the personalization interview for the same domain:
+- Keywords: "personalise", "personalize", "customise", "customize", "personalise for me", "personalize for me", "make it personal", "tailor this", "based on my needs", "for my needs"
+- These users want the system to ask them questions (age, goals, preferences) to find better-matched products.
+
+REFINEMENT — user wants to filter/adjust the current results without re-interviewing:
+- Price/budget: "cheaper", "under ₹X", "more affordable", "budget"
+- Format: "in powder form", "capsules instead", "liquid version"
 - Ingredient filters: "without fish", "vegan option", "no allergens"
 - Allergy mentions: "I have a fish allergy", "allergic to dairy"
 - Quantity: "show more", "other options", "alternatives"
 
-NEW TOPIC indicators (user wants something different):
+NEW_TOPIC — user wants something completely different:
 - Different health goal: "what about sleep?", "energy instead"
-- Different product category: "do you have vitamins?"
 - Ending conversation: "thanks", "that's all", "goodbye"
 - Completely unrelated: weather, general questions
 
-When extracting new_constraints, use these EXACT key names so downstream filters work:
+When extracting new_constraints (only for REFINEMENT), use these EXACT key names:
 - "allergies": list of allergy strings, e.g. ["fish", "dairy"]
 - "dietary_preference": string, e.g. "vegan", "vegetarian"
-- "budget_max": number (the numeric value only, strip any currency symbol), e.g. 1000 for "under ₹1000" or 30 for "under $30"
+- "budget_max": number (strip currency symbol), e.g. 1000 for "under ₹1000"
 - "format_preference": string, e.g. "capsule", "powder", "liquid"
+
+Return intent as one of: "refinement", "re_personalize", "new_topic"
 """
 
     user_prompt = f"""Current domain: {domain_slug}
@@ -84,8 +96,7 @@ Current preferences: {extracted_context}
 
 User's message: "{user_message}"
 
-Is this a refinement of the current search or a new topic?
-If refinement, extract the new constraints (budget, format, ingredients, etc.)."""
+Classify the intent and extract constraints if applicable."""
 
     model = get_refinement_model()
     messages = [
@@ -96,11 +107,23 @@ If refinement, extract the new constraints (budget, format, ingredients, etc.)."
 
     new_state = state.copy()
 
-    if result.is_refinement:
+    if result.intent == "refinement":
         # Merge new constraints into existing context
         new_state["extracted_context"] = {**extracted_context, **result.new_constraints}
         new_state["status"] = "refining"
         new_state["next_agent"] = "search"
+    elif result.intent == "re_personalize":
+        # User wants to restart the interview for the same domain.
+        # Clear graph state so the interviewer starts a fresh slot-filling pass,
+        # but keep domain_slug so we don't re-route.
+        updated_context = {**extracted_context}
+        updated_context.pop("graph_state", None)
+        updated_context.pop("candidate_problem", None)
+        new_state["extracted_context"] = updated_context
+        new_state["search_results"] = []
+        new_state["final_products"] = []
+        new_state["status"] = "collecting_info"
+        new_state["next_agent"] = "interviewer"
     else:
         # New topic - go through router
         new_state["status"] = "active"
