@@ -36,6 +36,19 @@ class RouterResponse(BaseModel):
         default=None,
         description="The specific product or ingredient name the user asked for. Only set when intent_type is 'direct_product'."
     )
+    inline_constraints: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description=(
+            "Budget/dietary/format constraints found inline in the same message as a direct_product or filter request. "
+            "Use these exact keys: "
+            "'budget_max' (number, strip currency symbol — e.g. 1000 for 'under ₹1000' or 50 for 'under $50'), "
+            "'dietary_preference' (string — e.g. 'vegan'), "
+            "'format_preference' (string — e.g. 'capsule'). "
+            "Examples: 'collagen under ₹1000' → {budget_max: 1000}, "
+            "'vegan protein powder' → {dietary_preference: 'vegan'}. "
+            "Leave null if no constraints are mentioned."
+        )
+    )
 
 def get_router_model():
     """Initialize the Bedrock model for routing."""
@@ -365,9 +378,12 @@ If they are asking an educational question about an ingredient or supplement, cl
                 # and Safety know to restore the interview after filtering.
                 new_state["intent_type"] = "filter"
                 new_state["next_agent"] = "refinement"
-                # Don't overwrite status — Refinement needs to see "awaiting_slot"
-                # to know the interview should resume after the filter pass.
                 new_state["status"] = _original_status or new_state.get("status")
+                # Seed inline constraints so Refinement's LLM call has a head-start
+                if result.inline_constraints:
+                    existing_ctx = new_state.get("extracted_context", {})
+                    existing_ctx.update(result.inline_constraints)
+                    new_state["extracted_context"] = existing_ctx
                 logger.info(
                     f"Filter request detected during status='{_original_status}'. "
                     f"Routing to refinement (status preserved)."
@@ -380,9 +396,16 @@ If they are asking an educational question about an ingredient or supplement, cl
                     f"Routing to ingredient_info agent (status preserved)."
                 )
             elif result.intent_type == "direct_product" and result.direct_search_term:
-                # Direct product request — bypass interviewer, go straight to search
+                # Direct product request — bypass interviewer, go straight to search.
+                # Also merge any inline constraints (budget, dietary, format) so
+                # Search can apply SQL-level price/attribute filters immediately.
                 existing_ctx = new_state.get("extracted_context", {})
                 existing_ctx["direct_search_term"] = result.direct_search_term
+                if result.inline_constraints:
+                    existing_ctx.update(result.inline_constraints)
+                    logger.info(
+                        f"Inline constraints extracted with direct product: {result.inline_constraints}"
+                    )
                 new_state["extracted_context"] = existing_ctx
                 new_state["intent_type"] = "direct_product"
                 new_state["next_agent"] = "search"
