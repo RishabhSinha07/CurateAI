@@ -18,6 +18,7 @@ class RefinementResponse(BaseModel):
             "One of: "
             "'refinement' if user wants to filter/adjust current results, "
             "'re_personalize' if user wants to restart the personalization interview for the same domain, "
+            "'ingredient_info' if user is asking an educational question about an ingredient or supplement, "
             "'new_topic' if user wants something completely different"
         )
     )
@@ -66,6 +67,11 @@ async def refinement_agent(state: AgentState) -> AgentState:
 
 Classify into ONE of three intents:
 
+INGREDIENT_INFO — user is asking an educational question about an ingredient or supplement:
+- Key signals: "how does X work", "why should I use X", "what does X do", "tell me about X", "benefits of X", "when should I take X", "how to take X", "is X safe", "side effects of X", "explain X"
+- Pronouns referring to a shown product/ingredient: "when should I take this?", "how does it work?", "is it safe?"
+- These users want to learn, not buy — route to ingredient_info, do NOT search for products.
+
 RE_PERSONALIZE — user wants to restart the personalization interview for the same domain:
 - Keywords: "personalise", "personalize", "customise", "customize", "personalise for me", "personalize for me", "make it personal", "tailor this", "based on my needs", "for my needs"
 - These users want the system to ask them questions (age, goals, preferences) to find better-matched products.
@@ -88,7 +94,7 @@ When extracting new_constraints (only for REFINEMENT), use these EXACT key names
 - "budget_max": number (strip currency symbol), e.g. 1000 for "under ₹1000"
 - "format_preference": string, e.g. "capsule", "powder", "liquid"
 
-Return intent as one of: "refinement", "re_personalize", "new_topic"
+Return intent as one of: "ingredient_info", "refinement", "re_personalize", "new_topic"
 """
 
     user_prompt = f"""Current domain: {domain_slug}
@@ -107,7 +113,10 @@ Classify the intent and extract constraints if applicable."""
 
     new_state = state.copy()
 
-    if result.intent == "refinement":
+    if result.intent == "ingredient_info":
+        # Educational question — route to ingredient_info, preserve all state
+        new_state["next_agent"] = "ingredient_info"
+    elif result.intent == "refinement":
         # Merge new constraints into existing context
         new_state["extracted_context"] = {**extracted_context, **result.new_constraints}
         new_state["status"] = "refining"
