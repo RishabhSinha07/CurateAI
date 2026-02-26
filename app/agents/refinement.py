@@ -117,8 +117,18 @@ Classify the intent and extract constraints if applicable."""
         # Educational question — route to ingredient_info, preserve all state
         new_state["next_agent"] = "ingredient_info"
     elif result.intent == "refinement":
-        # Merge new constraints into existing context
-        new_state["extracted_context"] = {**extracted_context, **result.new_constraints}
+        # Merge new constraints into extracted_context.
+        # _is_refinement_pass tells Safety to skip the full LLM response.
+        # _resume_interview tells Safety to restore awaiting_slot status and
+        # re-surface the pending question (used when filtering initial products
+        # mid-interview rather than filtering the final completed results).
+        current_status = state.get("status", "")
+        new_state["extracted_context"] = {
+            **extracted_context,
+            **result.new_constraints,
+            "_is_refinement_pass": True,
+            "_resume_interview": current_status == "awaiting_slot",
+        }
         new_state["status"] = "refining"
         new_state["next_agent"] = "search"
     elif result.intent == "re_personalize":

@@ -158,7 +158,7 @@ def after_interviewer(state: AgentState) -> Literal["initial_products", "search"
     return END
 
 
-def after_router(state: AgentState) -> Literal["interviewer", "journey", "safety", "search", "fallback", "ingredient_info"]:
+def after_router(state: AgentState) -> Literal["interviewer", "journey", "safety", "search", "fallback", "ingredient_info", "refinement"]:
     """
     Determine next step after router.
 
@@ -166,6 +166,7 @@ def after_router(state: AgentState) -> Literal["interviewer", "journey", "safety
     If journey intent → journey agent.
     If direct_product → search agent (bypass interviewer).
     If ingredient_info → ingredient_info agent (educational explanation).
+    If filter → refinement agent (filter initial products, then resume interview).
     Otherwise → interviewer (which will fetch initial products after
         identifying the user's problem).
     """
@@ -185,6 +186,9 @@ def after_router(state: AgentState) -> Literal["interviewer", "journey", "safety
 
     if next_agent == "ingredient_info":
         return "ingredient_info"
+
+    if next_agent == "refinement":
+        return "refinement"
 
     return "interviewer"
 
@@ -274,6 +278,7 @@ class ConsultationGraph:
                 "search": "search",
                 "fallback": "fallback",
                 "ingredient_info": "ingredient_info",
+                "refinement": "refinement",
             }
         )
 

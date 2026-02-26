@@ -113,6 +113,87 @@ async def safety_agent(state: AgentState) -> AgentState:
         new_state["next_agent"] = None
         return new_state
 
+    # --- Refinement short-circuit ---
+    # When the user filtered existing results (cheaper, vegan, capsule form etc.),
+    # the Refinement agent sets _is_refinement_pass=True in extracted_context.
+    # (We can't rely on status="refining" because Search/Reranker overwrite it.)
+    # Skip the full LLM consultation and return a brief contextual message so
+    # the same "Understanding Your Needs" wall of text doesn't repeat on every filter.
+    if extracted_context.get("_is_refinement_pass"):
+        new_constraints = {
+            k: v for k, v in extracted_context.items()
+            if k in ("budget_max", "dietary_preference", "format_preference", "allergies")
+        }
+
+        filter_labels = []
+        if "budget_max" in new_constraints:
+            # Detect currency symbol from products
+            _currency_symbols = {"INR": "₹", "USD": "$", "GBP": "£", "EUR": "€"}
+            _currency = next(
+                (p.get("currency", "USD").upper() for p in final_products if p.get("currency")),
+                "USD"
+            )
+            _symbol = _currency_symbols.get(_currency, "$")
+            filter_labels.append(f"under {_symbol}{int(new_constraints['budget_max'])}")
+        if "dietary_preference" in new_constraints:
+            filter_labels.append(new_constraints["dietary_preference"].lower())
+        if "format_preference" in new_constraints:
+            filter_labels.append(f"{new_constraints['format_preference'].lower()} form")
+        if "allergies" in new_constraints:
+            allergies = new_constraints["allergies"]
+            if isinstance(allergies, list):
+                filter_labels.append(f"no {', '.join(allergies)}")
+
+        if filter_labels:
+            filter_desc = " · ".join(filter_labels)
+            refinement_response = f"Here are your filtered results ({filter_desc})."
+        else:
+            refinement_response = "Here are your updated results."
+
+        new_state = state.copy()
+        # Clear both flags so they don't persist into future turns
+        cleared_context = {
+            k: v for k, v in extracted_context.items()
+            if k not in ("_is_refinement_pass", "_resume_interview")
+        }
+        new_state["extracted_context"] = cleared_context
+
+        # If filtering happened mid-interview (initial products phase), restore
+        # the awaiting_slot status and re-surface the pending question so the
+        # interview continues after showing the filtered products.
+        resume_interview = extracted_context.get("_resume_interview", False)
+        if resume_interview:
+            pending_q = cleared_context.get("pending_slot_question")
+            if pending_q:
+                refinement_response += f"\n\n{pending_q}"
+            new_state["status"] = "awaiting_slot"
+        else:
+            new_state["status"] = "completed"
+
+        new_state["response"] = refinement_response
+        new_state["next_agent"] = None
+        # Rebuild filter suggestions excluding already-applied filters
+        filter_suggestions = []
+        if "budget_max" not in new_constraints:
+            _currency = next(
+                (p.get("currency", "USD").upper() for p in final_products if p.get("currency")),
+                "USD"
+            )
+            _symbol = {"INR": "₹", "USD": "$", "GBP": "£", "EUR": "€"}.get(_currency, "$")
+            _threshold = {"INR": 1000, "USD": 50, "GBP": 40, "EUR": 45}.get(_currency, 50)
+            filter_suggestions.append(f"Under {_symbol}{_threshold}")
+        # Mid-interview: don't suggest filters — suggested_replies should be
+        # the slot question's answer options, which the Interviewer will provide
+        # on the next turn. Leave empty here.
+        if not resume_interview:
+            diet_val = str(new_constraints.get("dietary_preference", "")).lower()
+            if "vegan" not in diet_val:
+                filter_suggestions.append("Vegan options")
+            if "format_preference" not in new_constraints:
+                filter_suggestions.append("Capsule form")
+        new_state["suggested_replies"] = filter_suggestions
+        return new_state
+
     # Check if this is a journey bundle response
     journey_bundle = state.get("journey_bundle")
     intent_type = state.get("intent_type")

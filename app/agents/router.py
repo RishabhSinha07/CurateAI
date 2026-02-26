@@ -21,7 +21,9 @@ class RouterResponse(BaseModel):
             "'query' for specific product search, "
             "'journey' for customer journey bundle, "
             "'direct_product' for explicit product/ingredient purchase requests, "
-            "'ingredient_info' for educational questions about how an ingredient or supplement works"
+            "'ingredient_info' for educational questions about how an ingredient or supplement works, "
+            "'filter' for budget/format/dietary filter requests on already-shown products "
+            "(e.g. 'Under ₹1000', 'Vegan options', 'Capsule form', 'Without fish')"
         )
     )
     confidence: float = Field(description="Confidence score between 0.0 and 1.0")
@@ -211,7 +213,15 @@ Session context: The user is in an active consultation.
   Current domain: {state.get("domain_slug") or "unknown"}
   Pending prompt: "{state.get('extracted_context', {}).get('pending_slot_question')}"
 
-If the user's message is responding to this prompt (e.g. "yes", "no", "personalise", "sure", "oily skin", "28", "vegan"), you MUST classify as:
+FIRST check if the message is a budget or format filter on already-shown products:
+  - Budget: "Under ₹1000", "cheaper", "under $50", "budget options", "under [number]"
+  - Format: "Capsule form", "in powder", "liquid version", "capsules only"
+  - Dietary filter (ONLY when phrased as a filter request): "Vegan options", "vegetarian only", "without fish", "no dairy", "show me vegan"
+  If YES → classify as intent_type="filter", domain_slug="{state.get("domain_slug") or "wellness"}"
+
+  IMPORTANT: bare dietary words like "Non Veg", "Vegan", "Vegetarian", "Pescatarian" WITHOUT "options"/"only"/"show me" are NOT filters — they are slot answers to the pending question.
+
+If the message is a slot answer to the pending prompt (e.g. "yes", "no", "oily skin", "28", "Non Veg", "Vegan", "Intermediate") → classify as:
   intent_type="query", domain_slug="{state.get("domain_slug") or "wellness"}"
 The interviewer will handle it from there.
 
@@ -238,6 +248,7 @@ If they are asking an educational question about an ingredient or supplement, cl
         and _pending_q
         and _session_domain
         and _session_domain not in ("out_of_scope", None)
+        and result.intent_type not in ("filter", "ingredient_info")  # never override valid filter/info
         and (
             result.domain_slug == "out_of_scope"
             or result.domain_slug not in _known_domain_slugs
@@ -349,7 +360,19 @@ If they are asking an educational question about an ingredient or supplement, cl
                 )
 
             # Route based on intent type
-            if result.intent_type == "ingredient_info":
+            if result.intent_type == "filter":
+                # Filter on already-shown products — preserve status so Refinement
+                # and Safety know to restore the interview after filtering.
+                new_state["intent_type"] = "filter"
+                new_state["next_agent"] = "refinement"
+                # Don't overwrite status — Refinement needs to see "awaiting_slot"
+                # to know the interview should resume after the filter pass.
+                new_state["status"] = _original_status or new_state.get("status")
+                logger.info(
+                    f"Filter request detected during status='{_original_status}'. "
+                    f"Routing to refinement (status preserved)."
+                )
+            elif result.intent_type == "ingredient_info":
                 new_state["intent_type"] = "ingredient_info"
                 new_state["next_agent"] = "ingredient_info"
                 logger.info(
