@@ -54,11 +54,15 @@ def _build_constraint_filters(extracted_context: Dict[str, Any]) -> Dict[str, An
 
     # --- Dietary preference ---
     diet = None
-    if "dietary_preference" in extracted_context:
-        diet = extracted_context["dietary_preference"].lower()
+    for key in ("dietary_preference", "dietary"):
+        if key in extracted_context:
+            val = extracted_context[key]
+            if isinstance(val, str):
+                diet = val.lower()
+                break
     # Also check graph_state filled_attributes
     for attr_cat, attr_data in filled_attrs.items():
-        if attr_cat in ("diet", "dietary_preference"):
+        if attr_cat in ("diet", "dietary_preference", "dietary"):
             val = attr_data.get("value", "")
             if isinstance(val, str):
                 diet = val.lower()

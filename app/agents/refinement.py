@@ -63,9 +63,13 @@ async def refinement_agent(state: AgentState) -> AgentState:
     extracted_context = state.get("extracted_context", {})
     domain_slug = state.get("domain_slug")
 
-    system_message = """You are analyzing what a user wants to do after seeing product recommendations.
+    has_products = bool(state.get("final_products"))
+    product_count = len(state.get("final_products", []))
 
-Classify into ONE of three intents:
+    system_message = f"""You are analyzing what a user wants to do after seeing product recommendations.
+The user has already been shown {product_count} product(s) in the "{domain_slug}" domain.
+
+Classify into ONE of four intents:
 
 INGREDIENT_INFO — user is asking an educational question about an ingredient or supplement:
 - Key signals: "how does X work", "why should I use X", "what does X do", "tell me about X", "benefits of X", "when should I take X", "how to take X", "is X safe", "side effects of X", "explain X"
@@ -77,16 +81,18 @@ RE_PERSONALIZE — user wants to restart the personalization interview for the s
 - These users want the system to ask them questions (age, goals, preferences) to find better-matched products.
 
 REFINEMENT — user wants to filter/adjust the current results without re-interviewing:
-- Price/budget: "cheaper", "under ₹X", "more affordable", "budget"
+- Price/budget: "cheaper", "under ₹X", "under X", "under 1000", "more affordable", "budget", "less than X"
 - Format: "in powder form", "capsules instead", "liquid version"
 - Ingredient filters: "without fish", "vegan option", "no allergens"
 - Allergy mentions: "I have a fish allergy", "allergic to dairy"
 - Quantity: "show more", "other options", "alternatives"
+- IMPORTANT: Any message that is purely a price/budget constraint (e.g. "under 1500", "below 500", "max 2000") is ALWAYS a refinement when the user has been shown products. These are filters on the current results, never a new topic.
 
 NEW_TOPIC — user wants something completely different:
 - Different health goal: "what about sleep?", "energy instead"
 - Ending conversation: "thanks", "that's all", "goodbye"
 - Completely unrelated: weather, general questions
+- IMPORTANT: A bare budget like "under 1500" is NOT a new topic — it is a refinement filter on current results.
 
 When extracting new_constraints (only for REFINEMENT), use these EXACT key names:
 - "allergies": list of allergy strings, e.g. ["fish", "dairy"]

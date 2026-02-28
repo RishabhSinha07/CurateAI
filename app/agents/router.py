@@ -239,7 +239,15 @@ If the message is a slot answer to the pending prompt (e.g. "yes", "no", "oily s
 The interviewer will handle it from there.
 
 If they are asking an educational question about an ingredient or supplement, classify as intent_type="ingredient_info".
-''' if state.get("status") == "awaiting_slot" and state.get("extracted_context", {}).get("pending_slot_question") else ""}"""
+''' if state.get("status") == "awaiting_slot" and state.get("extracted_context", {}).get("pending_slot_question") else f'''
+Session context: The user has an active session in domain "{state.get("domain_slug")}".
+
+FIRST check if the message is a budget or format filter on products:
+  - Budget: "Under ₹1000", "cheaper", "under $50", "budget options", "under [number]", "under 1500", "below 500"
+  - Format: "Capsule form", "in powder", "liquid version", "capsules only"
+  - Dietary filter: "Vegan options", "vegetarian only", "without fish", "no dairy"
+  If YES → classify as intent_type="filter", domain_slug="{state.get("domain_slug") or "wellness"}"
+''' if state.get("domain_slug") and state.get("domain_slug") != "out_of_scope" else ""}"""
 
     model = get_router_model()
     result: RouterResponse = await model.ainvoke(system_prompt)
