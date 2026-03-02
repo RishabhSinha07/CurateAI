@@ -19,10 +19,14 @@ Subsequent turns (status=awaiting_slot) skip Router entirely and go to the
 Interviewer directly.
 """
 
+import logging
+import time
 import uuid
 from typing import Literal
 from langgraph.graph import StateGraph, END
 from sqlalchemy.ext.asyncio import AsyncSession
+
+logger = logging.getLogger(__name__)
 
 from app.agents.state import AgentState
 from app.agents.router import router_agent
@@ -44,6 +48,8 @@ def create_initial_state(
     existing_status: str = "active",
     domain_slug: str | None = None,
     previous_response: str | None = None,
+    tenant_id: uuid.UUID | None = None,
+    tenant_enabled_domains: list[str] | None = None,
 ) -> AgentState:
     """Create the initial state for a new conversation turn."""
     return AgentState(
@@ -61,6 +67,8 @@ def create_initial_state(
         status=existing_status,
         next_agent=None,
         optional_slot_hint=None,
+        tenant_id=tenant_id,
+        tenant_enabled_domains=tenant_enabled_domains or ["*"],
         intent_type=None,
         journey_type=None,
         journey_bundle=None,
@@ -327,50 +335,52 @@ class ConsultationGraph:
 
         return builder.compile()
 
+    async def _timed(self, agent_name: str, coro) -> AgentState:
+        """Wrap an agent coroutine with timing and structured logging."""
+        start = time.monotonic()
+        result = await coro
+        duration_ms = round((time.monotonic() - start) * 1000, 1)
+        logger.info(
+            f"agent_timing agent={agent_name} duration_ms={duration_ms} "
+            f"session={result.get('session_id')} status={result.get('status')} "
+            f"next={result.get('next_agent')}",
+            extra={
+                "agent": agent_name,
+                "duration_ms": duration_ms,
+                "session_id": str(result.get("session_id")),
+            },
+        )
+        return result
+
     async def _router_wrapper(self, state: AgentState) -> AgentState:
-        """Wrapper to inject db session into router agent."""
-        db = self._current_db
-        return await router_node(state, db)
+        return await self._timed("router", router_node(state, self._current_db))
 
     async def _initial_products_wrapper(self, state: AgentState) -> AgentState:
-        """Wrapper to inject db session into initial products agent."""
-        db = self._current_db
-        return await initial_products_node(state, db)
+        return await self._timed("initial_products", initial_products_node(state, self._current_db))
 
     async def _interviewer_wrapper(self, state: AgentState) -> AgentState:
-        """Wrapper for interviewer agent."""
-        return await interviewer_node(state)
+        return await self._timed("interviewer", interviewer_node(state))
 
     async def _search_wrapper(self, state: AgentState) -> AgentState:
-        """Wrapper to inject db session into search agent."""
-        db = self._current_db
-        return await search_node(state, db)
+        return await self._timed("search", search_node(state, self._current_db))
 
     async def _reranker_wrapper(self, state: AgentState) -> AgentState:
-        """Wrapper for reranker agent."""
-        return await reranker_node(state)
+        return await self._timed("reranker", reranker_node(state))
 
     async def _safety_wrapper(self, state: AgentState) -> AgentState:
-        """Wrapper for safety agent."""
-        return await safety_node(state)
+        return await self._timed("safety", safety_node(state))
 
     async def _refinement_wrapper(self, state: AgentState) -> AgentState:
-        """Wrapper for refinement agent."""
-        return await refinement_node(state)
+        return await self._timed("refinement", refinement_node(state))
 
     async def _journey_wrapper(self, state: AgentState) -> AgentState:
-        """Wrapper to inject db session into journey agent."""
-        db = self._current_db
-        return await journey_node(state, db)
+        return await self._timed("journey", journey_node(state, self._current_db))
 
     async def _fallback_wrapper(self, state: AgentState) -> AgentState:
-        """Wrapper to inject db session into fallback agent."""
-        db = self._current_db
-        return await fallback_node(state, db)
+        return await self._timed("fallback", fallback_node(state, self._current_db))
 
     async def _ingredient_info_wrapper(self, state: AgentState) -> AgentState:
-        """Wrapper for ingredient info agent (no db needed)."""
-        return await ingredient_info_node(state)
+        return await self._timed("ingredient_info", ingredient_info_node(state))
 
     async def run(self, state: AgentState, db: AsyncSession) -> AgentState:
         """

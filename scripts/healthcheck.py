@@ -20,8 +20,8 @@ def main():
             # Parse JSON response
             data = json.loads(response.read().decode('utf-8'))
 
-            # Verify expected response
-            if data.get("status") != "healthy":
+            # Verify expected response (accept "degraded" — fail-open for availability)
+            if data.get("status") not in ("healthy", "degraded"):
                 print(f"Health check failed: unexpected status {data}", file=sys.stderr)
                 sys.exit(1)
 

@@ -214,6 +214,7 @@ async def search_architect_agent(state: AgentState, db: AsyncSession) -> AgentSt
 
     # Perform hybrid search with fallback strategy
     product_repo = ProductRepository(db)
+    tenant_id = state.get("tenant_id")
 
     # Try primary threshold first (0.25 - balanced precision/recall)
     # Search across all products — domain slugs from scraped data are too broad
@@ -224,6 +225,7 @@ async def search_architect_agent(state: AgentState, db: AsyncSession) -> AgentSt
         limit=20,
         min_similarity=0.25,
         max_price=max_price,
+        tenant_id=tenant_id,
     )
 
     # Fallback to lower threshold if we got too few results
@@ -239,6 +241,7 @@ async def search_architect_agent(state: AgentState, db: AsyncSession) -> AgentSt
             limit=10,
             min_similarity=0.15,
             max_price=max_price,
+            tenant_id=tenant_id,
         )
         low_confidence_search = True
 
@@ -263,11 +266,26 @@ async def search_architect_agent(state: AgentState, db: AsyncSession) -> AgentSt
             "similarity_score": float(similarity)
         })
 
+    # Store search quality metadata in extracted_context for observability
+    search_metadata = {
+        "query_text": search_query_text,
+        "result_count": len(products_data),
+        "top_similarity": round(products_data[0]["similarity_score"], 3) if products_data else 0.0,
+        "low_confidence_search": low_confidence_search,
+        "constraint_filters_applied": constraint_filters or {},
+        "max_price_filter": max_price,
+    }
+
     # Update state
     new_state = state.copy()
     new_state["search_results"] = products_data
     new_state["status"] = "searching"
     new_state["next_agent"] = "reranker"
     new_state["low_confidence_search"] = low_confidence_search
+
+    # Merge search metadata into extracted_context
+    ctx = dict(new_state.get("extracted_context", {}))
+    ctx["_search_metadata"] = search_metadata
+    new_state["extracted_context"] = ctx
 
     return new_state

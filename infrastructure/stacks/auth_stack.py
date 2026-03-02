@@ -187,8 +187,49 @@ class AuthStack(Stack):
             authorizer=self.authorizer,
         )
 
-        # Note: Throttling for HTTP API should be configured via AWS Console or Usage Plans
-        # Default throttling limits apply: 10,000 requests/second per account per region
+        # Events endpoint integration
+        events_integration = integrations.HttpUrlIntegration(
+            "EventsIntegration",
+            f"{backend_url}/events",
+        )
+        self.api.add_routes(
+            path="/events",
+            methods=[apigw.HttpMethod.POST],
+            integration=events_integration,
+            authorizer=self.authorizer,
+        )
+
+        # Admin endpoints integrations
+        admin_products_integration = integrations.HttpUrlIntegration(
+            "AdminProductsIntegration",
+            f"{backend_url}/admin/products",
+        )
+        self.api.add_routes(
+            path="/admin/products",
+            methods=[apigw.HttpMethod.POST],
+            integration=admin_products_integration,
+            authorizer=self.authorizer,
+        )
+
+        admin_keys_integration = integrations.HttpUrlIntegration(
+            "AdminKeysIntegration",
+            f"{backend_url}/admin/api-keys/rotate",
+        )
+        self.api.add_routes(
+            path="/admin/api-keys/rotate",
+            methods=[apigw.HttpMethod.POST],
+            integration=admin_keys_integration,
+            authorizer=self.authorizer,
+        )
+
+        # Configure default stage throttle (burst=50, rate=20/sec)
+        cfn_stage = self.api.default_stage.node.default_child
+        cfn_stage.add_property_override(
+            "DefaultRouteSettings.ThrottlingBurstLimit", 50
+        )
+        cfn_stage.add_property_override(
+            "DefaultRouteSettings.ThrottlingRateLimit", 20
+        )
 
         # ============================================
         # CloudWatch Logs for API Gateway

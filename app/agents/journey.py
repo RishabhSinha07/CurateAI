@@ -66,7 +66,8 @@ async def journey_agent(state: AgentState, db: AsyncSession) -> AgentState:
 
     # Find matching journey bundle
     journey_repo = JourneyBundleRepository(db)
-    matched_journey = await journey_repo.match_by_keywords(domain_slug, user_message)
+    tenant_id = state.get("tenant_id")
+    matched_journey = await journey_repo.match_by_keywords(domain_slug, user_message, tenant_id=tenant_id)
     
     if not matched_journey:
         # No journey matched, fall back to regular query flow
@@ -88,7 +89,8 @@ async def journey_agent(state: AgentState, db: AsyncSession) -> AgentState:
         query_embedding=query_embedding,
         filters=None,
         limit=50,  # Get more products to filter by categories
-        min_similarity=-1.0  # Use negative threshold to catch EVERYTHING
+        min_similarity=-1.0,  # Use negative threshold to catch EVERYTHING
+        tenant_id=tenant_id,
     )
     
     # Filter products by categories and tags

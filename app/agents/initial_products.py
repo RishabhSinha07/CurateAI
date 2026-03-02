@@ -49,6 +49,7 @@ async def _semantic_search(
     domain_slug: str,
     problem_id: str,
     graph_domain: str,
+    tenant_id=None,
 ) -> list[dict] | None:
     """
     Try to find relevant products via semantic search using the candidate
@@ -96,6 +97,7 @@ async def _semantic_search(
             query_embedding=query_embedding,
             limit=INITIAL_PRODUCT_LIMIT,
             min_similarity=0.25,
+            tenant_id=tenant_id,
         )
 
         if results:
@@ -121,6 +123,7 @@ async def initial_products_agent(state: AgentState, db: AsyncSession) -> AgentSt
         return state
 
     product_repo = ProductRepository(db)
+    tenant_id = state.get("tenant_id")
 
     # --- Try semantic search using the identified problem ---
     products_data = None
@@ -137,6 +140,7 @@ async def initial_products_agent(state: AgentState, db: AsyncSession) -> AgentSt
     if problem_id and graph_domain:
         products_data = await _semantic_search(
             product_repo, domain_slug, problem_id, graph_domain,
+            tenant_id=tenant_id,
         )
     elif candidate:
         products_data = await _semantic_search(
@@ -144,6 +148,7 @@ async def initial_products_agent(state: AgentState, db: AsyncSession) -> AgentSt
             domain_slug,
             candidate["problem_id"],
             candidate["graph_domain"],
+            tenant_id=tenant_id,
         )
 
     # --- Fallback: semantic search using the user's raw message ---
@@ -158,6 +163,7 @@ async def initial_products_agent(state: AgentState, db: AsyncSession) -> AgentSt
                     query_embedding=query_embedding,
                     limit=INITIAL_PRODUCT_LIMIT,
                     min_similarity=0.15,
+                    tenant_id=tenant_id,
                 )
                 if results:
                     products = [product for product, _score in results]
@@ -167,7 +173,7 @@ async def initial_products_agent(state: AgentState, db: AsyncSession) -> AgentSt
 
     # --- Last resort: newest products from wellness ---
     if not products_data:
-        products = await product_repo.get_by_domain("wellness", limit=INITIAL_PRODUCT_LIMIT)
+        products = await product_repo.get_by_domain("wellness", limit=INITIAL_PRODUCT_LIMIT, tenant_id=tenant_id)
         products_data = _serialize_products(products)
 
     # Preserve extracted_context when copying state, but remove

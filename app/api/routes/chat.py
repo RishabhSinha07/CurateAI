@@ -12,6 +12,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
 from app.db.repositories.session import SessionRepository
 from app.agents.graph import get_consultation_graph, create_initial_state
+from app.api.middleware.auth import TenantContext, get_tenant_context
+from app.api.middleware.rate_limit import check_rate_limit
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -48,7 +50,11 @@ class ChatResponse(BaseModel):
 
 
 @router.post("", response_model=ChatResponse)
-async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)) -> ChatResponse:
+async def chat(
+    request: ChatRequest,
+    tenant: TenantContext = Depends(check_rate_limit),
+    db: AsyncSession = Depends(get_db),
+) -> ChatResponse:
     """
     Process a chat message and return AI consultation response.
 
@@ -60,8 +66,14 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)) -> Chat
     """
     session_repo = SessionRepository(db)
 
-    # Get or create session
-    chat_session = await session_repo.get_or_create(request.session_id)
+    # Get or create session (with tenant ownership check)
+    try:
+        chat_session = await session_repo.get_or_create(
+            session_id=request.session_id,
+            tenant_id=tenant.tenant_id,
+        )
+    except ValueError:
+        raise HTTPException(status_code=404, detail="Session not found")
 
     # Load existing domain slug if session has one
     domain_slug = chat_session.current_domain_slug
@@ -80,6 +92,7 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)) -> Chat
     # Save user message
     await session_repo.add_message(
         session_id=chat_session.id,
+        tenant_id=tenant.tenant_id,
         role="user",
         content=request.message
     )
@@ -92,6 +105,8 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)) -> Chat
         existing_status=chat_session.status,
         domain_slug=domain_slug,
         previous_response=previous_response,
+        tenant_id=tenant.tenant_id,
+        tenant_enabled_domains=tenant.enabled_domains,
     )
 
     # Run the consultation graph
@@ -132,6 +147,7 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)) -> Chat
 
     await session_repo.add_message(
         session_id=chat_session.id,
+        tenant_id=tenant.tenant_id,
         role="assistant",
         content=response_text,
         suggested_product_ids=product_ids
@@ -172,7 +188,8 @@ async def chat(request: ChatRequest, db: AsyncSession = Depends(get_db)) -> Chat
 async def get_chat_history(
     session_id: uuid.UUID,
     limit: int = 20,
-    db: AsyncSession = Depends(get_db)
+    tenant: TenantContext = Depends(get_tenant_context),
+    db: AsyncSession = Depends(get_db),
 ) -> dict:
     """
     Get chat history for a session.

@@ -1,27 +1,20 @@
 """
-ECS Stack for CurateAI - Ultra Cost-Optimized (Phase 1)
+ECS Stack for CurateAI
 
 Creates:
 - ECR repository for Docker images
 - ECS Cluster (Container Insights disabled)
-- Fargate Task Definition (0.5 vCPU, 1GB RAM, Spot pricing)
+- Fargate Task Definition (1 vCPU, 2GB RAM, on-demand)
 - Fargate Service with public IP (no ALB)
 - IAM roles for Bedrock access
+- Secrets Manager for database credentials
 
-Phase 1 Configuration:
-- No database secrets (YAML-based graphs only)
+Configuration:
+- Secrets Manager for DATABASE_URL (no hardcoded credentials)
 - IAM Task Role for Bedrock permissions (secure, no access keys needed)
 - 1 task minimum (no auto-scaling)
 - Public IP assignment
-- 3-day log retention
-
-Cost Optimization:
-- Fargate Spot: 70% savings
-- 0.5 vCPU, 1GB RAM: Save $20-30/month
-- No ALB: Save $20-25/month
-- 1 task minimum: Save $30/month
-- 3-day logs: Save $2/month
-- Total: ~$9-12/month
+- 14-day log retention
 """
 from aws_cdk import (
     Stack,
@@ -31,6 +24,7 @@ from aws_cdk import (
     aws_ecr as ecr,
     aws_logs as logs,
     aws_iam as iam,
+    aws_secretsmanager as sm,
     CfnOutput,
     RemovalPolicy,
     Tags,
@@ -80,13 +74,23 @@ class EcsStack(Stack):
         )
 
         # ============================================
+        # Secrets Manager (DB credentials)
+        # ============================================
+        # Import the existing secret (created manually via CLI)
+        self.db_secret = sm.Secret.from_secret_name_v2(
+            self,
+            "CurateAI-DB-Secret",
+            secret_name="curateai/database-url",
+        )
+
+        # ============================================
         # CloudWatch Logs
         # ============================================
         self.log_group = logs.LogGroup(
             self,
             "CurateAI-Logs",
             log_group_name="/ecs/curateai-app",
-            retention=logs.RetentionDays.THREE_DAYS,  # 3-day retention (cost-optimized)
+            retention=logs.RetentionDays.TWO_WEEKS,
             removal_policy=RemovalPolicy.DESTROY,
         )
 
@@ -141,16 +145,18 @@ class EcsStack(Stack):
             )
         )
 
+        # Grant task execution role access to secrets
+        self.db_secret.grant_read(self.task_execution_role)
+
         # ============================================
-        # Fargate Task Definition (Ultra Cost-Optimized)
+        # Fargate Task Definition
         # ============================================
         self.task_definition = ecs.FargateTaskDefinition(
             self,
             "CurateAI-Task",
             family="curateai-task",
-            # 0.5 vCPU, 1GB RAM (save $20-30/month vs 1 vCPU, 2GB)
-            cpu=512,  # 0.5 vCPU
-            memory_limit_mib=1024,  # 1GB RAM
+            cpu=1024,  # 1 vCPU
+            memory_limit_mib=2048,  # 2GB RAM
             execution_role=self.task_execution_role,
             task_role=self.task_role,
         )
@@ -179,10 +185,11 @@ class EcsStack(Stack):
                 "BEDROCK_MODEL_ID": "us.amazon.nova-pro-v1:0",
                 "EMBEDDING_MODEL_ID": "amazon.titan-embed-text-v2:0",
                 "EMBEDDING_DIMENSIONS": "1024",
-                # Database - Phase 2: Neon PostgreSQL
-                "DATABASE_URL": "postgresql+asyncpg://neondb_owner:npg_63rZkjATYsiQ@ep-green-moon-aia3mla2-pooler.c-4.us-east-1.aws.neon.tech/neondb",
-                # Knowledge Graphs - Phase 2: Still using YAML (can migrate later)
+                # Knowledge Graphs - Still using YAML (can migrate later)
                 "USE_DB_GRAPHS": "false",
+            },
+            secrets={
+                "DATABASE_URL": ecs.Secret.from_secrets_manager(self.db_secret),
             },
             health_check=ecs.HealthCheck(
                 command=[
@@ -215,10 +222,10 @@ class EcsStack(Stack):
             service_name="CurateAI-Service",
             # Keep 1 task running always (prevents downtime on deployments)
             desired_count=1,
-            # Fargate Spot for 70% cost savings
+            # On-demand Fargate for reliability
             capacity_provider_strategies=[
                 ecs.CapacityProviderStrategy(
-                    capacity_provider="FARGATE_SPOT",
+                    capacity_provider="FARGATE",
                     weight=1,
                 )
             ],

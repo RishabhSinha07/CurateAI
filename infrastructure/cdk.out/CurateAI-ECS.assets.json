@@ -1,7 +1,7 @@
 {
   "version": "36.0.0",
   "files": {
-    "baa2bd42439d4c3ee7d675b2b47644a09d49acb04500b9c7eae05c4a950e50cf": {
+    "b6db128a11a6a96e639068da0e87babc3b72c61a5d84a578f29d030fc807413e": {
       "source": {
         "path": "CurateAI-ECS.template.json",
         "packaging": "file"
@@ -9,7 +9,7 @@
       "destinations": {
         "558599919081-us-east-1": {
           "bucketName": "cdk-hnb659fds-assets-558599919081-us-east-1",
-          "objectKey": "baa2bd42439d4c3ee7d675b2b47644a09d49acb04500b9c7eae05c4a950e50cf.json",
+          "objectKey": "b6db128a11a6a96e639068da0e87babc3b72c61a5d84a578f29d030fc807413e.json",
           "region": "us-east-1",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-file-publishing-role-558599919081-us-east-1"
         }

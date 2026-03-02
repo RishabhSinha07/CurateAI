@@ -8,15 +8,29 @@ class SessionRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_or_create(self, session_id: Optional[uuid.UUID] = None) -> ChatSession:
-        """Get an existing session or create a new one."""
+    async def get_or_create(
+        self,
+        session_id: Optional[uuid.UUID] = None,
+        tenant_id: Optional[uuid.UUID] = None,
+    ) -> ChatSession:
+        """
+        Get an existing session or create a new one.
+
+        If session exists but belongs to a different tenant, raises ValueError.
+        """
         if session_id:
             db_session = await self.session.get(ChatSession, session_id)
             if db_session:
+                # Ownership check: session must belong to requesting tenant
+                if tenant_id and db_session.tenant_id != tenant_id:
+                    raise ValueError("Session belongs to a different tenant")
                 return db_session
-        
+
         # Create new session if ID not provided or not found
-        new_session = ChatSession(id=session_id or uuid.uuid4())
+        new_session = ChatSession(
+            id=session_id or uuid.uuid4(),
+            tenant_id=tenant_id,
+        )
         self.session.add(new_session)
         await self.session.flush() # Ensure ID is generated/available
         return new_session
@@ -24,10 +38,10 @@ class SessionRepository:
     async def update_context(self, session_id: uuid.UUID, context_updates: dict) -> ChatSession:
         """Update the extracted_context JSONB field."""
         curr_session = await self.get_or_create(session_id)
-        
+
         # Merge existing context with updates
         updated_context = {**curr_session.extracted_context, **context_updates}
-        
+
         await self.session.execute(
             update(ChatSession)
             .where(ChatSession.id == session_id)
@@ -45,15 +59,17 @@ class SessionRepository:
         )
 
     async def add_message(
-        self, 
-        session_id: uuid.UUID, 
-        role: str, 
-        content: str, 
-        suggested_product_ids: Optional[list[uuid.UUID]] = None
+        self,
+        session_id: uuid.UUID,
+        role: str,
+        content: str,
+        suggested_product_ids: Optional[list[uuid.UUID]] = None,
+        tenant_id: Optional[uuid.UUID] = None,
     ) -> ChatMessage:
         """Add a new message to the session history."""
         message = ChatMessage(
             session_id=session_id,
+            tenant_id=tenant_id,
             role=role,
             content=content,
             suggested_product_ids=suggested_product_ids

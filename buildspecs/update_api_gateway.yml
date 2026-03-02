@@ -13,14 +13,16 @@ phases:
       - echo "API ID $API_ID"
       - |
         INTEGRATIONS=$(aws apigatewayv2 get-integrations --api-id "$API_ID" --region "$AWS_DEFAULT_REGION")
-        HEALTH_IDS=$(echo "$INTEGRATIONS" | jq -r '.Items[] | select(.IntegrationUri | test("/health")) | .IntegrationId')
-        CHAT_IDS=$(echo "$INTEGRATIONS" | jq -r '.Items[] | select(.IntegrationUri | test("/chat")) | .IntegrationId')
-        for ID in $HEALTH_IDS; do
-          aws apigatewayv2 update-integration --api-id "$API_ID" --integration-id "$ID" --region "$AWS_DEFAULT_REGION" --integration-uri "http://$IP:8000/health"
-          echo "Updated health integration $ID"
-        done
-        for ID in $CHAT_IDS; do
-          aws apigatewayv2 update-integration --api-id "$API_ID" --integration-id "$ID" --region "$AWS_DEFAULT_REGION" --integration-uri "http://$IP:8000/chat"
-          echo "Updated chat integration $ID"
+        BASE="http://$IP:8000"
+
+        # Update all integrations by matching their current URI path
+        echo "$INTEGRATIONS" | jq -r '.Items[] | "\(.IntegrationId) \(.IntegrationUri)"' | while read ID URI; do
+          # Extract the path from the current URI (e.g., http://old-ip:8000/chat -> /chat)
+          PATH_PART=$(echo "$URI" | sed 's|http://[^/]*||')
+          if [ -n "$PATH_PART" ]; then
+            NEW_URI="${BASE}${PATH_PART}"
+            aws apigatewayv2 update-integration --api-id "$API_ID" --integration-id "$ID" --region "$AWS_DEFAULT_REGION" --integration-uri "$NEW_URI"
+            echo "Updated integration $ID: $NEW_URI"
+          fi
         done
       - echo "Done - API Gateway now points to http://$IP:8000"

@@ -55,7 +55,14 @@ def get_router_model():
     return get_bedrock_llm(structured_output_schema=RouterResponse)
 
 
-def _build_dynamic_problem_reference() -> str:
+def _filter_domains_for_tenant(domains: list[dict], tenant_enabled: list[str] | None) -> list[dict]:
+    """Filter domains by tenant's enabled_domains list. '*' means all."""
+    if not tenant_enabled or "*" in tenant_enabled:
+        return domains
+    return [d for d in domains if d["domain"] in tenant_enabled]
+
+
+def _build_dynamic_problem_reference(tenant_enabled_domains: list[str] | None = None) -> str:
     """
     Build a dynamic problem reference by loading all active knowledge graphs
     and extracting their problems with synonyms.
@@ -64,6 +71,7 @@ def _build_dynamic_problem_reference() -> str:
         Formatted string with problem categories and examples for the router prompt
     """
     domains = get_all_active_domains()
+    domains = _filter_domains_for_tenant(domains, tenant_enabled_domains)
     problem_sections = []
 
     for domain in domains:
@@ -118,8 +126,10 @@ async def router_agent(state: AgentState, db: AsyncSession) -> AgentState:
     The router focuses on domain identification. If the specific problem is clear,
     it will extract it. If not, the interviewer will ask about it.
     """
-    # Load domains from knowledge graphs
+    # Load domains from knowledge graphs, filtered by tenant's enabled domains
+    tenant_enabled = state.get("tenant_enabled_domains")
     domains = get_all_active_domains()
+    domains = _filter_domains_for_tenant(domains, tenant_enabled)
 
     # Format domain descriptions for the prompt
     domain_descriptions = "\n".join([
@@ -128,7 +138,7 @@ async def router_agent(state: AgentState, db: AsyncSession) -> AgentState:
     ])
 
     # Dynamically build problem reference from all knowledge graphs
-    problem_reference = _build_dynamic_problem_reference()
+    problem_reference = _build_dynamic_problem_reference(tenant_enabled)
 
     system_prompt = f"""You are a specialized Triage Agent for CurateAI. Your job is to identify the domain and optionally extract the problem if clearly stated.
 

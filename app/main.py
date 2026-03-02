@@ -6,9 +6,15 @@ import sys
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import Response
 
 from app.config import get_settings
 from app.api.routes.chat import router as chat_router
+from app.api.routes.events import router as events_router
+from app.api.routes.admin import router as admin_router
+from app.api.middleware.logging import RequestLoggingMiddleware
 
 settings = get_settings()
 
@@ -22,6 +28,12 @@ if settings.environment == "production":
                 "logger": record.name,
                 "message": record.getMessage(),
             }
+            # Include extra fields from structured logging
+            for key in ("request_id", "tenant_id", "method", "path",
+                        "status_code", "duration_ms", "client_ip",
+                        "agent", "session_id"):
+                if hasattr(record, key):
+                    log_obj[key] = getattr(record, key)
             if record.exc_info:
                 log_obj["exception"] = self.formatException(record.exc_info)
             return json.dumps(log_obj)
@@ -66,11 +78,14 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 app = FastAPI(
     title="CurateAI",
     description="Multi-agent AI consultation system for product recommendations",
-    version="0.1.0",
+    version="0.2.0",
     lifespan=lifespan,
     docs_url="/docs" if settings.environment != "production" else None,  # Disable in production
     redoc_url="/redoc" if settings.environment != "production" else None,
 )
+
+# Request logging middleware (outermost — measures full request duration)
+app.add_middleware(RequestLoggingMiddleware)
 
 # CORS middleware
 app.add_middleware(
@@ -83,9 +98,30 @@ app.add_middleware(
 
 
 @app.get("/health")
-async def health_check() -> dict[str, str]:
-    """Health check endpoint."""
-    return {"status": "healthy"}
+async def health_check() -> dict:
+    """
+    Enhanced health check with DB connectivity.
+
+    Returns 200 with status "healthy" or "degraded".
+    """
+    checks = {}
+
+    # DB connectivity check
+    try:
+        from app.db.session import engine
+        if engine:
+            from sqlalchemy import text
+            async with engine.connect() as conn:
+                await conn.execute(text("SELECT 1"))
+            checks["database"] = "ok"
+        else:
+            checks["database"] = "not_configured"
+    except Exception as e:
+        checks["database"] = f"error: {str(e)[:100]}"
+
+    overall = "healthy" if checks.get("database") in ("ok", "not_configured") else "degraded"
+
+    return {"status": overall, "checks": checks}
 
 
 @app.get("/")
@@ -122,3 +158,5 @@ async def test_graph() -> dict:
 
 # Include routers
 app.include_router(chat_router)
+app.include_router(events_router)
+app.include_router(admin_router)

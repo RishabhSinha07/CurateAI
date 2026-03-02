@@ -184,6 +184,10 @@
      "Ref": "CurateAIAPIBE2DA4B3"
     },
     "AutoDeploy": true,
+    "DefaultRouteSettings": {
+     "ThrottlingBurstLimit": 50,
+     "ThrottlingRateLimit": 20
+    },
     "StageName": "$default",
     "Tags": {
      "Component": "Authentication",
@@ -206,7 +210,7 @@
     },
     "IntegrationMethod": "ANY",
     "IntegrationType": "HTTP_PROXY",
-    "IntegrationUri": "http://35.175.144.102:8000/health",
+    "IntegrationUri": "http://3.236.29.39:8000/health",
     "PayloadFormatVersion": "1.0"
    },
    "Metadata": {
@@ -245,7 +249,7 @@
     },
     "IntegrationMethod": "ANY",
     "IntegrationType": "HTTP_PROXY",
-    "IntegrationUri": "http://35.175.144.102:8000/chat",
+    "IntegrationUri": "http://3.236.29.39:8000/chat",
     "PayloadFormatVersion": "1.0"
    },
    "Metadata": {
@@ -335,6 +339,132 @@
    },
    "Metadata": {
     "aws:cdk:path": "CurateAI-Auth/CurateAI-API/CognitoAuthorizer/Resource"
+   }
+  },
+  "CurateAIAPIPOSTeventsEventsIntegrationD52C7774": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "IntegrationMethod": "ANY",
+    "IntegrationType": "HTTP_PROXY",
+    "IntegrationUri": "http://3.236.29.39:8000/events",
+    "PayloadFormatVersion": "1.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/POST--events/EventsIntegration/Resource"
+   }
+  },
+  "CurateAIAPIPOSTeventsA10A1D68": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "CurateAIAPICognitoAuthorizerF1F98089"
+    },
+    "RouteKey": "POST /events",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "CurateAIAPIPOSTeventsEventsIntegrationD52C7774"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/POST--events/Resource"
+   }
+  },
+  "CurateAIAPIPOSTadminproductsAdminProductsIntegration3AC9A32F": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "IntegrationMethod": "ANY",
+    "IntegrationType": "HTTP_PROXY",
+    "IntegrationUri": "http://3.236.29.39:8000/admin/products",
+    "PayloadFormatVersion": "1.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/POST--admin--products/AdminProductsIntegration/Resource"
+   }
+  },
+  "CurateAIAPIPOSTadminproductsEBD1329E": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "CurateAIAPICognitoAuthorizerF1F98089"
+    },
+    "RouteKey": "POST /admin/products",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "CurateAIAPIPOSTadminproductsAdminProductsIntegration3AC9A32F"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/POST--admin--products/Resource"
+   }
+  },
+  "CurateAIAPIPOSTadminapikeysrotateAdminKeysIntegrationEEEADDF5": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "IntegrationMethod": "ANY",
+    "IntegrationType": "HTTP_PROXY",
+    "IntegrationUri": "http://3.236.29.39:8000/admin/api-keys/rotate",
+    "PayloadFormatVersion": "1.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/POST--admin--api-keys--rotate/AdminKeysIntegration/Resource"
+   }
+  },
+  "CurateAIAPIPOSTadminapikeysrotateA8097BB3": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "CurateAIAPICognitoAuthorizerF1F98089"
+    },
+    "RouteKey": "POST /admin/api-keys/rotate",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "CurateAIAPIPOSTadminapikeysrotateAdminKeysIntegrationEEEADDF5"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/POST--admin--api-keys--rotate/Resource"
    }
   },
   "APILogs5362790F": {

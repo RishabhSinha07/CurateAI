@@ -1383,6 +1383,14 @@
               "version": "2.120.0"
             }
           },
+          "CurateAI-DB-Secret": {
+            "id": "CurateAI-DB-Secret",
+            "path": "CurateAI-ECS/CurateAI-DB-Secret",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.Resource",
+              "version": "2.120.0"
+            }
+          },
           "CurateAI-Logs": {
             "id": "CurateAI-Logs",
             "path": "CurateAI-ECS/CurateAI-Logs",
@@ -1394,7 +1402,7 @@
                   "aws:cdk:cloudformation:type": "AWS::Logs::LogGroup",
                   "aws:cdk:cloudformation:props": {
                     "logGroupName": "/ecs/curateai-app",
-                    "retentionInDays": 3,
+                    "retentionInDays": 14,
                     "tags": [
                       {
                         "key": "Environment",
@@ -1515,6 +1523,14 @@
                       "aws:cdk:cloudformation:props": {
                         "policyDocument": {
                           "Statement": [
+                            {
+                              "Action": [
+                                "secretsmanager:DescribeSecret",
+                                "secretsmanager:GetSecretValue"
+                              ],
+                              "Effect": "Allow",
+                              "Resource": "arn:aws:secretsmanager:us-east-1:558599919081:secret:curateai/database-url-??????"
+                            },
                             {
                               "Action": [
                                 "ecr:BatchCheckLayerAvailability",
@@ -1791,7 +1807,7 @@
                           },
                           {
                             "name": "BEDROCK_MODEL_ID",
-                            "value": "us.amazon.nova-lite-v1:0"
+                            "value": "us.amazon.nova-pro-v1:0"
                           },
                           {
                             "name": "EMBEDDING_MODEL_ID",
@@ -1802,12 +1818,14 @@
                             "value": "1024"
                           },
                           {
-                            "name": "DATABASE_URL",
-                            "value": "postgresql+asyncpg://neondb_owner:npg_63rZkjATYsiQ@ep-green-moon-aia3mla2-pooler.c-4.us-east-1.aws.neon.tech/neondb"
-                          },
-                          {
                             "name": "USE_DB_GRAPHS",
                             "value": "false"
+                          }
+                        ],
+                        "secrets": [
+                          {
+                            "name": "DATABASE_URL",
+                            "valueFrom": "arn:aws:secretsmanager:us-east-1:558599919081:secret:curateai/database-url"
                           }
                         ],
                         "healthCheck": {
@@ -1822,7 +1840,7 @@
                         }
                       }
                     ],
-                    "cpu": "512",
+                    "cpu": "1024",
                     "executionRoleArn": {
                       "Fn::GetAtt": [
                         "TaskExecutionRoleA3CAE0F7",
@@ -1830,7 +1848,7 @@
                       ]
                     },
                     "family": "curateai-task",
-                    "memory": "1024",
+                    "memory": "2048",
                     "networkMode": "awsvpc",
                     "requiresCompatibilities": [
                       "FARGATE"
@@ -1896,7 +1914,7 @@
                   "aws:cdk:cloudformation:props": {
                     "capacityProviderStrategy": [
                       {
-                        "capacityProvider": "FARGATE_SPOT",
+                        "capacityProvider": "FARGATE",
                         "weight": 1
                       }
                     ],
@@ -2383,7 +2401,7 @@
                             },
                             "integrationMethod": "ANY",
                             "integrationType": "HTTP_PROXY",
-                            "integrationUri": "http://35.175.144.102:8000/health",
+                            "integrationUri": "http://3.236.29.39:8000/health",
                             "payloadFormatVersion": "1.0"
                           }
                         },
@@ -2452,7 +2470,7 @@
                             },
                             "integrationMethod": "ANY",
                             "integrationType": "HTTP_PROXY",
-                            "integrationUri": "http://35.175.144.102:8000/chat",
+                            "integrationUri": "http://3.236.29.39:8000/chat",
                             "payloadFormatVersion": "1.0"
                           }
                         },
@@ -2590,6 +2608,222 @@
                 },
                 "constructInfo": {
                   "fqn": "aws-cdk-lib.aws_apigatewayv2.HttpAuthorizer",
+                  "version": "2.120.0"
+                }
+              },
+              "POST--events": {
+                "id": "POST--events",
+                "path": "CurateAI-Auth/CurateAI-API/POST--events",
+                "children": {
+                  "EventsIntegration": {
+                    "id": "EventsIntegration",
+                    "path": "CurateAI-Auth/CurateAI-API/POST--events/EventsIntegration",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "CurateAI-Auth/CurateAI-API/POST--events/EventsIntegration/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Integration",
+                          "aws:cdk:cloudformation:props": {
+                            "apiId": {
+                              "Ref": "CurateAIAPIBE2DA4B3"
+                            },
+                            "integrationMethod": "ANY",
+                            "integrationType": "HTTP_PROXY",
+                            "integrationUri": "http://3.236.29.39:8000/events",
+                            "payloadFormatVersion": "1.0"
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnIntegration",
+                          "version": "2.120.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigatewayv2.HttpIntegration",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "CurateAI-Auth/CurateAI-API/POST--events/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Route",
+                      "aws:cdk:cloudformation:props": {
+                        "apiId": {
+                          "Ref": "CurateAIAPIBE2DA4B3"
+                        },
+                        "authorizationType": "JWT",
+                        "authorizerId": {
+                          "Ref": "CurateAIAPICognitoAuthorizerF1F98089"
+                        },
+                        "routeKey": "POST /events",
+                        "target": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "integrations/",
+                              {
+                                "Ref": "CurateAIAPIPOSTeventsEventsIntegrationD52C7774"
+                              }
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnRoute",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_apigatewayv2.HttpRoute",
+                  "version": "2.120.0"
+                }
+              },
+              "POST--admin--products": {
+                "id": "POST--admin--products",
+                "path": "CurateAI-Auth/CurateAI-API/POST--admin--products",
+                "children": {
+                  "AdminProductsIntegration": {
+                    "id": "AdminProductsIntegration",
+                    "path": "CurateAI-Auth/CurateAI-API/POST--admin--products/AdminProductsIntegration",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "CurateAI-Auth/CurateAI-API/POST--admin--products/AdminProductsIntegration/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Integration",
+                          "aws:cdk:cloudformation:props": {
+                            "apiId": {
+                              "Ref": "CurateAIAPIBE2DA4B3"
+                            },
+                            "integrationMethod": "ANY",
+                            "integrationType": "HTTP_PROXY",
+                            "integrationUri": "http://3.236.29.39:8000/admin/products",
+                            "payloadFormatVersion": "1.0"
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnIntegration",
+                          "version": "2.120.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigatewayv2.HttpIntegration",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "CurateAI-Auth/CurateAI-API/POST--admin--products/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Route",
+                      "aws:cdk:cloudformation:props": {
+                        "apiId": {
+                          "Ref": "CurateAIAPIBE2DA4B3"
+                        },
+                        "authorizationType": "JWT",
+                        "authorizerId": {
+                          "Ref": "CurateAIAPICognitoAuthorizerF1F98089"
+                        },
+                        "routeKey": "POST /admin/products",
+                        "target": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "integrations/",
+                              {
+                                "Ref": "CurateAIAPIPOSTadminproductsAdminProductsIntegration3AC9A32F"
+                              }
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnRoute",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_apigatewayv2.HttpRoute",
+                  "version": "2.120.0"
+                }
+              },
+              "POST--admin--api-keys--rotate": {
+                "id": "POST--admin--api-keys--rotate",
+                "path": "CurateAI-Auth/CurateAI-API/POST--admin--api-keys--rotate",
+                "children": {
+                  "AdminKeysIntegration": {
+                    "id": "AdminKeysIntegration",
+                    "path": "CurateAI-Auth/CurateAI-API/POST--admin--api-keys--rotate/AdminKeysIntegration",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "CurateAI-Auth/CurateAI-API/POST--admin--api-keys--rotate/AdminKeysIntegration/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Integration",
+                          "aws:cdk:cloudformation:props": {
+                            "apiId": {
+                              "Ref": "CurateAIAPIBE2DA4B3"
+                            },
+                            "integrationMethod": "ANY",
+                            "integrationType": "HTTP_PROXY",
+                            "integrationUri": "http://3.236.29.39:8000/admin/api-keys/rotate",
+                            "payloadFormatVersion": "1.0"
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnIntegration",
+                          "version": "2.120.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigatewayv2.HttpIntegration",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "CurateAI-Auth/CurateAI-API/POST--admin--api-keys--rotate/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::ApiGatewayV2::Route",
+                      "aws:cdk:cloudformation:props": {
+                        "apiId": {
+                          "Ref": "CurateAIAPIBE2DA4B3"
+                        },
+                        "authorizationType": "JWT",
+                        "authorizerId": {
+                          "Ref": "CurateAIAPICognitoAuthorizerF1F98089"
+                        },
+                        "routeKey": "POST /admin/api-keys/rotate",
+                        "target": {
+                          "Fn::Join": [
+                            "",
+                            [
+                              "integrations/",
+                              {
+                                "Ref": "CurateAIAPIPOSTadminapikeysrotateAdminKeysIntegrationEEEADDF5"
+                              }
+                            ]
+                          ]
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_apigatewayv2.CfnRoute",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_apigatewayv2.HttpRoute",
                   "version": "2.120.0"
                 }
               }
@@ -3113,6 +3347,316 @@
               "version": "2.120.0"
             }
           },
+          "CurateAI-UpdateAPIGW": {
+            "id": "CurateAI-UpdateAPIGW",
+            "path": "CurateAI-Pipeline/CurateAI-UpdateAPIGW",
+            "children": {
+              "Role": {
+                "id": "Role",
+                "path": "CurateAI-Pipeline/CurateAI-UpdateAPIGW/Role",
+                "children": {
+                  "ImportRole": {
+                    "id": "ImportRole",
+                    "path": "CurateAI-Pipeline/CurateAI-UpdateAPIGW/Role/ImportRole",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.Resource",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "CurateAI-Pipeline/CurateAI-UpdateAPIGW/Role/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "sts:AssumeRole",
+                              "Effect": "Allow",
+                              "Principal": {
+                                "Service": "codebuild.amazonaws.com"
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "tags": [
+                          {
+                            "key": "Environment",
+                            "value": "Production"
+                          },
+                          {
+                            "key": "ManagedBy",
+                            "value": "CDK"
+                          },
+                          {
+                            "key": "Phase",
+                            "value": "1"
+                          },
+                          {
+                            "key": "Project",
+                            "value": "CurateAI"
+                          },
+                          {
+                            "key": "Repository",
+                            "value": "RishabhSinha07/CurateAI"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "DefaultPolicy": {
+                    "id": "DefaultPolicy",
+                    "path": "CurateAI-Pipeline/CurateAI-UpdateAPIGW/Role/DefaultPolicy",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "CurateAI-Pipeline/CurateAI-UpdateAPIGW/Role/DefaultPolicy/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                          "aws:cdk:cloudformation:props": {
+                            "policyDocument": {
+                              "Statement": [
+                                {
+                                  "Action": [
+                                    "logs:CreateLogGroup",
+                                    "logs:CreateLogStream",
+                                    "logs:PutLogEvents"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": [
+                                    {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          "arn:aws:logs:us-east-1:558599919081:log-group:/aws/codebuild/",
+                                          {
+                                            "Ref": "CurateAIUpdateAPIGW27F21CBB"
+                                          },
+                                          ":*"
+                                        ]
+                                      ]
+                                    },
+                                    {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          "arn:aws:logs:us-east-1:558599919081:log-group:/aws/codebuild/",
+                                          {
+                                            "Ref": "CurateAIUpdateAPIGW27F21CBB"
+                                          }
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "Action": [
+                                    "codebuild:BatchPutCodeCoverages",
+                                    "codebuild:BatchPutTestCases",
+                                    "codebuild:CreateReport",
+                                    "codebuild:CreateReportGroup",
+                                    "codebuild:UpdateReport"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": {
+                                    "Fn::Join": [
+                                      "",
+                                      [
+                                        "arn:aws:codebuild:us-east-1:558599919081:report-group/",
+                                        {
+                                          "Ref": "CurateAIUpdateAPIGW27F21CBB"
+                                        },
+                                        "-*"
+                                      ]
+                                    ]
+                                  }
+                                },
+                                {
+                                  "Action": [
+                                    "ec2:DescribeNetworkInterfaces",
+                                    "ecs:DescribeTasks",
+                                    "ecs:ListTasks"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": "*"
+                                },
+                                {
+                                  "Action": [
+                                    "apigateway:GET",
+                                    "apigateway:PATCH"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": "arn:aws:apigateway:*::/*"
+                                },
+                                {
+                                  "Action": [
+                                    "s3:GetBucket*",
+                                    "s3:GetObject*",
+                                    "s3:List*"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": [
+                                    {
+                                      "Fn::GetAtt": [
+                                        "CurateAIPipelineArtifactsBucket5344FB10",
+                                        "Arn"
+                                      ]
+                                    },
+                                    {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          {
+                                            "Fn::GetAtt": [
+                                              "CurateAIPipelineArtifactsBucket5344FB10",
+                                              "Arn"
+                                            ]
+                                          },
+                                          "/*"
+                                        ]
+                                      ]
+                                    }
+                                  ]
+                                },
+                                {
+                                  "Action": [
+                                    "kms:Decrypt",
+                                    "kms:DescribeKey",
+                                    "kms:Encrypt",
+                                    "kms:GenerateDataKey*",
+                                    "kms:ReEncrypt*"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": {
+                                    "Fn::GetAtt": [
+                                      "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+                                      "Arn"
+                                    ]
+                                  }
+                                }
+                              ],
+                              "Version": "2012-10-17"
+                            },
+                            "policyName": "CurateAIUpdateAPIGWRoleDefaultPolicyBBD030D7",
+                            "roles": [
+                              {
+                                "Ref": "CurateAIUpdateAPIGWRoleF9F9E454"
+                              }
+                            ]
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                          "version": "2.120.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.Policy",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Role",
+                  "version": "2.120.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "CurateAI-Pipeline/CurateAI-UpdateAPIGW/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::CodeBuild::Project",
+                  "aws:cdk:cloudformation:props": {
+                    "artifacts": {
+                      "type": "CODEPIPELINE"
+                    },
+                    "cache": {
+                      "type": "NO_CACHE"
+                    },
+                    "description": "Update API Gateway integrations with new Fargate task IP",
+                    "encryptionKey": {
+                      "Fn::GetAtt": [
+                        "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+                        "Arn"
+                      ]
+                    },
+                    "environment": {
+                      "type": "LINUX_CONTAINER",
+                      "image": "aws/codebuild/standard:7.0",
+                      "imagePullCredentialsType": "CODEBUILD",
+                      "privilegedMode": false,
+                      "computeType": "BUILD_GENERAL1_SMALL",
+                      "environmentVariables": [
+                        {
+                          "name": "CLUSTER_NAME",
+                          "type": "PLAINTEXT",
+                          "value": "CurateAI-Cluster"
+                        },
+                        {
+                          "name": "SERVICE_NAME",
+                          "type": "PLAINTEXT",
+                          "value": "CurateAI-Service"
+                        },
+                        {
+                          "name": "API_NAME",
+                          "type": "PLAINTEXT",
+                          "value": "CurateAI-API"
+                        }
+                      ]
+                    },
+                    "name": "CurateAI-UpdateAPIGW",
+                    "serviceRole": {
+                      "Fn::GetAtt": [
+                        "CurateAIUpdateAPIGWRoleF9F9E454",
+                        "Arn"
+                      ]
+                    },
+                    "source": {
+                      "type": "CODEPIPELINE",
+                      "buildSpec": "buildspecs/update_api_gateway.yml"
+                    },
+                    "tags": [
+                      {
+                        "key": "Environment",
+                        "value": "Production"
+                      },
+                      {
+                        "key": "ManagedBy",
+                        "value": "CDK"
+                      },
+                      {
+                        "key": "Phase",
+                        "value": "1"
+                      },
+                      {
+                        "key": "Project",
+                        "value": "CurateAI"
+                      },
+                      {
+                        "key": "Repository",
+                        "value": "RishabhSinha07/CurateAI"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_codebuild.CfnProject",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_codebuild.PipelineProject",
+              "version": "2.120.0"
+            }
+          },
           "CurateAI-Pipeline": {
             "id": "CurateAI-Pipeline",
             "path": "CurateAI-Pipeline/CurateAI-Pipeline",
@@ -3481,6 +4025,12 @@
                                         "CurateAIPipelineSourceGitHubSourceCodePipelineActionRole01206964",
                                         "Arn"
                                       ]
+                                    },
+                                    {
+                                      "Fn::GetAtt": [
+                                        "CurateAIPipelineUpdateAPIGatewayUpdateAPIGatewayCodePipelineActionRole8E18DFB2",
+                                        "Arn"
+                                      ]
                                     }
                                   ]
                                 }
@@ -3636,6 +4186,37 @@
                             "roleArn": {
                               "Fn::GetAtt": [
                                 "CurateAIPipelineDeployECSDeployCodePipelineActionRole4FD38F1E",
+                                "Arn"
+                              ]
+                            }
+                          }
+                        ]
+                      },
+                      {
+                        "name": "UpdateAPIGateway",
+                        "actions": [
+                          {
+                            "name": "Update-APIGateway",
+                            "inputArtifacts": [
+                              {
+                                "name": "SourceOutput"
+                              }
+                            ],
+                            "actionTypeId": {
+                              "category": "Build",
+                              "version": "1",
+                              "owner": "AWS",
+                              "provider": "CodeBuild"
+                            },
+                            "configuration": {
+                              "ProjectName": {
+                                "Ref": "CurateAIUpdateAPIGW27F21CBB"
+                              }
+                            },
+                            "runOrder": 1,
+                            "roleArn": {
+                              "Fn::GetAtt": [
+                                "CurateAIPipelineUpdateAPIGatewayUpdateAPIGatewayCodePipelineActionRole8E18DFB2",
                                 "Arn"
                               ]
                             }
@@ -4157,6 +4738,139 @@
                                     "roles": [
                                       {
                                         "Ref": "CurateAIPipelineDeployECSDeployCodePipelineActionRole4FD38F1E"
+                                      }
+                                    ]
+                                  }
+                                },
+                                "constructInfo": {
+                                  "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                                  "version": "2.120.0"
+                                }
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_iam.Policy",
+                              "version": "2.120.0"
+                            }
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_iam.Role",
+                          "version": "2.120.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "constructs.Construct",
+                      "version": "10.4.5"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "constructs.Construct",
+                  "version": "10.4.5"
+                }
+              },
+              "UpdateAPIGateway": {
+                "id": "UpdateAPIGateway",
+                "path": "CurateAI-Pipeline/CurateAI-Pipeline/UpdateAPIGateway",
+                "children": {
+                  "Update-APIGateway": {
+                    "id": "Update-APIGateway",
+                    "path": "CurateAI-Pipeline/CurateAI-Pipeline/UpdateAPIGateway/Update-APIGateway",
+                    "children": {
+                      "CodePipelineActionRole": {
+                        "id": "CodePipelineActionRole",
+                        "path": "CurateAI-Pipeline/CurateAI-Pipeline/UpdateAPIGateway/Update-APIGateway/CodePipelineActionRole",
+                        "children": {
+                          "ImportCodePipelineActionRole": {
+                            "id": "ImportCodePipelineActionRole",
+                            "path": "CurateAI-Pipeline/CurateAI-Pipeline/UpdateAPIGateway/Update-APIGateway/CodePipelineActionRole/ImportCodePipelineActionRole",
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.Resource",
+                              "version": "2.120.0"
+                            }
+                          },
+                          "Resource": {
+                            "id": "Resource",
+                            "path": "CurateAI-Pipeline/CurateAI-Pipeline/UpdateAPIGateway/Update-APIGateway/CodePipelineActionRole/Resource",
+                            "attributes": {
+                              "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                              "aws:cdk:cloudformation:props": {
+                                "assumeRolePolicyDocument": {
+                                  "Statement": [
+                                    {
+                                      "Action": "sts:AssumeRole",
+                                      "Effect": "Allow",
+                                      "Principal": {
+                                        "AWS": "arn:aws:iam::558599919081:root"
+                                      }
+                                    }
+                                  ],
+                                  "Version": "2012-10-17"
+                                },
+                                "tags": [
+                                  {
+                                    "key": "Environment",
+                                    "value": "Production"
+                                  },
+                                  {
+                                    "key": "ManagedBy",
+                                    "value": "CDK"
+                                  },
+                                  {
+                                    "key": "Phase",
+                                    "value": "1"
+                                  },
+                                  {
+                                    "key": "Project",
+                                    "value": "CurateAI"
+                                  },
+                                  {
+                                    "key": "Repository",
+                                    "value": "RishabhSinha07/CurateAI"
+                                  }
+                                ]
+                              }
+                            },
+                            "constructInfo": {
+                              "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                              "version": "2.120.0"
+                            }
+                          },
+                          "DefaultPolicy": {
+                            "id": "DefaultPolicy",
+                            "path": "CurateAI-Pipeline/CurateAI-Pipeline/UpdateAPIGateway/Update-APIGateway/CodePipelineActionRole/DefaultPolicy",
+                            "children": {
+                              "Resource": {
+                                "id": "Resource",
+                                "path": "CurateAI-Pipeline/CurateAI-Pipeline/UpdateAPIGateway/Update-APIGateway/CodePipelineActionRole/DefaultPolicy/Resource",
+                                "attributes": {
+                                  "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                                  "aws:cdk:cloudformation:props": {
+                                    "policyDocument": {
+                                      "Statement": [
+                                        {
+                                          "Action": [
+                                            "codebuild:BatchGetBuilds",
+                                            "codebuild:StartBuild",
+                                            "codebuild:StopBuild"
+                                          ],
+                                          "Effect": "Allow",
+                                          "Resource": {
+                                            "Fn::GetAtt": [
+                                              "CurateAIUpdateAPIGW27F21CBB",
+                                              "Arn"
+                                            ]
+                                          }
+                                        }
+                                      ],
+                                      "Version": "2012-10-17"
+                                    },
+                                    "policyName": "CurateAIPipelineUpdateAPIGatewayUpdateAPIGatewayCodePipelineActionRoleDefaultPolicy61B18049",
+                                    "roles": [
+                                      {
+                                        "Ref": "CurateAIPipelineUpdateAPIGatewayUpdateAPIGatewayCodePipelineActionRole8E18DFB2"
                                       }
                                     ]
                                   }

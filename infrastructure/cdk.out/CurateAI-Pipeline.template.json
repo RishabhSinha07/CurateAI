@@ -309,6 +309,263 @@
     "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Build/Resource"
    }
   },
+  "CurateAIUpdateAPIGWRoleF9F9E454": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "codebuild.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-UpdateAPIGW/Role/Resource"
+   }
+  },
+  "CurateAIUpdateAPIGWRoleDefaultPolicyBBD030D7": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:558599919081:log-group:/aws/codebuild/",
+           {
+            "Ref": "CurateAIUpdateAPIGW27F21CBB"
+           },
+           ":*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:logs:us-east-1:558599919081:log-group:/aws/codebuild/",
+           {
+            "Ref": "CurateAIUpdateAPIGW27F21CBB"
+           }
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "codebuild:BatchPutCodeCoverages",
+        "codebuild:BatchPutTestCases",
+        "codebuild:CreateReport",
+        "codebuild:CreateReportGroup",
+        "codebuild:UpdateReport"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::Join": [
+         "",
+         [
+          "arn:aws:codebuild:us-east-1:558599919081:report-group/",
+          {
+           "Ref": "CurateAIUpdateAPIGW27F21CBB"
+          },
+          "-*"
+         ]
+        ]
+       }
+      },
+      {
+       "Action": [
+        "ec2:DescribeNetworkInterfaces",
+        "ecs:DescribeTasks",
+        "ecs:ListTasks"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "apigateway:GET",
+        "apigateway:PATCH"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:apigateway:*::/*"
+      },
+      {
+       "Action": [
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "CurateAIPipelineArtifactsBucket5344FB10",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "CurateAIPipelineArtifactsBucket5344FB10",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "kms:Decrypt",
+        "kms:DescribeKey",
+        "kms:Encrypt",
+        "kms:GenerateDataKey*",
+        "kms:ReEncrypt*"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CurateAIUpdateAPIGWRoleDefaultPolicyBBD030D7",
+    "Roles": [
+     {
+      "Ref": "CurateAIUpdateAPIGWRoleF9F9E454"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-UpdateAPIGW/Role/DefaultPolicy/Resource"
+   }
+  },
+  "CurateAIUpdateAPIGW27F21CBB": {
+   "Type": "AWS::CodeBuild::Project",
+   "Properties": {
+    "Artifacts": {
+     "Type": "CODEPIPELINE"
+    },
+    "Cache": {
+     "Type": "NO_CACHE"
+    },
+    "Description": "Update API Gateway integrations with new Fargate task IP",
+    "EncryptionKey": {
+     "Fn::GetAtt": [
+      "CurateAIPipelineArtifactsBucketEncryptionKey35586106",
+      "Arn"
+     ]
+    },
+    "Environment": {
+     "ComputeType": "BUILD_GENERAL1_SMALL",
+     "EnvironmentVariables": [
+      {
+       "Name": "CLUSTER_NAME",
+       "Type": "PLAINTEXT",
+       "Value": "CurateAI-Cluster"
+      },
+      {
+       "Name": "SERVICE_NAME",
+       "Type": "PLAINTEXT",
+       "Value": "CurateAI-Service"
+      },
+      {
+       "Name": "API_NAME",
+       "Type": "PLAINTEXT",
+       "Value": "CurateAI-API"
+      }
+     ],
+     "Image": "aws/codebuild/standard:7.0",
+     "ImagePullCredentialsType": "CODEBUILD",
+     "PrivilegedMode": false,
+     "Type": "LINUX_CONTAINER"
+    },
+    "Name": "CurateAI-UpdateAPIGW",
+    "ServiceRole": {
+     "Fn::GetAtt": [
+      "CurateAIUpdateAPIGWRoleF9F9E454",
+      "Arn"
+     ]
+    },
+    "Source": {
+     "BuildSpec": "buildspecs/update_api_gateway.yml",
+     "Type": "CODEPIPELINE"
+    },
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-UpdateAPIGW/Resource"
+   }
+  },
   "CurateAIPipelineArtifactsBucketEncryptionKey35586106": {
    "Type": "AWS::KMS::Key",
    "Properties": {
@@ -595,6 +852,12 @@
           "CurateAIPipelineSourceGitHubSourceCodePipelineActionRole01206964",
           "Arn"
          ]
+        },
+        {
+         "Fn::GetAtt": [
+          "CurateAIPipelineUpdateAPIGatewayUpdateAPIGatewayCodePipelineActionRole8E18DFB2",
+          "Arn"
+         ]
         }
        ]
       }
@@ -738,6 +1001,37 @@
        }
       ],
       "Name": "Deploy"
+     },
+     {
+      "Actions": [
+       {
+        "ActionTypeId": {
+         "Category": "Build",
+         "Owner": "AWS",
+         "Provider": "CodeBuild",
+         "Version": "1"
+        },
+        "Configuration": {
+         "ProjectName": {
+          "Ref": "CurateAIUpdateAPIGW27F21CBB"
+         }
+        },
+        "InputArtifacts": [
+         {
+          "Name": "SourceOutput"
+         }
+        ],
+        "Name": "Update-APIGateway",
+        "RoleArn": {
+         "Fn::GetAtt": [
+          "CurateAIPipelineUpdateAPIGatewayUpdateAPIGatewayCodePipelineActionRole8E18DFB2",
+          "Arn"
+         ]
+        },
+        "RunOrder": 1
+       }
+      ],
+      "Name": "UpdateAPIGateway"
      }
     ],
     "Tags": [
@@ -1113,6 +1407,81 @@
    },
    "Metadata": {
     "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Pipeline/Deploy/ECS-Deploy/CodePipelineActionRole/DefaultPolicy/Resource"
+   }
+  },
+  "CurateAIPipelineUpdateAPIGatewayUpdateAPIGatewayCodePipelineActionRole8E18DFB2": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": "arn:aws:iam::558599919081:root"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Pipeline/UpdateAPIGateway/Update-APIGateway/CodePipelineActionRole/Resource"
+   }
+  },
+  "CurateAIPipelineUpdateAPIGatewayUpdateAPIGatewayCodePipelineActionRoleDefaultPolicy61B18049": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "codebuild:BatchGetBuilds",
+        "codebuild:StartBuild",
+        "codebuild:StopBuild"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "CurateAIUpdateAPIGW27F21CBB",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CurateAIPipelineUpdateAPIGatewayUpdateAPIGatewayCodePipelineActionRoleDefaultPolicy61B18049",
+    "Roles": [
+     {
+      "Ref": "CurateAIPipelineUpdateAPIGatewayUpdateAPIGatewayCodePipelineActionRole8E18DFB2"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Pipeline/CurateAI-Pipeline/UpdateAPIGateway/Update-APIGateway/CodePipelineActionRole/DefaultPolicy/Resource"
    }
   },
   "CDKMetadata": {

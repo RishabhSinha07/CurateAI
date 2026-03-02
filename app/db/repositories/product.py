@@ -21,11 +21,13 @@ class ProductRepository:
         limit: int = 5,
         min_similarity: float = 0.5,
         max_price: Optional[float] = None,
+        tenant_id: Optional[uuid.UUID] = None,
     ) -> list[tuple[Product, float]]:
         """
         Perform hybrid search using vector similarity and JSONB filters.
 
         When *domain_slug* is provided, restricts to products in that domain.
+        When *tenant_id* is provided, restricts to products owned by that tenant.
         When ``None``, searches across all active products.
 
         Returns a list of tuples containing (Product, similarity_score).
@@ -40,6 +42,8 @@ class ProductRepository:
         ]
         if domain_slug:
             conditions.append(Product.domain_slugs.any(domain_slug))
+        if tenant_id:
+            conditions.append(Product.tenant_id == tenant_id)
 
         query = select(Product, similarity).where(and_(*conditions))
 
@@ -67,7 +71,7 @@ class ProductRepository:
 
         # Filter by minimum similarity and order by score
         query = query.where(similarity >= min_similarity).order_by(similarity.desc()).limit(limit)
-        
+
         result = await self.session.execute(query)
         return [(row[0], row[1]) for row in result.all()]
 
@@ -75,6 +79,7 @@ class ProductRepository:
         self,
         domain_slug: str,
         limit: int = 4,
+        tenant_id: Optional[uuid.UUID] = None,
     ) -> list[Product]:
         """
         Get active products for a domain, ordered by newest first.
@@ -84,24 +89,33 @@ class ProductRepository:
 
         Used for the initial product showcase before personalised search.
         """
+        conditions = [
+            Product.domain_slugs.any(domain_slug),
+            Product.is_active == True,
+        ]
+        if tenant_id:
+            conditions.append(Product.tenant_id == tenant_id)
+
         result = await self.session.execute(
             select(Product)
-            .where(
-                and_(
-                    Product.domain_slugs.any(domain_slug),
-                    Product.is_active == True,
-                )
-            )
+            .where(and_(*conditions))
             .order_by(Product.created_at.desc())
             .limit(limit)
         )
         return list(result.scalars().all())
 
-    async def get_by_ids(self, product_ids: list[uuid.UUID]) -> list[Product]:
+    async def get_by_ids(
+        self,
+        product_ids: list[uuid.UUID],
+        tenant_id: Optional[uuid.UUID] = None,
+    ) -> list[Product]:
         """Get multiple products by their IDs."""
         if not product_ids:
             return []
+        conditions = [Product.id.in_(product_ids)]
+        if tenant_id:
+            conditions.append(Product.tenant_id == tenant_id)
         result = await self.session.execute(
-            select(Product).where(Product.id.in_(product_ids))
+            select(Product).where(and_(*conditions))
         )
         return list(result.scalars().all())

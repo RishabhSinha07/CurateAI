@@ -10,6 +10,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Index,
+    Integer,
     Numeric,
     String,
     Text,
@@ -30,6 +31,85 @@ class Base(DeclarativeBase):
     pass
 
 
+# ============================================
+# Tenant & API Key Models
+# ============================================
+
+
+class Tenant(Base):
+    """
+    Tenant represents a company using CurateAI.
+
+    Each tenant has its own products, sessions, and API keys.
+    """
+
+    __tablename__ = "tenants"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid()
+    )
+    name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    slug: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    enabled_domains: Mapped[list[str]] = mapped_column(
+        ARRAY(String(50)), nullable=False, server_default="{*}"
+    )
+    allowed_origins: Mapped[list[str]] = mapped_column(
+        ARRAY(String(500)), nullable=False, server_default="{*}"
+    )
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    daily_bedrock_cost_cap_cents: Mapped[int] = mapped_column(
+        Integer, default=500, nullable=False
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    # Relationships
+    api_keys: Mapped[list["ApiKey"]] = relationship("ApiKey", back_populates="tenant")
+
+
+class ApiKey(Base):
+    """
+    API key for tenant authentication.
+
+    Keys are stored as SHA-256 hashes. The raw key is only shown once at creation.
+    """
+
+    __tablename__ = "api_keys"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid()
+    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    key_hash: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
+    key_prefix: Mapped[str] = mapped_column(String(8), nullable=False)
+    label: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    allowed_ips: Mapped[list[str] | None] = mapped_column(ARRAY(String(45)), nullable=True)
+    rate_limit_rpm: Mapped[int] = mapped_column(Integer, default=60, nullable=False)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    last_used_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    expires_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    # Relationships
+    tenant: Mapped["Tenant"] = relationship("Tenant", back_populates="api_keys")
+
+
+# ============================================
+# Core Models
+# ============================================
+
 # Domain model removed - domain configuration now managed via knowledge graphs
 
 
@@ -47,6 +127,9 @@ class Product(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid, primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid()
+    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id"), nullable=False, index=True
     )
     domain_slugs: Mapped[list[str]] = mapped_column(
         ARRAY(String(50)), nullable=False
@@ -77,8 +160,6 @@ class Product(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
 
-    # Relationships removed - domain now referenced by slug only
-
     __table_args__ = (
         Index("idx_products_attributes", "attributes", postgresql_using="gin"),
         Index(
@@ -103,6 +184,9 @@ class ChatSession(Base):
 
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid, primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid()
+    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id"), nullable=False, index=True
     )
     user_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, nullable=True)  # Optional for guests
     current_domain_slug: Mapped[str | None] = mapped_column(
@@ -141,6 +225,9 @@ class ChatMessage(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid, primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid()
     )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id"), nullable=False, index=True
+    )
     session_id: Mapped[uuid.UUID] = mapped_column(
         Uuid, ForeignKey("chat_sessions.id", ondelete="CASCADE"), nullable=False, index=True
     )
@@ -175,6 +262,9 @@ class JourneyBundle(Base):
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid, primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid()
     )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id"), nullable=False, index=True
+    )
     domain_slug: Mapped[str] = mapped_column(
         String(50), nullable=False, index=True
     )
@@ -203,11 +293,48 @@ class JourneyBundle(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
 
-    # Relationships removed - domain now referenced by slug only
-
     __table_args__ = (
         Index("idx_journey_bundles_keywords", "keywords", postgresql_using="gin"),
         # Unique constraint on domain_slug + journey_id
         UniqueConstraint("domain_slug", "journey_id", name="uq_journey_bundle_domain_journey"),
     )
 
+
+# ============================================
+# Analytics Models
+# ============================================
+
+
+class ProductEvent(Base):
+    """
+    Tracks product interaction events (click, add_to_cart, purchase).
+    Used for analytics and conversion tracking.
+    """
+
+    __tablename__ = "product_events"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid()
+    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id"), nullable=False, index=True
+    )
+    session_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("chat_sessions.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    product_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("products.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    event_type: Mapped[str] = mapped_column(
+        String(50), nullable=False
+    )  # click, add_to_cart, purchase
+    metadata_: Mapped[dict | None] = mapped_column(
+        "metadata", JSONB, nullable=True
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        Index("idx_product_events_type_created", "event_type", "created_at"),
+    )

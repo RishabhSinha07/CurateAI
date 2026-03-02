@@ -281,7 +281,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/baa2bd42439d4c3ee7d675b2b47644a09d49acb04500b9c7eae05c4a950e50cf.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/b6db128a11a6a96e639068da0e87babc3b72c61a5d84a578f29d030fc807413e.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -485,7 +485,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/b15c5fdbabef69e9b7485f6fc241d71d762326883c564ae5ee6bddca1b0ee6ab.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/3947dcc3ca8a0aa0af8329043043b0db50dc3f07a97c2011f0fd954c03af1a28.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -599,6 +599,42 @@
             "data": "CurateAIAPICognitoAuthorizerF1F98089"
           }
         ],
+        "/CurateAI-Auth/CurateAI-API/POST--events/EventsIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPIPOSTeventsEventsIntegrationD52C7774"
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-API/POST--events/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPIPOSTeventsA10A1D68"
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-API/POST--admin--products/AdminProductsIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPIPOSTadminproductsAdminProductsIntegration3AC9A32F"
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-API/POST--admin--products/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPIPOSTadminproductsEBD1329E"
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-API/POST--admin--api-keys--rotate/AdminKeysIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPIPOSTadminapikeysrotateAdminKeysIntegrationEEEADDF5"
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-API/POST--admin--api-keys--rotate/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPIPOSTadminapikeysrotateA8097BB3"
+          }
+        ],
         "/CurateAI-Auth/API-Logs/Resource": [
           {
             "type": "aws:cdk:logicalId",
@@ -686,7 +722,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/c2ffa11ecb0793cf4a726dca9b8873365b0fe260e00a81934c784a0cc67045cf.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/5242acce74735236dfc6bd2e2759fa4c2edd0fce9e5c0199a921d52d0120b340.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -746,6 +782,24 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "CurateAIBuild441D4260"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-UpdateAPIGW/Role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIUpdateAPIGWRoleF9F9E454"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-UpdateAPIGW/Role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIUpdateAPIGWRoleDefaultPolicyBBD030D7"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-UpdateAPIGW/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIUpdateAPIGW27F21CBB"
           }
         ],
         "/CurateAI-Pipeline/CurateAI-Pipeline/ArtifactsBucketEncryptionKey/Resource": [
@@ -824,6 +878,18 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "CurateAIPipelineDeployECSDeployCodePipelineActionRoleDefaultPolicy836E0219"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-Pipeline/UpdateAPIGateway/Update-APIGateway/CodePipelineActionRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIPipelineUpdateAPIGatewayUpdateAPIGatewayCodePipelineActionRole8E18DFB2"
+          }
+        ],
+        "/CurateAI-Pipeline/CurateAI-Pipeline/UpdateAPIGateway/Update-APIGateway/CodePipelineActionRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIPipelineUpdateAPIGatewayUpdateAPIGatewayCodePipelineActionRoleDefaultPolicy61B18049"
           }
         ],
         "/CurateAI-Pipeline/PipelineName": [

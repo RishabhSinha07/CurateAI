@@ -26,6 +26,10 @@ class AgentState(TypedDict):
     next_agent: str | None
     optional_slot_hint: str | None  # Hint about optional slots to show with final response
     
+    # Tenant context
+    tenant_id: uuid.UUID | None
+    tenant_enabled_domains: list[str]
+
     # Journey-specific fields
     intent_type: str | None  # "query" or "journey"
     journey_type: str | None  # e.g., "beginner_gym", "skincare_routine_start"

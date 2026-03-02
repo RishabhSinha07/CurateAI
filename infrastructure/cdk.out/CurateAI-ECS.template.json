@@ -81,7 +81,7 @@
    "Type": "AWS::Logs::LogGroup",
    "Properties": {
     "LogGroupName": "/ecs/curateai-app",
-    "RetentionInDays": 3,
+    "RetentionInDays": 14,
     "Tags": [
      {
       "Key": "Environment",
@@ -172,6 +172,14 @@
    "Properties": {
     "PolicyDocument": {
      "Statement": [
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:secretsmanager:us-east-1:558599919081:secret:curateai/database-url-??????"
+      },
       {
        "Action": [
         "ecr:BatchCheckLayerAvailability",
@@ -322,7 +330,7 @@
        },
        {
         "Name": "BEDROCK_MODEL_ID",
-        "Value": "us.amazon.nova-lite-v1:0"
+        "Value": "us.amazon.nova-pro-v1:0"
        },
        {
         "Name": "EMBEDDING_MODEL_ID",
@@ -331,10 +339,6 @@
        {
         "Name": "EMBEDDING_DIMENSIONS",
         "Value": "1024"
-       },
-       {
-        "Name": "DATABASE_URL",
-        "Value": "postgresql+asyncpg://neondb_owner:npg_63rZkjATYsiQ@ep-green-moon-aia3mla2-pooler.c-4.us-east-1.aws.neon.tech/neondb"
        },
        {
         "Name": "USE_DB_GRAPHS",
@@ -417,10 +421,16 @@
         "ContainerPort": 8000,
         "Protocol": "tcp"
        }
+      ],
+      "Secrets": [
+       {
+        "Name": "DATABASE_URL",
+        "ValueFrom": "arn:aws:secretsmanager:us-east-1:558599919081:secret:curateai/database-url"
+       }
       ]
      }
     ],
-    "Cpu": "512",
+    "Cpu": "1024",
     "ExecutionRoleArn": {
      "Fn::GetAtt": [
       "TaskExecutionRoleA3CAE0F7",
@@ -428,7 +438,7 @@
      ]
     },
     "Family": "curateai-task",
-    "Memory": "1024",
+    "Memory": "2048",
     "NetworkMode": "awsvpc",
     "RequiresCompatibilities": [
      "FARGATE"
@@ -471,7 +481,7 @@
    "Properties": {
     "CapacityProviderStrategy": [
      {
-      "CapacityProvider": "FARGATE_SPOT",
+      "CapacityProvider": "FARGATE",
       "Weight": 1
      }
     ],

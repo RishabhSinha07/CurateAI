@@ -117,11 +117,13 @@ Rules:
         # Generate embedding and search across all domains
         query_embedding = await generate_embedding_async(search_query)
         repo = ProductRepository(db)
+        tenant_id = state.get("tenant_id")
         results = await repo.hybrid_search(
             query_embedding=query_embedding,
             domain_slug=None,
             limit=8,
             min_similarity=0.15,
+            tenant_id=tenant_id,
         )
 
         if results:
