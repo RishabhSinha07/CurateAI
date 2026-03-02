@@ -75,7 +75,7 @@ def main():
     # CodeStar Connection (optional - can create manually later)
     codestar_connection_arn = get_env_var(
         "CODESTAR_CONNECTION_ARN",
-        default=None,
+        default="arn:aws:codestar-connections:us-east-1:558599919081:connection/213b4c6a-80b7-4436-aa8e-3363db24b7e9",
         required=False,
     )
 

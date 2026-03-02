@@ -911,7 +911,7 @@
          "Version": "1"
         },
         "Configuration": {
-         "ConnectionArn": "arn:aws:codestar-connections:us-east-1:558599919081:connection/PLACEHOLDER-UPDATE-ME",
+         "ConnectionArn": "arn:aws:codestar-connections:us-east-1:558599919081:connection/213b4c6a-80b7-4436-aa8e-3363db24b7e9",
          "FullRepositoryId": "RishabhSinha07/CurateAI",
          "BranchName": "main"
         },
@@ -1115,7 +1115,7 @@
       {
        "Action": "codestar-connections:UseConnection",
        "Effect": "Allow",
-       "Resource": "arn:aws:codestar-connections:us-east-1:558599919081:connection/PLACEHOLDER-UPDATE-ME"
+       "Resource": "arn:aws:codestar-connections:us-east-1:558599919081:connection/213b4c6a-80b7-4436-aa8e-3363db24b7e9"
       },
       {
        "Action": [
@@ -1515,10 +1515,6 @@
      ]
     ]
    }
-  },
-  "CodeStarConnectionSetup": {
-   "Description": "CodeStar connection setup reminder",
-   "Value": "IMPORTANT: Create CodeStar connection and update pipeline. See deployment guide."
   }
  },
  "Parameters": {

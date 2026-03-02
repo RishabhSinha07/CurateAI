@@ -210,7 +210,7 @@
     },
     "IntegrationMethod": "ANY",
     "IntegrationType": "HTTP_PROXY",
-    "IntegrationUri": "http://3.236.29.39:8000/health",
+    "IntegrationUri": "http://3.82.127.19:8000/health",
     "PayloadFormatVersion": "1.0"
    },
    "Metadata": {
@@ -249,7 +249,7 @@
     },
     "IntegrationMethod": "ANY",
     "IntegrationType": "HTTP_PROXY",
-    "IntegrationUri": "http://3.236.29.39:8000/chat",
+    "IntegrationUri": "http://3.82.127.19:8000/chat",
     "PayloadFormatVersion": "1.0"
    },
    "Metadata": {
@@ -349,7 +349,7 @@
     },
     "IntegrationMethod": "ANY",
     "IntegrationType": "HTTP_PROXY",
-    "IntegrationUri": "http://3.236.29.39:8000/events",
+    "IntegrationUri": "http://3.82.127.19:8000/events",
     "PayloadFormatVersion": "1.0"
    },
    "Metadata": {
@@ -391,7 +391,7 @@
     },
     "IntegrationMethod": "ANY",
     "IntegrationType": "HTTP_PROXY",
-    "IntegrationUri": "http://3.236.29.39:8000/admin/products",
+    "IntegrationUri": "http://3.82.127.19:8000/admin/products",
     "PayloadFormatVersion": "1.0"
    },
    "Metadata": {
@@ -433,7 +433,7 @@
     },
     "IntegrationMethod": "ANY",
     "IntegrationType": "HTTP_PROXY",
-    "IntegrationUri": "http://3.236.29.39:8000/admin/api-keys/rotate",
+    "IntegrationUri": "http://3.82.127.19:8000/admin/api-keys/rotate",
     "PayloadFormatVersion": "1.0"
    },
    "Metadata": {

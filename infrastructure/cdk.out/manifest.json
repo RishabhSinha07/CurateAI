@@ -25,7 +25,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/0ebc17756ebdd10dc006bf30d8a9550e4ae59dba9551145e4e524eea2fc95427.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/2dc57f4ec640cb21026f476c8312d3a79999472e3ab8f51bc06bf023b273f9a0.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -152,70 +152,10 @@
             "data": "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E"
           }
         ],
-        "/CurateAI-Network/ECR-API-Endpoint/SecurityGroup/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "ECRAPIEndpointSecurityGroup4547491C"
-          }
-        ],
-        "/CurateAI-Network/ECR-API-Endpoint/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "ECRAPIEndpoint958C225F"
-          }
-        ],
-        "/CurateAI-Network/ECR-Docker-Endpoint/SecurityGroup/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "ECRDockerEndpointSecurityGroup6D30C9E8"
-          }
-        ],
-        "/CurateAI-Network/ECR-Docker-Endpoint/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "ECRDockerEndpoint04567B85"
-          }
-        ],
-        "/CurateAI-Network/S3-Endpoint/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "S3Endpoint067200C7"
-          }
-        ],
-        "/CurateAI-Network/CloudWatch-Logs-Endpoint/SecurityGroup/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CloudWatchLogsEndpointSecurityGroupEE065128"
-          }
-        ],
-        "/CurateAI-Network/CloudWatch-Logs-Endpoint/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CloudWatchLogsEndpoint55C1B1BE"
-          }
-        ],
-        "/CurateAI-Network/Bedrock-Runtime-Endpoint/SecurityGroup/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "BedrockRuntimeEndpointSecurityGroup7FF13E70"
-          }
-        ],
-        "/CurateAI-Network/Bedrock-Runtime-Endpoint/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "BedrockRuntimeEndpointB46EBC4B"
-          }
-        ],
         "/CurateAI-Network/Fargate-SG/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "FargateSG3742C269"
-          }
-        ],
-        "/CurateAI-Network/VPC-Endpoint-SG/Resource": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "VPCEndpointSG5D2DB8AD"
           }
         ],
         "/CurateAI-Network/CDKMetadata/Default": [
@@ -485,7 +425,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/3947dcc3ca8a0aa0af8329043043b0db50dc3f07a97c2011f0fd954c03af1a28.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/7c1212fb478b05d180ea1fd7cf31b91fc62716b9e4c3d5dafa6d946dbcc3208a.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -722,7 +662,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/5242acce74735236dfc6bd2e2759fa4c2edd0fce9e5c0199a921d52d0120b340.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/ea43a269c4409182ebc79586885d19df9ac6d1e85ada3c1249a28cce36a96776.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -902,12 +842,6 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "PipelineUrl"
-          }
-        ],
-        "/CurateAI-Pipeline/CodeStarConnectionSetup": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "CodeStarConnectionSetup"
           }
         ],
         "/CurateAI-Pipeline/CDKMetadata/Default": [

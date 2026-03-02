@@ -475,569 +475,6 @@
               "version": "2.120.0"
             }
           },
-          "ECR-API-Endpoint": {
-            "id": "ECR-API-Endpoint",
-            "path": "CurateAI-Network/ECR-API-Endpoint",
-            "children": {
-              "SecurityGroup": {
-                "id": "SecurityGroup",
-                "path": "CurateAI-Network/ECR-API-Endpoint/SecurityGroup",
-                "children": {
-                  "Resource": {
-                    "id": "Resource",
-                    "path": "CurateAI-Network/ECR-API-Endpoint/SecurityGroup/Resource",
-                    "attributes": {
-                      "aws:cdk:cloudformation:type": "AWS::EC2::SecurityGroup",
-                      "aws:cdk:cloudformation:props": {
-                        "groupDescription": "CurateAI-Network/ECR-API-Endpoint/SecurityGroup",
-                        "securityGroupEgress": [
-                          {
-                            "cidrIp": "0.0.0.0/0",
-                            "description": "Allow all outbound traffic by default",
-                            "ipProtocol": "-1"
-                          }
-                        ],
-                        "securityGroupIngress": [
-                          {
-                            "cidrIp": {
-                              "Fn::GetAtt": [
-                                "CurateAIVPC67003679",
-                                "CidrBlock"
-                              ]
-                            },
-                            "ipProtocol": "tcp",
-                            "fromPort": 443,
-                            "toPort": 443,
-                            "description": {
-                              "Fn::Join": [
-                                "",
-                                [
-                                  "from ",
-                                  {
-                                    "Fn::GetAtt": [
-                                      "CurateAIVPC67003679",
-                                      "CidrBlock"
-                                    ]
-                                  },
-                                  ":443"
-                                ]
-                              ]
-                            }
-                          }
-                        ],
-                        "tags": [
-                          {
-                            "key": "Environment",
-                            "value": "Production"
-                          },
-                          {
-                            "key": "ManagedBy",
-                            "value": "CDK"
-                          },
-                          {
-                            "key": "Phase",
-                            "value": "1"
-                          },
-                          {
-                            "key": "Project",
-                            "value": "CurateAI"
-                          },
-                          {
-                            "key": "Repository",
-                            "value": "RishabhSinha07/CurateAI"
-                          }
-                        ],
-                        "vpcId": {
-                          "Ref": "CurateAIVPC67003679"
-                        }
-                      }
-                    },
-                    "constructInfo": {
-                      "fqn": "aws-cdk-lib.aws_ec2.CfnSecurityGroup",
-                      "version": "2.120.0"
-                    }
-                  }
-                },
-                "constructInfo": {
-                  "fqn": "aws-cdk-lib.aws_ec2.SecurityGroup",
-                  "version": "2.120.0"
-                }
-              },
-              "Resource": {
-                "id": "Resource",
-                "path": "CurateAI-Network/ECR-API-Endpoint/Resource",
-                "attributes": {
-                  "aws:cdk:cloudformation:type": "AWS::EC2::VPCEndpoint",
-                  "aws:cdk:cloudformation:props": {
-                    "privateDnsEnabled": true,
-                    "securityGroupIds": [
-                      {
-                        "Fn::GetAtt": [
-                          "ECRAPIEndpointSecurityGroup4547491C",
-                          "GroupId"
-                        ]
-                      }
-                    ],
-                    "serviceName": "com.amazonaws.us-east-1.ecr.api",
-                    "subnetIds": [
-                      {
-                        "Ref": "CurateAIVPCPublicSubnet1SubnetB5E92D6E"
-                      },
-                      {
-                        "Ref": "CurateAIVPCPublicSubnet2SubnetB85A5986"
-                      }
-                    ],
-                    "vpcEndpointType": "Interface",
-                    "vpcId": {
-                      "Ref": "CurateAIVPC67003679"
-                    }
-                  }
-                },
-                "constructInfo": {
-                  "fqn": "aws-cdk-lib.aws_ec2.CfnVPCEndpoint",
-                  "version": "2.120.0"
-                }
-              }
-            },
-            "constructInfo": {
-              "fqn": "aws-cdk-lib.aws_ec2.InterfaceVpcEndpoint",
-              "version": "2.120.0"
-            }
-          },
-          "ECR-Docker-Endpoint": {
-            "id": "ECR-Docker-Endpoint",
-            "path": "CurateAI-Network/ECR-Docker-Endpoint",
-            "children": {
-              "SecurityGroup": {
-                "id": "SecurityGroup",
-                "path": "CurateAI-Network/ECR-Docker-Endpoint/SecurityGroup",
-                "children": {
-                  "Resource": {
-                    "id": "Resource",
-                    "path": "CurateAI-Network/ECR-Docker-Endpoint/SecurityGroup/Resource",
-                    "attributes": {
-                      "aws:cdk:cloudformation:type": "AWS::EC2::SecurityGroup",
-                      "aws:cdk:cloudformation:props": {
-                        "groupDescription": "CurateAI-Network/ECR-Docker-Endpoint/SecurityGroup",
-                        "securityGroupEgress": [
-                          {
-                            "cidrIp": "0.0.0.0/0",
-                            "description": "Allow all outbound traffic by default",
-                            "ipProtocol": "-1"
-                          }
-                        ],
-                        "securityGroupIngress": [
-                          {
-                            "cidrIp": {
-                              "Fn::GetAtt": [
-                                "CurateAIVPC67003679",
-                                "CidrBlock"
-                              ]
-                            },
-                            "ipProtocol": "tcp",
-                            "fromPort": 443,
-                            "toPort": 443,
-                            "description": {
-                              "Fn::Join": [
-                                "",
-                                [
-                                  "from ",
-                                  {
-                                    "Fn::GetAtt": [
-                                      "CurateAIVPC67003679",
-                                      "CidrBlock"
-                                    ]
-                                  },
-                                  ":443"
-                                ]
-                              ]
-                            }
-                          }
-                        ],
-                        "tags": [
-                          {
-                            "key": "Environment",
-                            "value": "Production"
-                          },
-                          {
-                            "key": "ManagedBy",
-                            "value": "CDK"
-                          },
-                          {
-                            "key": "Phase",
-                            "value": "1"
-                          },
-                          {
-                            "key": "Project",
-                            "value": "CurateAI"
-                          },
-                          {
-                            "key": "Repository",
-                            "value": "RishabhSinha07/CurateAI"
-                          }
-                        ],
-                        "vpcId": {
-                          "Ref": "CurateAIVPC67003679"
-                        }
-                      }
-                    },
-                    "constructInfo": {
-                      "fqn": "aws-cdk-lib.aws_ec2.CfnSecurityGroup",
-                      "version": "2.120.0"
-                    }
-                  }
-                },
-                "constructInfo": {
-                  "fqn": "aws-cdk-lib.aws_ec2.SecurityGroup",
-                  "version": "2.120.0"
-                }
-              },
-              "Resource": {
-                "id": "Resource",
-                "path": "CurateAI-Network/ECR-Docker-Endpoint/Resource",
-                "attributes": {
-                  "aws:cdk:cloudformation:type": "AWS::EC2::VPCEndpoint",
-                  "aws:cdk:cloudformation:props": {
-                    "privateDnsEnabled": true,
-                    "securityGroupIds": [
-                      {
-                        "Fn::GetAtt": [
-                          "ECRDockerEndpointSecurityGroup6D30C9E8",
-                          "GroupId"
-                        ]
-                      }
-                    ],
-                    "serviceName": "com.amazonaws.us-east-1.ecr.dkr",
-                    "subnetIds": [
-                      {
-                        "Ref": "CurateAIVPCPublicSubnet1SubnetB5E92D6E"
-                      },
-                      {
-                        "Ref": "CurateAIVPCPublicSubnet2SubnetB85A5986"
-                      }
-                    ],
-                    "vpcEndpointType": "Interface",
-                    "vpcId": {
-                      "Ref": "CurateAIVPC67003679"
-                    }
-                  }
-                },
-                "constructInfo": {
-                  "fqn": "aws-cdk-lib.aws_ec2.CfnVPCEndpoint",
-                  "version": "2.120.0"
-                }
-              }
-            },
-            "constructInfo": {
-              "fqn": "aws-cdk-lib.aws_ec2.InterfaceVpcEndpoint",
-              "version": "2.120.0"
-            }
-          },
-          "S3-Endpoint": {
-            "id": "S3-Endpoint",
-            "path": "CurateAI-Network/S3-Endpoint",
-            "children": {
-              "Resource": {
-                "id": "Resource",
-                "path": "CurateAI-Network/S3-Endpoint/Resource",
-                "attributes": {
-                  "aws:cdk:cloudformation:type": "AWS::EC2::VPCEndpoint",
-                  "aws:cdk:cloudformation:props": {
-                    "routeTableIds": [
-                      {
-                        "Ref": "CurateAIVPCPublicSubnet1RouteTableB2BA8702"
-                      },
-                      {
-                        "Ref": "CurateAIVPCPublicSubnet2RouteTableEC7CE134"
-                      }
-                    ],
-                    "serviceName": {
-                      "Fn::Join": [
-                        "",
-                        [
-                          "com.amazonaws.",
-                          {
-                            "Ref": "AWS::Region"
-                          },
-                          ".s3"
-                        ]
-                      ]
-                    },
-                    "vpcEndpointType": "Gateway",
-                    "vpcId": {
-                      "Ref": "CurateAIVPC67003679"
-                    }
-                  }
-                },
-                "constructInfo": {
-                  "fqn": "aws-cdk-lib.aws_ec2.CfnVPCEndpoint",
-                  "version": "2.120.0"
-                }
-              }
-            },
-            "constructInfo": {
-              "fqn": "aws-cdk-lib.aws_ec2.GatewayVpcEndpoint",
-              "version": "2.120.0"
-            }
-          },
-          "CloudWatch-Logs-Endpoint": {
-            "id": "CloudWatch-Logs-Endpoint",
-            "path": "CurateAI-Network/CloudWatch-Logs-Endpoint",
-            "children": {
-              "SecurityGroup": {
-                "id": "SecurityGroup",
-                "path": "CurateAI-Network/CloudWatch-Logs-Endpoint/SecurityGroup",
-                "children": {
-                  "Resource": {
-                    "id": "Resource",
-                    "path": "CurateAI-Network/CloudWatch-Logs-Endpoint/SecurityGroup/Resource",
-                    "attributes": {
-                      "aws:cdk:cloudformation:type": "AWS::EC2::SecurityGroup",
-                      "aws:cdk:cloudformation:props": {
-                        "groupDescription": "CurateAI-Network/CloudWatch-Logs-Endpoint/SecurityGroup",
-                        "securityGroupEgress": [
-                          {
-                            "cidrIp": "0.0.0.0/0",
-                            "description": "Allow all outbound traffic by default",
-                            "ipProtocol": "-1"
-                          }
-                        ],
-                        "securityGroupIngress": [
-                          {
-                            "cidrIp": {
-                              "Fn::GetAtt": [
-                                "CurateAIVPC67003679",
-                                "CidrBlock"
-                              ]
-                            },
-                            "ipProtocol": "tcp",
-                            "fromPort": 443,
-                            "toPort": 443,
-                            "description": {
-                              "Fn::Join": [
-                                "",
-                                [
-                                  "from ",
-                                  {
-                                    "Fn::GetAtt": [
-                                      "CurateAIVPC67003679",
-                                      "CidrBlock"
-                                    ]
-                                  },
-                                  ":443"
-                                ]
-                              ]
-                            }
-                          }
-                        ],
-                        "tags": [
-                          {
-                            "key": "Environment",
-                            "value": "Production"
-                          },
-                          {
-                            "key": "ManagedBy",
-                            "value": "CDK"
-                          },
-                          {
-                            "key": "Phase",
-                            "value": "1"
-                          },
-                          {
-                            "key": "Project",
-                            "value": "CurateAI"
-                          },
-                          {
-                            "key": "Repository",
-                            "value": "RishabhSinha07/CurateAI"
-                          }
-                        ],
-                        "vpcId": {
-                          "Ref": "CurateAIVPC67003679"
-                        }
-                      }
-                    },
-                    "constructInfo": {
-                      "fqn": "aws-cdk-lib.aws_ec2.CfnSecurityGroup",
-                      "version": "2.120.0"
-                    }
-                  }
-                },
-                "constructInfo": {
-                  "fqn": "aws-cdk-lib.aws_ec2.SecurityGroup",
-                  "version": "2.120.0"
-                }
-              },
-              "Resource": {
-                "id": "Resource",
-                "path": "CurateAI-Network/CloudWatch-Logs-Endpoint/Resource",
-                "attributes": {
-                  "aws:cdk:cloudformation:type": "AWS::EC2::VPCEndpoint",
-                  "aws:cdk:cloudformation:props": {
-                    "privateDnsEnabled": true,
-                    "securityGroupIds": [
-                      {
-                        "Fn::GetAtt": [
-                          "CloudWatchLogsEndpointSecurityGroupEE065128",
-                          "GroupId"
-                        ]
-                      }
-                    ],
-                    "serviceName": "com.amazonaws.us-east-1.logs",
-                    "subnetIds": [
-                      {
-                        "Ref": "CurateAIVPCPublicSubnet1SubnetB5E92D6E"
-                      },
-                      {
-                        "Ref": "CurateAIVPCPublicSubnet2SubnetB85A5986"
-                      }
-                    ],
-                    "vpcEndpointType": "Interface",
-                    "vpcId": {
-                      "Ref": "CurateAIVPC67003679"
-                    }
-                  }
-                },
-                "constructInfo": {
-                  "fqn": "aws-cdk-lib.aws_ec2.CfnVPCEndpoint",
-                  "version": "2.120.0"
-                }
-              }
-            },
-            "constructInfo": {
-              "fqn": "aws-cdk-lib.aws_ec2.InterfaceVpcEndpoint",
-              "version": "2.120.0"
-            }
-          },
-          "Bedrock-Runtime-Endpoint": {
-            "id": "Bedrock-Runtime-Endpoint",
-            "path": "CurateAI-Network/Bedrock-Runtime-Endpoint",
-            "children": {
-              "SecurityGroup": {
-                "id": "SecurityGroup",
-                "path": "CurateAI-Network/Bedrock-Runtime-Endpoint/SecurityGroup",
-                "children": {
-                  "Resource": {
-                    "id": "Resource",
-                    "path": "CurateAI-Network/Bedrock-Runtime-Endpoint/SecurityGroup/Resource",
-                    "attributes": {
-                      "aws:cdk:cloudformation:type": "AWS::EC2::SecurityGroup",
-                      "aws:cdk:cloudformation:props": {
-                        "groupDescription": "CurateAI-Network/Bedrock-Runtime-Endpoint/SecurityGroup",
-                        "securityGroupEgress": [
-                          {
-                            "cidrIp": "0.0.0.0/0",
-                            "description": "Allow all outbound traffic by default",
-                            "ipProtocol": "-1"
-                          }
-                        ],
-                        "securityGroupIngress": [
-                          {
-                            "cidrIp": {
-                              "Fn::GetAtt": [
-                                "CurateAIVPC67003679",
-                                "CidrBlock"
-                              ]
-                            },
-                            "ipProtocol": "tcp",
-                            "fromPort": 443,
-                            "toPort": 443,
-                            "description": {
-                              "Fn::Join": [
-                                "",
-                                [
-                                  "from ",
-                                  {
-                                    "Fn::GetAtt": [
-                                      "CurateAIVPC67003679",
-                                      "CidrBlock"
-                                    ]
-                                  },
-                                  ":443"
-                                ]
-                              ]
-                            }
-                          }
-                        ],
-                        "tags": [
-                          {
-                            "key": "Environment",
-                            "value": "Production"
-                          },
-                          {
-                            "key": "ManagedBy",
-                            "value": "CDK"
-                          },
-                          {
-                            "key": "Phase",
-                            "value": "1"
-                          },
-                          {
-                            "key": "Project",
-                            "value": "CurateAI"
-                          },
-                          {
-                            "key": "Repository",
-                            "value": "RishabhSinha07/CurateAI"
-                          }
-                        ],
-                        "vpcId": {
-                          "Ref": "CurateAIVPC67003679"
-                        }
-                      }
-                    },
-                    "constructInfo": {
-                      "fqn": "aws-cdk-lib.aws_ec2.CfnSecurityGroup",
-                      "version": "2.120.0"
-                    }
-                  }
-                },
-                "constructInfo": {
-                  "fqn": "aws-cdk-lib.aws_ec2.SecurityGroup",
-                  "version": "2.120.0"
-                }
-              },
-              "Resource": {
-                "id": "Resource",
-                "path": "CurateAI-Network/Bedrock-Runtime-Endpoint/Resource",
-                "attributes": {
-                  "aws:cdk:cloudformation:type": "AWS::EC2::VPCEndpoint",
-                  "aws:cdk:cloudformation:props": {
-                    "privateDnsEnabled": false,
-                    "securityGroupIds": [
-                      {
-                        "Fn::GetAtt": [
-                          "BedrockRuntimeEndpointSecurityGroup7FF13E70",
-                          "GroupId"
-                        ]
-                      }
-                    ],
-                    "serviceName": "com.amazonaws.us-east-1.bedrock-runtime",
-                    "subnetIds": [
-                      {
-                        "Ref": "CurateAIVPCPublicSubnet1SubnetB5E92D6E"
-                      },
-                      {
-                        "Ref": "CurateAIVPCPublicSubnet2SubnetB85A5986"
-                      }
-                    ],
-                    "vpcEndpointType": "Interface",
-                    "vpcId": {
-                      "Ref": "CurateAIVPC67003679"
-                    }
-                  }
-                },
-                "constructInfo": {
-                  "fqn": "aws-cdk-lib.aws_ec2.CfnVPCEndpoint",
-                  "version": "2.120.0"
-                }
-              }
-            },
-            "constructInfo": {
-              "fqn": "aws-cdk-lib.aws_ec2.InterfaceVpcEndpoint",
-              "version": "2.120.0"
-            }
-          },
           "Fargate-SG": {
             "id": "Fargate-SG",
             "path": "CurateAI-Network/Fargate-SG",
@@ -1063,104 +500,6 @@
                         "fromPort": 8000,
                         "toPort": 8000,
                         "description": "Allow HTTP traffic from internet"
-                      }
-                    ],
-                    "tags": [
-                      {
-                        "key": "Environment",
-                        "value": "Production"
-                      },
-                      {
-                        "key": "ManagedBy",
-                        "value": "CDK"
-                      },
-                      {
-                        "key": "Phase",
-                        "value": "1"
-                      },
-                      {
-                        "key": "Project",
-                        "value": "CurateAI"
-                      },
-                      {
-                        "key": "Repository",
-                        "value": "RishabhSinha07/CurateAI"
-                      }
-                    ],
-                    "vpcId": {
-                      "Ref": "CurateAIVPC67003679"
-                    }
-                  }
-                },
-                "constructInfo": {
-                  "fqn": "aws-cdk-lib.aws_ec2.CfnSecurityGroup",
-                  "version": "2.120.0"
-                }
-              }
-            },
-            "constructInfo": {
-              "fqn": "aws-cdk-lib.aws_ec2.SecurityGroup",
-              "version": "2.120.0"
-            }
-          },
-          "VPC-Endpoint-SG": {
-            "id": "VPC-Endpoint-SG",
-            "path": "CurateAI-Network/VPC-Endpoint-SG",
-            "children": {
-              "Resource": {
-                "id": "Resource",
-                "path": "CurateAI-Network/VPC-Endpoint-SG/Resource",
-                "attributes": {
-                  "aws:cdk:cloudformation:type": "AWS::EC2::SecurityGroup",
-                  "aws:cdk:cloudformation:props": {
-                    "groupDescription": "Security group for VPC endpoints",
-                    "securityGroupEgress": [
-                      {
-                        "cidrIp": "255.255.255.255/32",
-                        "description": "Disallow all traffic",
-                        "ipProtocol": "icmp",
-                        "fromPort": 252,
-                        "toPort": 86
-                      }
-                    ],
-                    "securityGroupIngress": [
-                      {
-                        "sourceSecurityGroupId": {
-                          "Fn::GetAtt": [
-                            "FargateSG3742C269",
-                            "GroupId"
-                          ]
-                        },
-                        "ipProtocol": "tcp",
-                        "fromPort": 443,
-                        "toPort": 443,
-                        "description": "Allow HTTPS from Fargate tasks"
-                      },
-                      {
-                        "cidrIp": {
-                          "Fn::GetAtt": [
-                            "CurateAIVPC67003679",
-                            "CidrBlock"
-                          ]
-                        },
-                        "ipProtocol": "tcp",
-                        "fromPort": 443,
-                        "toPort": 443,
-                        "description": {
-                          "Fn::Join": [
-                            "",
-                            [
-                              "from ",
-                              {
-                                "Fn::GetAtt": [
-                                  "CurateAIVPC67003679",
-                                  "CidrBlock"
-                                ]
-                              },
-                              ":443"
-                            ]
-                          ]
-                        }
                       }
                     ],
                     "tags": [
@@ -2401,7 +1740,7 @@
                             },
                             "integrationMethod": "ANY",
                             "integrationType": "HTTP_PROXY",
-                            "integrationUri": "http://3.236.29.39:8000/health",
+                            "integrationUri": "http://3.82.127.19:8000/health",
                             "payloadFormatVersion": "1.0"
                           }
                         },
@@ -2470,7 +1809,7 @@
                             },
                             "integrationMethod": "ANY",
                             "integrationType": "HTTP_PROXY",
-                            "integrationUri": "http://3.236.29.39:8000/chat",
+                            "integrationUri": "http://3.82.127.19:8000/chat",
                             "payloadFormatVersion": "1.0"
                           }
                         },
@@ -2630,7 +1969,7 @@
                             },
                             "integrationMethod": "ANY",
                             "integrationType": "HTTP_PROXY",
-                            "integrationUri": "http://3.236.29.39:8000/events",
+                            "integrationUri": "http://3.82.127.19:8000/events",
                             "payloadFormatVersion": "1.0"
                           }
                         },
@@ -2702,7 +2041,7 @@
                             },
                             "integrationMethod": "ANY",
                             "integrationType": "HTTP_PROXY",
-                            "integrationUri": "http://3.236.29.39:8000/admin/products",
+                            "integrationUri": "http://3.82.127.19:8000/admin/products",
                             "payloadFormatVersion": "1.0"
                           }
                         },
@@ -2774,7 +2113,7 @@
                             },
                             "integrationMethod": "ANY",
                             "integrationType": "HTTP_PROXY",
-                            "integrationUri": "http://3.236.29.39:8000/admin/api-keys/rotate",
+                            "integrationUri": "http://3.82.127.19:8000/admin/api-keys/rotate",
                             "payloadFormatVersion": "1.0"
                           }
                         },
@@ -4108,7 +3447,7 @@
                               "provider": "CodeStarSourceConnection"
                             },
                             "configuration": {
-                              "ConnectionArn": "arn:aws:codestar-connections:us-east-1:558599919081:connection/PLACEHOLDER-UPDATE-ME",
+                              "ConnectionArn": "arn:aws:codestar-connections:us-east-1:558599919081:connection/213b4c6a-80b7-4436-aa8e-3363db24b7e9",
                               "FullRepositoryId": "RishabhSinha07/CurateAI",
                               "BranchName": "main"
                             },
@@ -4335,7 +3674,7 @@
                                         {
                                           "Action": "codestar-connections:UseConnection",
                                           "Effect": "Allow",
-                                          "Resource": "arn:aws:codestar-connections:us-east-1:558599919081:connection/PLACEHOLDER-UPDATE-ME"
+                                          "Resource": "arn:aws:codestar-connections:us-east-1:558599919081:connection/213b4c6a-80b7-4436-aa8e-3363db24b7e9"
                                         },
                                         {
                                           "Action": [
@@ -4921,14 +4260,6 @@
           "PipelineUrl": {
             "id": "PipelineUrl",
             "path": "CurateAI-Pipeline/PipelineUrl",
-            "constructInfo": {
-              "fqn": "aws-cdk-lib.CfnOutput",
-              "version": "2.120.0"
-            }
-          },
-          "CodeStarConnectionSetup": {
-            "id": "CodeStarConnectionSetup",
-            "path": "CurateAI-Pipeline/CodeStarConnectionSetup",
             "constructInfo": {
               "fqn": "aws-cdk-lib.CfnOutput",
               "version": "2.120.0"
