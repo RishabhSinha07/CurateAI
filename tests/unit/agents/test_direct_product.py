@@ -110,20 +110,93 @@ async def test_search_still_uses_graph_for_normal_queries(base_state):
 # ── Safety Tests ──────────────────────────────────────────────────────────────
 
 @pytest.mark.asyncio
-async def test_safety_direct_product_template_response(base_state):
-    """Safety should return a template response for direct_product (no LLM call)."""
+async def test_safety_direct_product_llm_response(base_state):
+    """Safety should return an LLM-generated response for direct_product with benefits."""
+    from unittest.mock import AsyncMock, patch
+    from app.agents.safety import SafetyResponse
+
+    mock_result = SafetyResponse(
+        response="**Melatonin** is a naturally occurring hormone known to support your body's sleep-wake cycle. It may help with falling asleep faster and improving overall sleep quality. Look for products with clear dosage info to find the right fit for your routine.",
+        disclaimers=[],
+        contains_medical_claims=False,
+        is_safe=True,
+    )
+    mock_model = AsyncMock()
+    mock_model.ainvoke.return_value = mock_result
+
+    base_state["intent_type"] = "direct_product"
+    base_state["extracted_context"] = {"direct_search_term": "melatonin"}
+    base_state["final_products"] = [
+        {"id": "1", "name": "Restful Sleep", "brand": "NatureCo", "description": "Melatonin supplement"}
+    ]
+
+    with patch("app.agents.safety.get_safety_model", return_value=mock_model):
+        result = await safety_agent(base_state)
+
+    assert "melatonin" in result["response"].lower()
+    assert "sleep" in result["response"].lower()
+    assert result["status"] == "awaiting_slot"
+    assert "Personalise for me" in result["suggested_replies"]
+    assert result["next_agent"] is None
+    # Should still have disclaimers appended
+    assert "FDA" in result["response"]
+    mock_model.ainvoke.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_safety_direct_product_llm_fallback(base_state):
+    """Safety should fall back to template if LLM call fails."""
+    from unittest.mock import AsyncMock, patch
+
+    mock_model = AsyncMock()
+    mock_model.ainvoke.side_effect = Exception("LLM unavailable")
+
     base_state["intent_type"] = "direct_product"
     base_state["extracted_context"] = {"direct_search_term": "melatonin"}
     base_state["final_products"] = [
         {"id": "1", "name": "Restful Sleep", "description": "Melatonin supplement"}
     ]
 
-    result = await safety_agent(base_state)
+    with patch("app.agents.safety.get_safety_model", return_value=mock_model):
+        result = await safety_agent(base_state)
 
     assert "melatonin" in result["response"].lower()
     assert result["status"] == "awaiting_slot"
     assert "Personalise for me" in result["suggested_replies"]
-    assert result["next_agent"] is None
+    assert "FDA" in result["response"]
+
+
+@pytest.mark.asyncio
+async def test_safety_direct_product_includes_match_reasons_in_prompt(base_state):
+    """Safety should pass product match reasons to the LLM prompt."""
+    from unittest.mock import AsyncMock, patch, call
+    from app.agents.safety import SafetyResponse
+
+    mock_result = SafetyResponse(
+        response="**Vitamin C** is known to support immune function and may help with skin radiance.",
+        disclaimers=[],
+        contains_medical_claims=False,
+        is_safe=True,
+    )
+    mock_model = AsyncMock()
+    mock_model.ainvoke.return_value = mock_result
+
+    base_state["intent_type"] = "direct_product"
+    base_state["extracted_context"] = {"direct_search_term": "vitamin C"}
+    base_state["final_products"] = [
+        {"id": "1", "name": "C-1000", "brand": "PureVit", "match_reasons": ["High potency vitamin C", "Immune support"]},
+        {"id": "2", "name": "C Complex", "brand": "NutraLife", "match_reasons": "Buffered vitamin C"},
+    ]
+
+    with patch("app.agents.safety.get_safety_model", return_value=mock_model):
+        result = await safety_agent(base_state)
+
+    # Verify the LLM prompt includes product context
+    prompt_sent = mock_model.ainvoke.call_args[0][0]
+    assert "C-1000" in prompt_sent
+    assert "PureVit" in prompt_sent
+    assert "High potency vitamin C" in prompt_sent
+    assert "Buffered vitamin C" in prompt_sent
 
 
 @pytest.mark.asyncio

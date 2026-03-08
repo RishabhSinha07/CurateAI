@@ -198,12 +198,64 @@ async def safety_agent(state: AgentState) -> AgentState:
     journey_bundle = state.get("journey_bundle")
     intent_type = state.get("intent_type")
 
-    # Direct product intent — simplified template response (no LLM call)
+    # Direct product intent — brief LLM-generated response with benefits
     if intent_type == "direct_product":
         direct_search_term = extracted_context.get("direct_search_term", "your search")
-        response = f"Here are products matching **{direct_search_term}**."
 
-        # Append default disclaimer
+        # Gather product summaries for context
+        product_summaries = []
+        for p in final_products[:5]:
+            summary = p.get("name", "")
+            if p.get("brand"):
+                summary += f" by {p['brand']}"
+            if p.get("match_reasons"):
+                reasons = p["match_reasons"] if isinstance(p["match_reasons"], list) else [p["match_reasons"]]
+                summary += f" — {'; '.join(reasons)}"
+            product_summaries.append(summary)
+        products_block = "\n".join(f"- {s}" for s in product_summaries) if product_summaries else "No product details available."
+
+        direct_prompt = f"""You are a wellness consultant for CurateAI. The user searched directly for **{direct_search_term}**.
+
+Here are the top matching products (product cards are shown separately by the UI — do NOT list product names):
+{products_block}
+
+Write a short, conversational response (60-100 words) that:
+1. Acknowledges what they searched for
+2. Briefly explains why **{direct_search_term}** is beneficial — key mechanisms or expected benefits (1-2 sentences)
+3. A practical tip on what to look for or how to get the most out of it (1 sentence)
+
+**Rules:**
+- Do NOT list or name individual products — the UI handles that
+- Do NOT greet the user
+- Use hedging language: "may help", "known to support", "often used for"
+- Never claim products treat, cure, or prevent disease
+- Use **bold** for key terms
+- Keep it warm but concise
+
+Your Tasks:
+1. RESPONSE: Write the brief response
+2. SAFETY CHECK: Note if you make any medical claims
+3. DISCLAIMERS: List any needed disclaimers
+"""
+
+        try:
+            model = get_safety_model()
+            result: SafetyResponse = await model.ainvoke(direct_prompt)
+            response = result.response.strip() if result.response else f"Here are products matching **{direct_search_term}**."
+
+            # Append disclaimers from the LLM if present
+            if result.disclaimers:
+                response += "\n\n" + format_disclaimers(result.disclaimers)
+            elif result.contains_medical_claims:
+                default_disclaimer = [
+                    "These statements have not been evaluated by the FDA. These products are not intended to diagnose, treat, cure, or prevent any disease. Please consult with a healthcare professional before starting any new supplement regimen."
+                ]
+                response += "\n\n" + format_disclaimers(default_disclaimer)
+        except Exception as e:
+            logger.warning(f"Direct product LLM call failed, using fallback: {e}")
+            response = f"Here are products matching **{direct_search_term}**."
+
+        # Always append default disclaimer
         default_disclaimer = [
             "These statements have not been evaluated by the FDA. These products are not intended to diagnose, treat, cure, or prevent any disease. Please consult with a healthcare professional before starting any new supplement regimen."
         ]
