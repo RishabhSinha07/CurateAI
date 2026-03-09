@@ -9,7 +9,7 @@ A multi-agent AI consultation system for personalized product recommendations. U
 ## Tech Stack
 
 - **FastAPI** + **LangGraph** — async API with state machine agent orchestration
-- **AWS Bedrock** — Claude 3.5 Haiku (agents), Titan Embed v2 (embeddings)
+- **AWS Bedrock** — Amazon Nova Pro (agents + embeddings)
 - **PostgreSQL** + **pgvector** — product catalog + vector search
 - **NetworkX** — knowledge graph loading/querying
 
