@@ -39,6 +39,7 @@ from app.agents.refinement import refinement_agent
 from app.agents.journey import journey_agent
 from app.agents.fallback import fallback_agent
 from app.agents.ingredient_info import ingredient_info_agent
+from app.agents.product_detail import product_detail_agent
 
 
 def create_initial_state(
@@ -52,12 +53,14 @@ def create_initial_state(
     tenant_enabled_domains: list[str] | None = None,
 ) -> AgentState:
     """Create the initial state for a new conversation turn."""
+    ctx = existing_context or {}
+
     return AgentState(
         session_id=session_id,
         user_message=user_message,
         previous_domain_slug=domain_slug,  # Snapshot current domain for change detection
         domain_slug=domain_slug,
-        extracted_context=existing_context or {},
+        extracted_context=ctx,
         missing_slots=[],
         initial_products=[],
         search_results=[],
@@ -72,6 +75,7 @@ def create_initial_state(
         intent_type=None,
         journey_type=None,
         journey_bundle=None,
+        product_context=None,
     )
 
 
@@ -125,6 +129,11 @@ async def ingredient_info_node(state: AgentState) -> AgentState:
     return await ingredient_info_agent(state)
 
 
+async def product_detail_node(state: AgentState, db: AsyncSession) -> AgentState:
+    """Product detail agent node - answers questions about a specific shown product."""
+    return await product_detail_agent(state, db)
+
+
 def should_route_to(state: AgentState) -> Literal["router", "interviewer", "refinement", "fallback"]:
     """
     Determine the entry point based on session status.
@@ -166,7 +175,7 @@ def after_interviewer(state: AgentState) -> Literal["initial_products", "search"
     return END
 
 
-def after_router(state: AgentState) -> Literal["interviewer", "journey", "safety", "search", "fallback", "ingredient_info", "refinement"]:
+def after_router(state: AgentState) -> Literal["interviewer", "journey", "safety", "search", "fallback", "ingredient_info", "refinement", "product_detail"]:
     """
     Determine next step after router.
 
@@ -174,6 +183,7 @@ def after_router(state: AgentState) -> Literal["interviewer", "journey", "safety
     If journey intent → journey agent.
     If direct_product → search agent (bypass interviewer).
     If ingredient_info → ingredient_info agent (educational explanation).
+    If product_detail → product detail agent (product-specific Q&A).
     If filter → refinement agent (filter initial products, then resume interview).
     Otherwise → interviewer (which will fetch initial products after
         identifying the user's problem).
@@ -195,6 +205,9 @@ def after_router(state: AgentState) -> Literal["interviewer", "journey", "safety
     if next_agent == "ingredient_info":
         return "ingredient_info"
 
+    if next_agent == "product_detail":
+        return "product_detail"
+
     if next_agent == "refinement":
         return "refinement"
 
@@ -213,16 +226,19 @@ def after_journey(state: AgentState) -> Literal["safety", "interviewer"]:
     return "safety"
 
 
-def after_refinement(state: AgentState) -> Literal["search", "router", "interviewer", "ingredient_info"]:
+def after_refinement(state: AgentState) -> Literal["search", "router", "interviewer", "ingredient_info", "product_detail"]:
     """
     Determine next step after refinement detection.
 
+    If product_detail, answer a question about a specific shown product.
     If ingredient_info, answer the educational question without disrupting state.
     If refinement, go to search with updated constraints.
     If re_personalize, go to interviewer to restart slot-filling for the same domain.
     If new topic, go to router for fresh classification.
     """
     next_agent = state.get("next_agent")
+    if next_agent == "product_detail":
+        return "product_detail"
     if next_agent == "ingredient_info":
         return "ingredient_info"
     if next_agent == "search":
@@ -258,6 +274,7 @@ class ConsultationGraph:
         builder.add_node("journey", self._journey_wrapper)
         builder.add_node("fallback", self._fallback_wrapper)
         builder.add_node("ingredient_info", self._ingredient_info_wrapper)
+        builder.add_node("product_detail", self._product_detail_wrapper)
 
         # Set conditional entry point
         builder.set_conditional_entry_point(
@@ -275,6 +292,10 @@ class ConsultationGraph:
         # routes correctly (back to interviewer, refinement, etc.)
         builder.add_edge("ingredient_info", END)
 
+        # Product detail: always end the turn.
+        # Like ingredient_info, status is preserved so the next turn routes correctly.
+        builder.add_edge("product_detail", END)
+
         # Add edges
         builder.add_conditional_edges(
             "router",
@@ -286,6 +307,7 @@ class ConsultationGraph:
                 "search": "search",
                 "fallback": "fallback",
                 "ingredient_info": "ingredient_info",
+                "product_detail": "product_detail",
                 "refinement": "refinement",
             }
         )
@@ -318,6 +340,7 @@ class ConsultationGraph:
             "refinement",
             after_refinement,
             {
+                "product_detail": "product_detail",
                 "ingredient_info": "ingredient_info",
                 "search": "search",
                 "router": "router",
@@ -381,6 +404,9 @@ class ConsultationGraph:
 
     async def _ingredient_info_wrapper(self, state: AgentState) -> AgentState:
         return await self._timed("ingredient_info", ingredient_info_node(state))
+
+    async def _product_detail_wrapper(self, state: AgentState) -> AgentState:
+        return await self._timed("product_detail", product_detail_node(state, self._current_db))
 
     async def run(self, state: AgentState, db: AsyncSession) -> AgentState:
         """

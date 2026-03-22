@@ -22,6 +22,7 @@ class RouterResponse(BaseModel):
             "'journey' for customer journey bundle, "
             "'direct_product' for explicit product/ingredient purchase requests, "
             "'ingredient_info' for educational questions about how an ingredient or supplement works, "
+            "'product_detail' for questions about a specific product already shown in recommendations, "
             "'filter' for budget/format/dietary filter requests on already-shown products "
             "(e.g. 'Under ₹1000', 'Vegan options', 'Capsule form', 'Without fish')"
         )
@@ -35,6 +36,10 @@ class RouterResponse(BaseModel):
     direct_search_term: Optional[str] = Field(
         default=None,
         description="The specific product or ingredient name the user asked for. Only set when intent_type is 'direct_product'."
+    )
+    product_reference: Optional[str] = Field(
+        default=None,
+        description="The name or phrase the user used to refer to a specific shown product. Only set when intent_type is 'product_detail'."
     )
     inline_constraints: Optional[Dict[str, Any]] = Field(
         default=None,
@@ -126,6 +131,12 @@ async def router_agent(state: AgentState, db: AsyncSession) -> AgentState:
     The router focuses on domain identification. If the specific problem is clear,
     it will extract it. If not, the interviewer will ask about it.
     """
+    # Fast-path: if PDA is awaiting user confirmation, route directly to PDA
+    if (state.get("extracted_context") or {}).get("pda_pending_confirm"):
+        new_state = state.copy()
+        new_state["next_agent"] = "product_detail"
+        return new_state
+
     # Load domains from knowledge graphs, filtered by tenant's enabled domains
     tenant_enabled = state.get("tenant_enabled_domains")
     domains = get_all_active_domains()
@@ -139,6 +150,35 @@ async def router_agent(state: AgentState, db: AsyncSession) -> AgentState:
 
     # Dynamically build problem reference from all knowledge graphs
     problem_reference = _build_dynamic_problem_reference(tenant_enabled)
+
+    # Collect shown product names for product_detail detection
+    # Read from extracted_context["shown_products"] (persisted across turns)
+    # since initial_products/final_products start empty each turn.
+    _ext_ctx = state.get("extracted_context") or {}
+    shown_products = _ext_ctx.get("shown_products") or []
+    shown_product_names = [p.get("name", "") for p in shown_products if p.get("name")]
+    shown_names_str = ", ".join(f'"{n}"' for n in shown_product_names[:8])
+    _pda_last = _ext_ctx.get("pda_last_product", "")
+
+    _pda_lines = []
+    if shown_product_names:
+        _pda_lines.append(f"\nProducts currently shown to the user: {shown_names_str}")
+        if _pda_last:
+            _pda_lines.append(
+                f'The user was just discussing "{_pda_last}". '
+                "Follow-up questions like \"are there side effects?\", \"is it vegan?\", "
+                "\"how should I take it?\" are about THAT product → product_detail."
+            )
+        _pda_lines.append(
+            "When the user asks about a specific shown product OR asks an educational question "
+            "about an ingredient/supplement, use product_detail instead of ingredient_info."
+        )
+        _pda_lines.append(
+            "Do NOT use product_detail for navigation requests like "
+            '"show me more", "other options", "cheaper ones", "different products" '
+            "— those are filter/query/refinement."
+        )
+    _pda_hint = "\n".join(_pda_lines) + "\n" if _pda_lines else ""
 
     system_prompt = f"""You are a specialized Triage Agent for CurateAI. Your job is to identify the domain and optionally extract the problem if clearly stated.
 
@@ -182,6 +222,12 @@ Intent Types:
      - "Do you have collagen?" → direct_product (wants to buy)
      - "Why should I use collagen?" → ingredient_info (wants explanation)
    - For ingredient_info, set domain_slug to the most relevant domain if determinable, otherwise 'wellness'.
+
+5. **product_detail**: The user is asking about a SPECIFIC product that was already shown in recommendations. They want to learn more about that particular product.
+   - Key signals: "tell me more about X", "what's in X", "is X vegan?", "how do I take X?", "more info on X", "what about the X one"
+   - Pronouns or partial names clearly referring to a shown product: "tell me more about the sleep one", "is that one vegan?", "how should I take it?"
+   - IMPORTANT: Only use product_detail when products have been shown AND user is referring to a specific one.
+   - Set product_reference to the name or phrase the user used to identify the product.
 
 Available Problems by Domain (for reference only):
 
@@ -249,7 +295,7 @@ If the message is a slot answer to the pending prompt (e.g. "yes", "no", "oily s
 The interviewer will handle it from there.
 
 If they are asking an educational question about an ingredient or supplement, classify as intent_type="ingredient_info".
-''' if state.get("status") == "awaiting_slot" and state.get("extracted_context", {}).get("pending_slot_question") else f'''
+{_pda_hint}''' if state.get("status") == "awaiting_slot" and state.get("extracted_context", {}).get("pending_slot_question") else f'''
 Session context: The user has an active session in domain "{state.get("domain_slug")}".
 
 FIRST check if the message is a budget or format filter on products:
@@ -257,7 +303,7 @@ FIRST check if the message is a budget or format filter on products:
   - Format: "Capsule form", "in powder", "liquid version", "capsules only"
   - Dietary filter: "Vegan options", "vegetarian only", "without fish", "no dairy"
   If YES → classify as intent_type="filter", domain_slug="{state.get("domain_slug") or "wellness"}"
-''' if state.get("domain_slug") and state.get("domain_slug") != "out_of_scope" else ""}"""
+{_pda_hint}''' if state.get("domain_slug") and state.get("domain_slug") != "out_of_scope" else ""}"""
 
     model = get_router_model()
     result: RouterResponse = await model.ainvoke(system_prompt)
@@ -279,7 +325,7 @@ FIRST check if the message is a budget or format filter on products:
         and _pending_q
         and _session_domain
         and _session_domain not in ("out_of_scope", None)
-        and result.intent_type not in ("filter", "ingredient_info")  # never override valid filter/info
+        and result.intent_type not in ("filter", "ingredient_info", "product_detail")  # never override valid filter/info/pda
         and (
             result.domain_slug == "out_of_scope"
             or result.domain_slug not in _known_domain_slugs
@@ -406,13 +452,37 @@ FIRST check if the message is a budget or format filter on products:
                     f"Filter request detected during status='{_original_status}'. "
                     f"Routing to refinement (status preserved)."
                 )
-            elif result.intent_type == "ingredient_info":
-                new_state["intent_type"] = "ingredient_info"
-                new_state["next_agent"] = "ingredient_info"
+            elif result.intent_type == "product_detail":
+                # Product-specific question — route to PDA, preserve status
+                new_state["intent_type"] = "product_detail"
+                new_state["next_agent"] = "product_detail"
+                existing_ctx = new_state.get("extracted_context", {})
+                existing_ctx["pda_product_reference"] = result.product_reference or state["user_message"]
+                new_state["extracted_context"] = existing_ctx
                 logger.info(
-                    f"Ingredient info request detected. "
-                    f"Routing to ingredient_info agent (status preserved)."
+                    f"Product detail request detected: '{result.product_reference}'. "
+                    f"Routing to product_detail agent (status preserved)."
                 )
+            elif result.intent_type == "ingredient_info":
+                # If products are shown, redirect to PDA instead —
+                # it answers ingredient questions with product context.
+                if shown_product_names:
+                    new_state["intent_type"] = "product_detail"
+                    new_state["next_agent"] = "product_detail"
+                    existing_ctx = new_state.get("extracted_context", {})
+                    existing_ctx["pda_product_reference"] = state["user_message"]
+                    new_state["extracted_context"] = existing_ctx
+                    logger.info(
+                        f"Ingredient info redirected to product_detail (products shown). "
+                        f"User message used as product reference."
+                    )
+                else:
+                    new_state["intent_type"] = "ingredient_info"
+                    new_state["next_agent"] = "ingredient_info"
+                    logger.info(
+                        f"Ingredient info request detected. "
+                        f"Routing to ingredient_info agent (status preserved)."
+                    )
             elif result.intent_type == "direct_product" and result.direct_search_term:
                 # Direct product request — bypass interviewer, go straight to search.
                 # Also merge any inline constraints (budget, dietary, format) so

@@ -10,6 +10,7 @@ below because it controls AI agent behaviour (personas, slots, safety rules).
 
 import asyncio
 import json
+import uuid
 from decimal import Decimal
 from pathlib import Path
 
@@ -17,6 +18,9 @@ from sqlalchemy import text
 
 from app.db.models import Product
 from app.db.session import async_session_factory
+
+# Seed tenant created in migration 005
+SEED_TENANT_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")
 
 # Path to the scraped product catalogue (relative to project root).
 PRODUCTS_JSON = Path(__file__).resolve().parents[2] / "pipeline" / "data" / "scraped_products_v3.json"
@@ -89,6 +93,7 @@ async def seed_products(session, products: list[dict]) -> int:
 
     for product_data in products:
         product = Product(
+            tenant_id=SEED_TENANT_ID,
             domain_slugs=product_data["domain_slugs"],
             sku=product_data["sku"],
             name=product_data["name"],

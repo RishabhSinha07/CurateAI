@@ -34,3 +34,6 @@ class AgentState(TypedDict):
     intent_type: str | None  # "query" or "journey"
     journey_type: str | None  # e.g., "beginner_gym", "skincare_routine_start"
     journey_bundle: dict | None  # Journey info with name, description, and products with usage guidance
+
+    # Product Detail Agent
+    product_context: dict | None  # Loaded product data for PDA (matched from shown products)

@@ -19,12 +19,17 @@ class RefinementResponse(BaseModel):
             "'refinement' if user wants to filter/adjust current results, "
             "'re_personalize' if user wants to restart the personalization interview for the same domain, "
             "'ingredient_info' if user is asking an educational question about an ingredient or supplement, "
+            "'product_detail' if user is asking about a specific product from the shown recommendations, "
             "'new_topic' if user wants something completely different"
         )
     )
     new_constraints: Dict[str, Any] = Field(
         default_factory=dict,
         description="New constraints to add (e.g., budget, format preference). Only for refinement intent."
+    )
+    product_reference: str | None = Field(
+        default=None,
+        description="The name or phrase the user used to refer to a specific shown product. Only for product_detail intent."
     )
     reasoning: str = Field(default="", description="Brief explanation of the decision")
 
@@ -63,18 +68,46 @@ async def refinement_agent(state: AgentState) -> AgentState:
     extracted_context = state.get("extracted_context", {})
     domain_slug = state.get("domain_slug")
 
+    # Fast-path: if PDA is awaiting user confirmation (yes/no) or the user
+    # just picked a product from the selection list, route directly to PDA
+    # without invoking the classification LLM.
+    if extracted_context.get("pda_pending_confirm"):
+        new_state = state.copy()
+        new_state["next_agent"] = "product_detail"
+        return new_state
+
     has_products = bool(state.get("final_products"))
     product_count = len(state.get("final_products", []))
+    # Read from extracted_context["shown_products"] (persisted across turns)
+    # since initial_products/final_products start empty each turn.
+    shown_products = extracted_context.get("shown_products") or []
+    product_names = [p.get("name", "") for p in shown_products if p.get("name")]
+    product_names_str = ", ".join(f'"{n}"' for n in product_names[:8])
+    pda_last = extracted_context.get("pda_last_product", "")
+
+    pda_context_block = ""
+    if pda_last:
+        pda_context_block = (
+            f'The user was just discussing "{pda_last}". '
+            'Follow-up questions like "are there side effects?", "is it vegan?", '
+            '"how should I take it?" are about THAT product → product_detail.\n'
+        )
 
     system_message = f"""You are analyzing what a user wants to do after seeing product recommendations.
 The user has already been shown {product_count} product(s) in the "{domain_slug}" domain.
+{f"Shown product names: {product_names_str}" if product_names else ""}
+{pda_context_block}
+Classify into ONE of five intents:
 
-Classify into ONE of four intents:
+PRODUCT_DETAIL — user is asking about a specific shown product OR an educational ingredient question:
+- Questions about a shown product: "tell me more about X", "what's in the X one", "is X vegan?", "how do I take X?"
+- Pronouns or partial names: "tell me more about the sleep one", "is that one vegan?", "how should I take it?"
+- Follow-up questions about the product just discussed: "are there side effects?", "what's the dosage?", "can I take it daily?"
+- Educational ingredient questions: "how does collagen work?", "what does magnesium do?", "benefits of zinc"
+- Set product_reference to the product name, ingredient, or phrase the user mentioned
+- Do NOT use product_detail for navigation like "show me more", "other options", "different products" — those are REFINEMENT or NEW_TOPIC
 
-INGREDIENT_INFO — user is asking an educational question about an ingredient or supplement:
-- Key signals: "how does X work", "why should I use X", "what does X do", "tell me about X", "benefits of X", "when should I take X", "how to take X", "is X safe", "side effects of X", "explain X"
-- Pronouns referring to a shown product/ingredient: "when should I take this?", "how does it work?", "is it safe?"
-- These users want to learn, not buy — route to ingredient_info, do NOT search for products.
+INGREDIENT_INFO — Same as product_detail but only when no products exist (rare in refinement).
 
 RE_PERSONALIZE — user wants to restart the personalization interview for the same domain:
 - Keywords: "personalise", "personalize", "customise", "customize", "personalise for me", "personalize for me", "make it personal", "tailor this", "based on my needs", "for my needs"
@@ -100,7 +133,7 @@ When extracting new_constraints (only for REFINEMENT), use these EXACT key names
 - "budget_max": number (strip currency symbol), e.g. 1000 for "under ₹1000"
 - "format_preference": string, e.g. "capsule", "powder", "liquid"
 
-Return intent as one of: "ingredient_info", "refinement", "re_personalize", "new_topic"
+Return intent as one of: "product_detail", "ingredient_info", "refinement", "re_personalize", "new_topic"
 """
 
     user_prompt = f"""Current domain: {domain_slug}
@@ -119,9 +152,23 @@ Classify the intent and extract constraints if applicable."""
 
     new_state = state.copy()
 
-    if result.intent == "ingredient_info":
-        # Educational question — route to ingredient_info, preserve all state
-        new_state["next_agent"] = "ingredient_info"
+    if result.intent == "product_detail":
+        # Product-specific question — route to PDA, preserve all state
+        updated_context = {**extracted_context}
+        updated_context["pda_product_reference"] = result.product_reference or user_message
+        new_state["extracted_context"] = updated_context
+        new_state["next_agent"] = "product_detail"
+    elif result.intent == "ingredient_info":
+        # If products are shown, redirect to PDA — it handles ingredient
+        # questions with product context. Only use ingredient_info when
+        # no products exist (shouldn't happen in refinement, but safety net).
+        if shown_products:
+            updated_context = {**extracted_context}
+            updated_context["pda_product_reference"] = user_message
+            new_state["extracted_context"] = updated_context
+            new_state["next_agent"] = "product_detail"
+        else:
+            new_state["next_agent"] = "ingredient_info"
     elif result.intent == "refinement":
         # Merge new constraints into extracted_context.
         # _is_refinement_pass tells Safety to skip the full LLM response.

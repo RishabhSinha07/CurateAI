@@ -37,6 +37,19 @@ class ProductRecommendation(BaseModel):
     match_reasons: list[str]
 
 
+class ProductDetail(BaseModel):
+    """Full product detail returned when PDA responds."""
+    id: str
+    name: str
+    brand: Optional[str] = None
+    price: Optional[float] = None
+    currency: str = "USD"
+    product_url: Optional[str] = None
+    image_url: Optional[str] = None
+    description: Optional[str] = None
+    attributes: dict = {}
+
+
 class ChatResponse(BaseModel):
     """Response body for chat endpoint."""
     session_id: uuid.UUID
@@ -47,6 +60,7 @@ class ChatResponse(BaseModel):
     products: list[ProductRecommendation] = []
     suggested_replies: list[str] = []
     journey_info: Optional[dict] = None  # Journey bundle info if intent_type is "journey"
+    product_detail: Optional[ProductDetail] = None  # Full product info when PDA responds
 
 
 @router.post("", response_model=ChatResponse)
@@ -140,6 +154,19 @@ async def chat(
     final_products = final_state.get("final_products", [])
     display_products = final_products or final_state.get("initial_products", [])
 
+    # Persist shown products in extracted_context so they survive across turns.
+    # This lets Router/Refinement detect product_detail intent and PDA match
+    # against the products the user has actually seen.
+    if display_products:
+        ctx = final_state.get("extracted_context") or {}
+        ctx["shown_products"] = [
+            {k: p.get(k) for k in ("id", "name", "brand", "description", "price", "currency",
+                                    "product_url", "image_url", "attributes", "match_reasons")}
+            for p in display_products[:8]
+        ]
+        final_state["extracted_context"] = ctx
+        await session_repo.update_context(chat_session.id, ctx)
+
     # Save assistant response
     product_ids = None
     if display_products:
@@ -172,6 +199,22 @@ async def chat(
     journey_info = final_state.get("journey_bundle")
     intent_type = final_state.get("intent_type")
 
+    # Get product detail if PDA responded
+    product_detail_data = None
+    if final_state.get("product_context"):
+        pc = final_state["product_context"]
+        product_detail_data = ProductDetail(
+            id=pc.get("id", ""),
+            name=pc.get("name", ""),
+            brand=pc.get("brand"),
+            price=pc.get("price"),
+            currency=pc.get("currency", "USD"),
+            product_url=pc.get("product_url"),
+            image_url=pc.get("image_url"),
+            description=pc.get("description"),
+            attributes=pc.get("attributes", {}),
+        )
+
     return ChatResponse(
         session_id=chat_session.id,
         response=response_text,
@@ -180,7 +223,8 @@ async def chat(
         intent_type=intent_type,
         products=recommendations,
         suggested_replies=final_state.get("suggested_replies", []),
-        journey_info=journey_info
+        journey_info=journey_info,
+        product_detail=product_detail_data,
     )
 
 
