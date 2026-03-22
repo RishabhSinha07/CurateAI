@@ -8,6 +8,12 @@ settings = get_settings()
 
 # Make database connection optional for Phase 1
 if settings.database_url:
+    # Supabase pooler (PgBouncer in transaction mode) doesn't support
+    # prepared statements — disable asyncpg's statement cache.
+    _connect_args = {}
+    if "pooler.supabase.com" in (settings.database_url or ""):
+        _connect_args["statement_cache_size"] = 0
+
     engine = create_async_engine(
         settings.database_url,
         echo=settings.debug,
@@ -15,6 +21,7 @@ if settings.database_url:
         pool_size=settings.db_pool_size,
         max_overflow=settings.db_max_overflow,
         pool_recycle=settings.db_pool_recycle,
+        connect_args=_connect_args,
     )
 
     async_session_factory = async_sessionmaker(
