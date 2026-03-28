@@ -226,13 +226,13 @@ def after_journey(state: AgentState) -> Literal["safety", "interviewer"]:
     return "safety"
 
 
-def after_refinement(state: AgentState) -> Literal["search", "router", "interviewer", "ingredient_info", "product_detail"]:
+def after_refinement(state: AgentState) -> Literal["search", "safety", "router", "interviewer", "ingredient_info", "product_detail"]:
     """
     Determine next step after refinement detection.
 
     If product_detail, answer a question about a specific shown product.
     If ingredient_info, answer the educational question without disrupting state.
-    If refinement, go to search with updated constraints.
+    If refinement, filter in-memory and go to safety for response formatting.
     If re_personalize, go to interviewer to restart slot-filling for the same domain.
     If new topic, go to router for fresh classification.
     """
@@ -241,6 +241,8 @@ def after_refinement(state: AgentState) -> Literal["search", "router", "intervie
         return "product_detail"
     if next_agent == "ingredient_info":
         return "ingredient_info"
+    if next_agent == "safety":
+        return "safety"
     if next_agent == "search":
         return "search"
     if next_agent == "interviewer":
@@ -343,6 +345,7 @@ class ConsultationGraph:
                 "product_detail": "product_detail",
                 "ingredient_info": "ingredient_info",
                 "search": "search",
+                "safety": "safety",
                 "router": "router",
                 "interviewer": "interviewer",
             }

@@ -1,4 +1,5 @@
-from typing import Any, Dict
+import logging
+from typing import Any, Dict, List
 from pydantic import BaseModel, Field, field_validator
 
 from app.agents.validators import parse_dict, parse_bool
@@ -7,6 +8,8 @@ from langchain_core.messages import HumanMessage, SystemMessage
 from app.config import get_settings
 from app.agents.state import AgentState
 from app.agents.llm import get_bedrock_llm
+
+logger = logging.getLogger(__name__)
 
 settings = get_settings()
 
@@ -170,20 +173,26 @@ Classify the intent and extract constraints if applicable."""
         else:
             new_state["next_agent"] = "ingredient_info"
     elif result.intent == "refinement":
-        # Merge new constraints into extracted_context.
-        # _is_refinement_pass tells Safety to skip the full LLM response.
-        # _resume_interview tells Safety to restore awaiting_slot status and
-        # re-surface the pending question (used when filtering initial products
-        # mid-interview rather than filtering the final completed results).
+        # Filter the already-shown products in-memory instead of re-running
+        # a full database search. This is faster and matches user expectation
+        # ("filter what I'm looking at").
         current_status = state.get("status", "")
+        constraints = result.new_constraints
+        filtered = _filter_shown_products(shown_products, constraints)
+        logger.info(
+            f"Refinement in-memory filter: {len(shown_products)} → {len(filtered)} products, "
+            f"constraints={constraints}"
+        )
+
         new_state["extracted_context"] = {
             **extracted_context,
-            **result.new_constraints,
+            **constraints,
             "_is_refinement_pass": True,
             "_resume_interview": current_status == "awaiting_slot",
         }
+        new_state["final_products"] = filtered
         new_state["status"] = "refining"
-        new_state["next_agent"] = "search"
+        new_state["next_agent"] = "safety"
     elif result.intent == "re_personalize":
         # User wants to restart the interview for the same domain.
         # Clear graph state so the interviewer starts a fresh slot-filling pass,
@@ -210,3 +219,48 @@ Classify the intent and extract constraints if applicable."""
         new_state["extracted_context"] = updated_context
 
     return new_state
+
+
+def _filter_shown_products(
+    products: List[Dict[str, Any]],
+    constraints: Dict[str, Any],
+) -> List[Dict[str, Any]]:
+    """Filter already-shown products in-memory using refinement constraints."""
+    filtered = list(products)
+
+    # Budget filter
+    budget_max = constraints.get("budget_max")
+    if budget_max is not None:
+        budget_max = float(budget_max)
+        filtered = [p for p in filtered if (p.get("price") or 0) <= budget_max]
+
+    # Dietary preference — match against product description or attributes
+    diet = constraints.get("dietary_preference")
+    if diet:
+        diet_lower = diet.lower()
+        filtered = [
+            p for p in filtered
+            if diet_lower in (p.get("description") or "").lower()
+            or diet_lower in str(p.get("attributes") or {}).lower()
+        ]
+
+    # Format preference — match against description or attributes
+    fmt = constraints.get("format_preference")
+    if fmt:
+        fmt_lower = fmt.lower()
+        filtered = [
+            p for p in filtered
+            if fmt_lower in (p.get("description") or "").lower()
+            or fmt_lower in str(p.get("attributes") or {}).lower()
+        ]
+
+    # Allergy exclusion — exclude products mentioning the allergen
+    allergies = constraints.get("allergies")
+    if allergies and isinstance(allergies, list):
+        def _has_allergen(product: Dict, allergens: List[str]) -> bool:
+            text = (product.get("description") or "").lower()
+            text += " " + str(product.get("attributes") or {}).lower()
+            return any(a.lower() in text for a in allergens)
+        filtered = [p for p in filtered if not _has_allergen(p, allergies)]
+
+    return filtered

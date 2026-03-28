@@ -325,11 +325,14 @@ async def interviewer_agent(state: AgentState) -> AgentState:
         )
 
         try:
-            # Search across ALL knowledge graphs for global safety questions,
+            # Search tenant-enabled knowledge graphs for global safety questions,
             # since the user's domain may not define them (e.g., sleep_stress
             # has no global attrs but energy/gut/hair do).
             from app.knowledge.graph_loader import list_available_graphs
             available_graphs = list_available_graphs()
+            tenant_enabled = state.get("tenant_enabled_domains")
+            if tenant_enabled and "*" not in tenant_enabled:
+                available_graphs = [g for g in available_graphs if g in tenant_enabled]
 
             # Prioritize the current domain's graph
             graph_order = sorted(

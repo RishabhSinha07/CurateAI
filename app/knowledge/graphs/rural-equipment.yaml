@@ -1,0 +1,887 @@
+# Rural Equipment Knowledge Graph
+#
+# This graph defines the domain knowledge for rural/agricultural equipment
+# product recommendations. It uses a classification-only approach —
+# subcategories as problem nodes with synonyms for intent matching,
+# no interview questions or ingredient edges.
+#
+# STRUCTURE:
+# - 16 parent categories (for grouping context)
+# - 71 subcategory problem nodes (each a user goal/need)
+# - No attributes, no edges (search is pure semantic + category filter)
+
+metadata:
+  domain: rural-equipment
+  version: 1.0.0
+  created_at: "2026-03-27"
+  description: "Knowledge graph for rural and agricultural equipment recommendations"
+  display_name: "Rural Equipment"
+  persona: "You are an agricultural equipment specialist who helps farmers and rural workers find the right tools and machinery for their needs. You understand farming operations, land preparation, crop maintenance, harvesting, and post-harvest processing. You consider the user's specific task, farm size, and budget to recommend appropriate equipment."
+  is_active: true
+  parent_domain: null
+
+nodes:
+  # ============================================================================
+  # PROBLEMS - Each subcategory is a user goal/need
+  # Grouped by parent category for readability
+  # ============================================================================
+  problems:
+
+    # --------------------------------------------------------------------------
+    # BRUSH CUTTERS & TRIMMERS
+    # --------------------------------------------------------------------------
+    - id: brush_cutters
+      name: "brush_cutters"
+      display_name: "Brush Cutters"
+      synonyms:
+        - "grass cutter"
+        - "weed cutter"
+        - "brush clearing machine"
+        - "side pack brush cutter"
+        - "backpack brush cutter"
+        - "2 stroke brush cutter"
+        - "4 stroke brush cutter"
+        - "ghas katne ki machine"
+        - "jhadiya katne ki machine"
+      description: "Motorized brush cutters for clearing grass, weeds, and brush"
+
+    - id: hedge_trimmers
+      name: "hedge_trimmers"
+      display_name: "Hedge Trimmers"
+      synonyms:
+        - "hedge cutter"
+        - "hedge cutting machine"
+        - "garden trimmer"
+        - "bush trimmer"
+        - "shrub cutter"
+      description: "Equipment for trimming and shaping hedges and shrubs"
+
+    - id: trimmer_heads
+      name: "trimmer_heads"
+      display_name: "Trimmer Heads"
+      synonyms:
+        - "trimmer head replacement"
+        - "nylon head"
+        - "cutter head"
+        - "bump feed head"
+        - "auto cut head"
+      description: "Replacement trimmer heads for brush cutters"
+
+    - id: trimmer_lines
+      name: "trimmer_lines"
+      display_name: "Trimmer Lines"
+      synonyms:
+        - "nylon line"
+        - "trimmer string"
+        - "cutting line"
+        - "trimmer wire"
+        - "nylon cord"
+      description: "Replacement nylon cutting lines for trimmers"
+
+    - id: brush_cutter_attachments
+      name: "brush_cutter_attachments"
+      display_name: "Brush Cutter Attachments"
+      synonyms:
+        - "blade attachment"
+        - "TCT blade"
+        - "2T blade"
+        - "paddy guard"
+        - "brush cutter blade"
+        - "cutter attachment"
+        - "multi tool attachment"
+      description: "Blades, guards, and other attachments for brush cutters"
+
+    - id: brush_cutter_accessories
+      name: "brush_cutter_accessories"
+      display_name: "Brush Cutter Accessories"
+      synonyms:
+        - "harness"
+        - "shoulder strap"
+        - "safety goggles"
+        - "face shield"
+        - "brush cutter belt"
+        - "protective gear"
+      description: "Safety gear, harnesses, and accessories for brush cutters"
+
+    - id: brush_cutter_spare_parts
+      name: "brush_cutter_spare_parts"
+      display_name: "Brush Cutter Spare Parts"
+      synonyms:
+        - "brush cutter parts"
+        - "carburetor"
+        - "ignition coil"
+        - "starter assembly"
+        - "clutch"
+        - "gear box"
+        - "drive shaft"
+        - "piston kit"
+        - "brush cutter repair"
+      description: "Replacement spare parts for brush cutter maintenance and repair"
+
+    # --------------------------------------------------------------------------
+    # CHAFF CUTTERS & CHIPPERS
+    # --------------------------------------------------------------------------
+    - id: chaff_cutters
+      name: "chaff_cutters"
+      display_name: "Chaff Cutters"
+      synonyms:
+        - "fodder cutter"
+        - "toka machine"
+        - "chara cutting machine"
+        - "hay cutter"
+        - "straw cutter"
+        - "kutti machine"
+        - "chaff cutting machine"
+      description: "Machines for cutting fodder, hay, and straw into small pieces for animal feed"
+
+    - id: wood_chippers
+      name: "wood_chippers"
+      display_name: "Wood Chippers"
+      synonyms:
+        - "wood chipper machine"
+        - "branch chipper"
+        - "wood shredder"
+        - "tree chipper"
+        - "wood chipping machine"
+        - "lakdi ki machine"
+      description: "Machines for chipping and shredding wood and branches"
+
+    # --------------------------------------------------------------------------
+    # CHAINSAWS
+    # --------------------------------------------------------------------------
+    - id: chainsaws_18
+      name: "chainsaws_18"
+      display_name: "Chainsaws (18\")"
+      synonyms:
+        - "18 inch chainsaw"
+        - "small chainsaw"
+        - "light chainsaw"
+        - "ped katne ki machine"
+        - "wood cutting saw"
+        - "petrol chainsaw 18"
+      description: "18-inch chainsaws for light to medium tree cutting and wood work"
+
+    - id: chainsaws_22
+      name: "chainsaws_22"
+      display_name: "Chainsaws (22\")"
+      synonyms:
+        - "22 inch chainsaw"
+        - "large chainsaw"
+        - "heavy duty chainsaw"
+        - "bada chainsaw"
+        - "petrol chainsaw 22"
+      description: "22-inch chainsaws for heavy-duty tree cutting and logging"
+
+    - id: electric_chainsaws
+      name: "electric_chainsaws"
+      display_name: "Electric Chainsaws"
+      synonyms:
+        - "electric saw"
+        - "battery chainsaw"
+        - "cordless chainsaw"
+        - "bijli wala chainsaw"
+      description: "Electric-powered chainsaws for quieter, lighter cutting tasks"
+
+    - id: electric_pole_saws
+      name: "electric_pole_saws"
+      display_name: "Electric Pole Saws"
+      synonyms:
+        - "pole saw"
+        - "tree pruner"
+        - "long reach saw"
+        - "high branch cutter"
+        - "telescopic saw"
+      description: "Extended-reach electric saws for pruning high branches"
+
+    - id: chainsaw_spare_parts
+      name: "chainsaw_spare_parts"
+      display_name: "Chainsaw Spare Parts"
+      synonyms:
+        - "chainsaw parts"
+        - "chainsaw chain"
+        - "guide bar"
+        - "chainsaw bar"
+        - "sprocket"
+        - "chainsaw repair parts"
+        - "chain replacement"
+      description: "Replacement chains, bars, and parts for chainsaw maintenance"
+
+    # --------------------------------------------------------------------------
+    # COMBO PACKAGES
+    # --------------------------------------------------------------------------
+    - id: brush_cutter_packages
+      name: "brush_cutter_packages"
+      display_name: "Brush Cutter Packages"
+      synonyms:
+        - "brush cutter combo"
+        - "brush cutter kit"
+        - "brush cutter set"
+        - "brush cutter bundle"
+      description: "Complete brush cutter packages with accessories"
+
+    - id: multi_tool_combos
+      name: "multi_tool_combos"
+      display_name: "Multi-Tool Combos"
+      synonyms:
+        - "multi tool set"
+        - "all in one tool"
+        - "combo tool kit"
+        - "multi purpose machine"
+        - "versatile tool"
+      description: "Multi-purpose tool kits combining brush cutter, chainsaw, and other tools"
+
+    - id: power_weeder_combos
+      name: "power_weeder_combos"
+      display_name: "Power Weeder Combos"
+      synonyms:
+        - "power weeder set"
+        - "weeder combo kit"
+        - "power weeder bundle"
+        - "weeder with attachments"
+      description: "Power weeder packages with attachments and accessories"
+
+    - id: power_weeder_combos_pro
+      name: "power_weeder_combos_pro"
+      display_name: "Power Weeder Combos (Pro)"
+      synonyms:
+        - "professional power weeder"
+        - "pro weeder combo"
+        - "heavy duty weeder combo"
+        - "commercial weeder set"
+      description: "Professional-grade power weeder combo packages for heavy-duty use"
+
+    # --------------------------------------------------------------------------
+    # EARTH AUGERS & TREE PLANTERS
+    # --------------------------------------------------------------------------
+    - id: earth_augers_small
+      name: "earth_augers_small"
+      display_name: "Earth Augers (Small)"
+      synonyms:
+        - "small auger"
+        - "hand auger"
+        - "post hole digger"
+        - "boring machine small"
+        - "gadda khodne ki machine"
+        - "hole digger"
+        - "1 man auger"
+      description: "Small earth augers for digging post holes and planting"
+
+    - id: earth_augers_large
+      name: "earth_augers_large"
+      display_name: "Earth Augers (Large)"
+      synonyms:
+        - "large auger"
+        - "heavy duty auger"
+        - "big boring machine"
+        - "2 man auger"
+        - "heavy auger machine"
+      description: "Large earth augers for heavy-duty boring and digging"
+
+    - id: drill_bits
+      name: "drill_bits"
+      display_name: "Drill Bits"
+      synonyms:
+        - "auger bit"
+        - "auger drill bit"
+        - "boring bit"
+        - "earth drill bit"
+        - "replacement bit"
+      description: "Replacement drill bits for earth augers in various sizes"
+
+    - id: manual_tree_planters
+      name: "manual_tree_planters"
+      display_name: "Manual Tree Planters"
+      synonyms:
+        - "tree planting tool"
+        - "sapling planter"
+        - "manual planter"
+        - "hand planter"
+        - "ped lagane ka aujar"
+      description: "Manual tools for planting trees and saplings"
+
+    - id: tree_planters_2_man
+      name: "tree_planters_2_man"
+      display_name: "Tree Planters (2-Man)"
+      synonyms:
+        - "two man tree planter"
+        - "2 person planter"
+        - "heavy duty tree planter"
+        - "motorized tree planter"
+      description: "Two-person operated tree planting machines"
+
+    - id: earth_auger_spare_parts
+      name: "earth_auger_spare_parts"
+      display_name: "Earth Auger Spare Parts"
+      synonyms:
+        - "auger parts"
+        - "auger repair"
+        - "auger replacement parts"
+        - "boring machine parts"
+      description: "Replacement parts for earth auger maintenance and repair"
+
+    # --------------------------------------------------------------------------
+    # ENGINES & MOTORS
+    # --------------------------------------------------------------------------
+    - id: 2_stroke_engines
+      name: "2_stroke_engines"
+      display_name: "2-Stroke Engines"
+      synonyms:
+        - "2 stroke motor"
+        - "two stroke engine"
+        - "petrol engine 2 stroke"
+        - "do stroke engine"
+      description: "2-stroke petrol engines for agricultural equipment"
+
+    - id: 4_stroke_engines
+      name: "4_stroke_engines"
+      display_name: "4-Stroke Engines"
+      synonyms:
+        - "4 stroke motor"
+        - "four stroke engine"
+        - "petrol engine 4 stroke"
+        - "char stroke engine"
+        - "diesel engine"
+      description: "4-stroke engines for agricultural machinery and equipment"
+
+    - id: bare_engines
+      name: "bare_engines"
+      display_name: "Bare Engines"
+      synonyms:
+        - "engine only"
+        - "standalone engine"
+        - "replacement engine"
+        - "engine without attachments"
+      description: "Standalone engines without attachments for custom setups"
+
+    # --------------------------------------------------------------------------
+    # GENERATORS
+    # --------------------------------------------------------------------------
+    - id: portable_generators
+      name: "portable_generators"
+      display_name: "Portable Generators"
+      synonyms:
+        - "generator"
+        - "genset"
+        - "portable genset"
+        - "petrol generator"
+        - "bijli ki machine"
+        - "power generator"
+        - "inverter generator"
+        - "light machine"
+      description: "Portable power generators for farm and rural use"
+
+    # --------------------------------------------------------------------------
+    # LIGHTING & TORCHES
+    # --------------------------------------------------------------------------
+    - id: torches_flashlights
+      name: "torches_flashlights"
+      display_name: "Torches & Flashlights"
+      synonyms:
+        - "torch"
+        - "flashlight"
+        - "LED torch"
+        - "rechargeable torch"
+        - "farm light"
+        - "battery torch"
+        - "torch light"
+      description: "Torches and flashlights for farm and outdoor use"
+
+    # --------------------------------------------------------------------------
+    # POWER TILLERS & ENGINES
+    # --------------------------------------------------------------------------
+    - id: power_tillers
+      name: "power_tillers"
+      display_name: "Power Tillers"
+      synonyms:
+        - "tiller"
+        - "power tiller machine"
+        - "walking tractor"
+        - "jute wala tiller"
+        - "khet jotne ki machine"
+        - "land tiller"
+        - "soil tiller"
+      description: "Power tillers for soil preparation and land cultivation"
+
+    - id: mini_tillers
+      name: "mini_tillers"
+      display_name: "Mini Tillers"
+      synonyms:
+        - "mini tiller machine"
+        - "small tiller"
+        - "compact tiller"
+        - "chhota tiller"
+        - "kitchen garden tiller"
+        - "lightweight tiller"
+      description: "Compact mini tillers for small farms and kitchen gardens"
+
+    - id: power_weeders
+      name: "power_weeders"
+      display_name: "Power Weeders"
+      synonyms:
+        - "power weeder machine"
+        - "weeding machine"
+        - "ghas nikalne ki machine"
+        - "khurpi machine"
+        - "mechanical weeder"
+        - "motorized weeder"
+      description: "Motorized weeders for removing weeds from crop fields"
+
+    - id: rotary_tillers
+      name: "rotary_tillers"
+      display_name: "Rotary Tillers"
+      synonyms:
+        - "rotavator"
+        - "rotary cultivator"
+        - "rotary hoe"
+        - "soil rotavator"
+        - "ghoomne wala tiller"
+      description: "Rotary tillers for breaking and mixing soil"
+
+    - id: chain_cultivators
+      name: "chain_cultivators"
+      display_name: "Chain Cultivators"
+      synonyms:
+        - "chain type cultivator"
+        - "cultivator machine"
+        - "field cultivator"
+        - "chain weeder"
+      description: "Chain-driven cultivators for field cultivation and weeding"
+
+    - id: inter_cultivators
+      name: "inter_cultivators"
+      display_name: "Inter Cultivators"
+      synonyms:
+        - "inter row cultivator"
+        - "row cultivator"
+        - "between row weeder"
+        - "inter cultivation machine"
+      description: "Cultivators for weeding between crop rows"
+
+    - id: stubble_mowers
+      name: "stubble_mowers"
+      display_name: "Stubble Mowers"
+      synonyms:
+        - "stubble cutter"
+        - "residue cutter"
+        - "parali katne ki machine"
+        - "straw mower"
+        - "crop residue management"
+      description: "Mowers for cutting crop stubble and residue after harvest"
+
+    - id: tiller_engine_parts
+      name: "tiller_engine_parts"
+      display_name: "Tiller Engine Parts"
+      synonyms:
+        - "tiller engine repair"
+        - "tiller motor parts"
+        - "engine spare parts"
+        - "tiller engine replacement"
+      description: "Engine-specific replacement parts for power tillers"
+
+    - id: tiller_spare_parts
+      name: "tiller_spare_parts"
+      display_name: "Tiller Spare Parts"
+      synonyms:
+        - "tiller parts"
+        - "tiller repair parts"
+        - "tiller blade"
+        - "tiller wheel"
+        - "tiller belt"
+        - "power tiller repair"
+      description: "General replacement parts for power tiller maintenance"
+
+    # --------------------------------------------------------------------------
+    # PRESSURE WASHERS & AIR TOOLS
+    # --------------------------------------------------------------------------
+    - id: pressure_washers
+      name: "pressure_washers"
+      display_name: "Pressure Washers"
+      synonyms:
+        - "pressure washer machine"
+        - "high pressure washer"
+        - "car washer"
+        - "water jet machine"
+        - "dhulai machine"
+        - "cleaning machine"
+      description: "Standard pressure washers for cleaning equipment and surfaces"
+
+    - id: pressure_washers_brass
+      name: "pressure_washers_brass"
+      display_name: "Pressure Washers (Brass)"
+      synonyms:
+        - "brass pressure washer"
+        - "brass pump washer"
+        - "heavy duty pressure washer"
+        - "brass head washer"
+      description: "Brass-pump pressure washers for durability and heavy use"
+
+    - id: high_pressure_washers_light
+      name: "high_pressure_washers_light"
+      display_name: "High Pressure Washers (Light)"
+      synonyms:
+        - "light pressure washer"
+        - "home pressure washer"
+        - "small pressure washer"
+        - "portable pressure washer"
+      description: "Lightweight high-pressure washers for home and light use"
+
+    - id: high_pressure_washers_heavy
+      name: "high_pressure_washers_heavy"
+      display_name: "High Pressure Washers (Heavy)"
+      synonyms:
+        - "heavy duty pressure washer"
+        - "commercial pressure washer"
+        - "industrial washer"
+        - "professional pressure washer"
+      description: "Heavy-duty high-pressure washers for commercial and industrial use"
+
+    - id: foam_washers
+      name: "foam_washers"
+      display_name: "Foam Washers"
+      synonyms:
+        - "foam cannon"
+        - "foam gun"
+        - "snow foam washer"
+        - "foam cleaning machine"
+      description: "Foam-generating washers for deep cleaning"
+
+    - id: air_compressors_oil_based
+      name: "air_compressors_oil_based"
+      display_name: "Air Compressors (Oil-Based)"
+      synonyms:
+        - "oil compressor"
+        - "oil lubricated compressor"
+        - "belt drive compressor"
+        - "hawa ki machine"
+      description: "Oil-lubricated air compressors for heavy-duty pneumatic tools"
+
+    - id: air_compressors_oil_free
+      name: "air_compressors_oil_free"
+      display_name: "Air Compressors (Oil-Free)"
+      synonyms:
+        - "oil free compressor"
+        - "dry compressor"
+        - "maintenance free compressor"
+        - "portable compressor"
+      description: "Oil-free air compressors for clean, low-maintenance operation"
+
+    - id: electric_blowers
+      name: "electric_blowers"
+      display_name: "Electric Blowers"
+      synonyms:
+        - "leaf blower electric"
+        - "air blower"
+        - "electric air blower"
+        - "dust blower"
+      description: "Electric-powered blowers for clearing leaves and debris"
+
+    - id: handheld_blowers
+      name: "handheld_blowers"
+      display_name: "Handheld Blowers"
+      synonyms:
+        - "hand blower"
+        - "portable blower"
+        - "petrol blower"
+        - "backpack blower"
+        - "leaf blower"
+      description: "Portable handheld blowers for outdoor cleaning"
+
+    # --------------------------------------------------------------------------
+    # PROCESSING EQUIPMENT
+    # --------------------------------------------------------------------------
+    - id: corn_threshers
+      name: "corn_threshers"
+      display_name: "Corn Threshers"
+      synonyms:
+        - "maize thresher"
+        - "corn sheller"
+        - "makka chheelne ki machine"
+        - "maize shelling machine"
+        - "bhutta machine"
+      description: "Machines for threshing and shelling corn/maize"
+
+    - id: harvesters
+      name: "harvesters"
+      display_name: "Harvesters"
+      synonyms:
+        - "harvester machine"
+        - "crop harvester"
+        - "harvesting machine"
+        - "katai machine"
+      description: "Harvesting machines for various crops"
+
+    - id: heavy_chaff_cutters
+      name: "heavy_chaff_cutters"
+      display_name: "Heavy Chaff Cutters"
+      synonyms:
+        - "heavy duty chaff cutter"
+        - "commercial chaff cutter"
+        - "large fodder cutter"
+        - "bada toka machine"
+      description: "Heavy-duty chaff cutters for commercial fodder processing"
+
+    - id: micro_balers
+      name: "micro_balers"
+      display_name: "Micro Balers"
+      synonyms:
+        - "mini baler"
+        - "small baler"
+        - "hay baler"
+        - "straw baler"
+        - "baling machine"
+        - "gatha banane ki machine"
+      description: "Compact baling machines for hay and straw bundling"
+
+    - id: rice_mills
+      name: "rice_mills"
+      display_name: "Rice Mills"
+      synonyms:
+        - "rice milling machine"
+        - "rice huller"
+        - "rice polisher"
+        - "chawal ki machine"
+        - "dhan kutai machine"
+        - "paddy mill"
+      description: "Rice milling and processing machines for hulling and polishing"
+
+    # --------------------------------------------------------------------------
+    # REAPERS & HARVESTERS
+    # --------------------------------------------------------------------------
+    - id: petrol_reapers
+      name: "petrol_reapers"
+      display_name: "Petrol Reapers"
+      synonyms:
+        - "reaper machine"
+        - "crop reaper"
+        - "petrol reaper machine"
+        - "fasal katne ki machine"
+        - "wheat reaper"
+        - "paddy reaper"
+      description: "Petrol-powered reapers for cutting crops like wheat and paddy"
+
+    - id: reaper_attachments
+      name: "reaper_attachments"
+      display_name: "Reaper Attachments"
+      synonyms:
+        - "reaper blade"
+        - "reaper parts"
+        - "reaper cutter bar"
+        - "reaper accessories"
+      description: "Attachments and accessories for reaper machines"
+
+    - id: tea_harvesters
+      name: "tea_harvesters"
+      display_name: "Tea Harvesters"
+      synonyms:
+        - "tea plucking machine"
+        - "tea leaf harvester"
+        - "chai patti todne ki machine"
+        - "tea pruner"
+      description: "Specialized machines for harvesting tea leaves"
+
+    # --------------------------------------------------------------------------
+    # SEEDERS
+    # --------------------------------------------------------------------------
+    - id: seeders
+      name: "seeders"
+      display_name: "Seeders"
+      synonyms:
+        - "seed drill"
+        - "seeder machine"
+        - "seed planter"
+        - "beej boni machine"
+        - "seed sowing machine"
+        - "manual seeder"
+        - "hand seeder"
+        - "planting machine"
+      description: "Seed sowing and planting machines for various crops"
+
+    # --------------------------------------------------------------------------
+    # SHADE NETS & COVERS
+    # --------------------------------------------------------------------------
+    - id: shade_nets_green
+      name: "shade_nets_green"
+      display_name: "Shade Nets (Green)"
+      synonyms:
+        - "green shade net"
+        - "green net"
+        - "agro shade net"
+        - "hari jali"
+        - "garden net"
+        - "sunlight filter net"
+      description: "Green shade nets for sun protection of crops and nurseries"
+
+    - id: shade_nets_colored
+      name: "shade_nets_colored"
+      display_name: "Shade Nets (Colored)"
+      synonyms:
+        - "colored shade net"
+        - "red shade net"
+        - "white shade net"
+        - "blue shade net"
+        - "rangin jali"
+      description: "Colored shade nets for specific crop light management"
+
+    - id: shade_nets_heavy
+      name: "shade_nets_heavy"
+      display_name: "Shade Nets (Heavy)"
+      synonyms:
+        - "heavy duty shade net"
+        - "thick shade net"
+        - "90% shade net"
+        - "commercial shade net"
+        - "moti jali"
+      description: "Heavy-duty shade nets for maximum sun protection"
+
+    - id: nursery_covers
+      name: "nursery_covers"
+      display_name: "Nursery Covers"
+      synonyms:
+        - "nursery net"
+        - "grow bag"
+        - "plant cover"
+        - "seedling cover"
+        - "greenhouse cover"
+        - "poly cover"
+        - "nursery protection"
+        - "paudha cover"
+      description: "Protective covers and grow bags for nurseries and seedlings"
+
+    # --------------------------------------------------------------------------
+    # SPRAYERS
+    # --------------------------------------------------------------------------
+    - id: battery_sprayers
+      name: "battery_sprayers"
+      display_name: "Battery Sprayers"
+      synonyms:
+        - "battery operated sprayer"
+        - "electric sprayer"
+        - "rechargeable sprayer"
+        - "battery pump sprayer"
+        - "battery wala sprayer"
+      description: "Battery-powered sprayers for pesticide and fertilizer application"
+
+    - id: li_ion_battery_sprayers
+      name: "li_ion_battery_sprayers"
+      display_name: "Li-Ion Battery Sprayers"
+      synonyms:
+        - "lithium battery sprayer"
+        - "lithium ion sprayer"
+        - "li-ion sprayer"
+        - "lightweight battery sprayer"
+        - "long lasting battery sprayer"
+      description: "Lithium-ion battery sprayers for longer runtime and lighter weight"
+
+    - id: knapsack_sprayers
+      name: "knapsack_sprayers"
+      display_name: "Knapsack Sprayers"
+      synonyms:
+        - "manual sprayer"
+        - "hand pump sprayer"
+        - "backpack sprayer"
+        - "peeth wala sprayer"
+        - "hand sprayer"
+        - "dawai chidakne ki machine"
+      description: "Manual backpack sprayers for pesticide and fertilizer spraying"
+
+    - id: htp_sprayers
+      name: "htp_sprayers"
+      display_name: "HTP Sprayers"
+      synonyms:
+        - "high pressure sprayer"
+        - "HTP pump"
+        - "power sprayer"
+        - "high throw pump"
+        - "orchard sprayer"
+      description: "High-pressure HTP sprayers for large-scale spraying operations"
+
+    - id: htp_sprayer_sets
+      name: "htp_sprayer_sets"
+      display_name: "HTP Sprayer Sets"
+      synonyms:
+        - "HTP set"
+        - "HTP sprayer kit"
+        - "sprayer pump set"
+        - "complete HTP set"
+        - "HTP spray system"
+      description: "Complete HTP sprayer sets with pump, hose, and nozzles"
+
+    - id: boom_sprayers
+      name: "boom_sprayers"
+      display_name: "Boom Sprayers"
+      synonyms:
+        - "boom spray"
+        - "tractor sprayer"
+        - "field sprayer"
+        - "crop sprayer boom"
+        - "wide area sprayer"
+      description: "Boom sprayers for wide-area field spraying"
+
+    - id: portable_sprayers
+      name: "portable_sprayers"
+      display_name: "Portable Sprayers"
+      synonyms:
+        - "small sprayer"
+        - "garden sprayer"
+        - "hand held sprayer"
+        - "chhota sprayer"
+        - "home garden sprayer"
+      description: "Compact portable sprayers for garden and small-area use"
+
+    - id: trolley_sprayers
+      name: "trolley_sprayers"
+      display_name: "Trolley Sprayers"
+      synonyms:
+        - "wheeled sprayer"
+        - "trolley pump"
+        - "trolley spray machine"
+        - "cart sprayer"
+      description: "Wheeled trolley-mounted sprayers for easy mobility"
+
+    - id: sprayer_spare_parts
+      name: "sprayer_spare_parts"
+      display_name: "Sprayer Spare Parts"
+      synonyms:
+        - "sprayer parts"
+        - "spray nozzle"
+        - "sprayer pump parts"
+        - "sprayer hose"
+        - "sprayer lance"
+        - "sprayer repair"
+      description: "Replacement nozzles, hoses, and parts for sprayer maintenance"
+
+    # --------------------------------------------------------------------------
+    # WATER PUMPS
+    # --------------------------------------------------------------------------
+    - id: water_pumps
+      name: "water_pumps"
+      display_name: "Water Pumps"
+      synonyms:
+        - "pump"
+        - "water pump machine"
+        - "pani ki motor"
+        - "irrigation pump"
+        - "petrol water pump"
+        - "diesel water pump"
+        - "centrifugal pump"
+        - "sinchai pump"
+      description: "Water pumps for irrigation and water transfer"
+
+    - id: water_pump_parts
+      name: "water_pump_parts"
+      display_name: "Water Pump Parts"
+      synonyms:
+        - "pump parts"
+        - "pump repair parts"
+        - "impeller"
+        - "pump seal"
+        - "pump bearing"
+        - "motor parts"
+      description: "Replacement parts for water pump maintenance and repair"
+
+  # ============================================================================
+  # ATTRIBUTES - None for now (classification-only graph)
+  # ============================================================================
+  attributes: []
+
+edges: []

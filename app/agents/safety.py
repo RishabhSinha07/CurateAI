@@ -17,6 +17,35 @@ from app.knowledge.graph_loader import get_knowledge_graph
 settings = get_settings()
 logger = logging.getLogger(__name__)
 
+# Domain-specific default disclaimers. Domains not listed here get no default disclaimer.
+_DOMAIN_DISCLAIMERS: dict[str, str] = {
+    "wellness": (
+        "These statements have not been evaluated by the FDA. These products "
+        "are not intended to diagnose, treat, cure, or prevent any disease. "
+        "Please consult with a healthcare professional before starting any "
+        "new supplement regimen."
+    ),
+    "rural-equipment": (
+        "Always follow the manufacturer's safety instructions and wear "
+        "appropriate protective equipment when operating machinery. "
+        "Specifications are provided by the manufacturer and may vary."
+    ),
+}
+
+
+def _get_default_disclaimer(domain_slug: str | None) -> list[str]:
+    """Return domain-appropriate default disclaimer, or empty list if none applies."""
+    if not domain_slug:
+        # Backward compat: default to wellness disclaimer when domain is unknown
+        return [_DOMAIN_DISCLAIMERS["wellness"]]
+    # Check exact match first
+    disclaimer = _DOMAIN_DISCLAIMERS.get(domain_slug)
+    if not disclaimer:
+        # All non-rural domains are wellness-related
+        if domain_slug != "rural-equipment":
+            disclaimer = _DOMAIN_DISCLAIMERS.get("wellness")
+    return [disclaimer] if disclaimer else []
+
 
 class SafetyResponse(BaseModel):
     """Structured response from the Safety agent."""
@@ -56,6 +85,7 @@ async def safety_agent(state: AgentState) -> AgentState:
     5. Handles out-of-scope requests gracefully
     """
     status = state.get("status", "")
+    domain_slug = state.get("domain_slug")
     domain_config = state.get("domain_config") or {}
     final_products = state.get("final_products", [])
     extracted_context = state.get("extracted_context", {})
@@ -247,19 +277,17 @@ Your Tasks:
             if result.disclaimers:
                 response += "\n\n" + format_disclaimers(result.disclaimers)
             elif result.contains_medical_claims:
-                default_disclaimer = [
-                    "These statements have not been evaluated by the FDA. These products are not intended to diagnose, treat, cure, or prevent any disease. Please consult with a healthcare professional before starting any new supplement regimen."
-                ]
-                response += "\n\n" + format_disclaimers(default_disclaimer)
+                default_disclaimer = _get_default_disclaimer(domain_slug)
+                if default_disclaimer:
+                    response += "\n\n" + format_disclaimers(default_disclaimer)
         except Exception as e:
             logger.warning(f"Direct product LLM call failed, using fallback: {e}")
             response = f"Here are products matching **{direct_search_term}**."
 
-        # Always append default disclaimer
-        default_disclaimer = [
-            "These statements have not been evaluated by the FDA. These products are not intended to diagnose, treat, cure, or prevent any disease. Please consult with a healthcare professional before starting any new supplement regimen."
-        ]
-        response += "\n\n" + format_disclaimers(default_disclaimer)
+        # Append domain-appropriate default disclaimer
+        default_disclaimer = _get_default_disclaimer(domain_slug)
+        if default_disclaimer:
+            response += "\n\n" + format_disclaimers(default_disclaimer)
 
         # Append domain-specific disclaimers if available
         if safety_disclaimers:
@@ -281,11 +309,9 @@ Your Tasks:
         if safety_disclaimers:
             journey_response += "\n\n" + format_disclaimers(safety_disclaimers)
         else:
-            # Default disclaimer
-            default_disclaimer = [
-                "These statements have not been evaluated by the FDA. These products are not intended to diagnose, treat, cure, or prevent any disease. Please consult with a healthcare professional before starting any new supplement regimen."
-            ]
-            journey_response += "\n\n" + format_disclaimers(default_disclaimer)
+            default_disclaimer = _get_default_disclaimer(domain_slug)
+            if default_disclaimer:
+                journey_response += "\n\n" + format_disclaimers(default_disclaimer)
 
         new_state = state.copy()
         new_state["response"] = journey_response
@@ -460,11 +486,9 @@ Your Tasks:
     if result.disclaimers:
         final_response += "\n\n" + format_disclaimers(result.disclaimers)
     elif result.contains_medical_claims:
-        # Default disclaimer for health products
-        default_disclaimer = [
-            "These statements have not been evaluated by the FDA. These products are not intended to diagnose, treat, cure, or prevent any disease. Please consult with a healthcare professional before starting any new supplement regimen."
-        ]
-        final_response += "\n\n" + format_disclaimers(default_disclaimer)
+        default_disclaimer = _get_default_disclaimer(domain_slug)
+        if default_disclaimer:
+            final_response += "\n\n" + format_disclaimers(default_disclaimer)
 
     # Layer 5: Append domain-specific disclaimers programmatically
     if safety_disclaimers:
