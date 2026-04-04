@@ -179,6 +179,7 @@ async def safety_agent(state: AgentState) -> AgentState:
     domain_slug = state.get("domain_slug")
     domain_config = state.get("domain_config") or {}
     final_products = state.get("final_products", [])
+    user_message = state.get("user_message", "")
     extracted_context = state.get("extracted_context", {})
     safety_disclaimers = domain_config.get("safety_disclaimers", [])
 
@@ -355,6 +356,9 @@ Write a short, conversational response (60-100 words) that:
 
 **Language guidelines:**
 {dp_config["language_guidelines"]}
+
+**IMPORTANT: Respond in the same language as the user's message below.**
+User's message: "{user_message}"
 
 Your Tasks:
 1. RESPONSE: Write the brief response
@@ -548,6 +552,9 @@ Write your response following these 4 layers IN ORDER:
 
 **Language guidelines:**
 {main_config["language_guidelines"]}
+
+**IMPORTANT: Respond in the same language as the user's message below.**
+User's message: "{user_message}"
 
 Your Tasks:
 1. RESPONSE: Write the 4-layer response as described

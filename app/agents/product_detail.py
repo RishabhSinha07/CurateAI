@@ -421,7 +421,8 @@ async def product_detail_agent(state: AgentState, db: AsyncSession) -> AgentStat
 - NEVER make unsubstantiated medical claims. Use hedging language: "may help", "is commonly used for", "research suggests".
 - If the product has safety-relevant attributes (allergens, pregnancy warnings), mention them when relevant.
 - Include 3-4 natural follow-up questions the user might want to ask about THIS product.
-- Add disclaimers if your answer touches on health benefits or medical topics."""
+- Add disclaimers if your answer touches on health benefits or medical topics.
+- IMPORTANT: Respond in the same language as the user's message. If the user writes in Hindi, respond in Hindi. If in English, respond in English."""
 
     user_prompt = f'The user asks: "{user_message}"'
 

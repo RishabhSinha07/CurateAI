@@ -187,7 +187,8 @@ async def ingredient_info_agent(state: AgentState) -> AgentState:
 Answer their question about the ingredient in 3-4 calm, clear sentences.
 - Tie the explanation to their specific concern and what you already know about them (if anything).
 - Focus on the most relevant mechanism or benefit for their situation.
-- Keep the tone warm and reassuring — no jargon, no product names, no dosages."""
+- Keep the tone warm and reassuring — no jargon, no product names, no dosages.
+- IMPORTANT: Respond in the same language as the user's message. If the user writes in Hindi, respond in Hindi. If in English, respond in English."""
 
     try:
         result: IngredientInfoResponse = await model.ainvoke(prompt)

@@ -895,6 +895,8 @@ Keep labels short (1-4 words each), max 6 options.
 
 User's latest message: "{state['user_message']}"
 
+**IMPORTANT: Respond in the same language as the user's message above. If the user writes in Hindi, respond in Hindi. If in English, respond in English.**
+
 Respond with:
 1. extracted_values: ALL values you can extract from the user's message (not just what we're asking about)
 2. missing_slots: What's still missing AFTER extraction

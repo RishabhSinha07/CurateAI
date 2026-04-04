@@ -100,6 +100,7 @@ Rules:
 - search_query should be descriptive and natural (good for semantic/embedding search).
 - suggested_replies should have 2-3 quick options the user can tap.
 - Keep questions friendly and brief.
+- IMPORTANT: Respond in the same language as the user's message. If the user writes in Hindi, respond in Hindi. If in English, respond in English.
 """
 
     model = get_fallback_model()
