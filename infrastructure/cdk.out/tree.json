@@ -65,8 +65,31 @@
                     "attributes": {
                       "aws:cdk:cloudformation:type": "AWS::EC2::Subnet",
                       "aws:cdk:cloudformation:props": {
+                        "assignIpv6AddressOnCreation": true,
                         "availabilityZone": "us-east-1a",
                         "cidrBlock": "10.0.0.0/24",
+                        "ipv6CidrBlock": {
+                          "Fn::Select": [
+                            0,
+                            {
+                              "Fn::Cidr": [
+                                {
+                                  "Fn::Select": [
+                                    0,
+                                    {
+                                      "Fn::GetAtt": [
+                                        "CurateAIVPC67003679",
+                                        "Ipv6CidrBlocks"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                256,
+                                "64"
+                              ]
+                            }
+                          ]
+                        },
                         "mapPublicIpOnLaunch": true,
                         "tags": [
                           {
@@ -217,8 +240,31 @@
                     "attributes": {
                       "aws:cdk:cloudformation:type": "AWS::EC2::Subnet",
                       "aws:cdk:cloudformation:props": {
+                        "assignIpv6AddressOnCreation": true,
                         "availabilityZone": "us-east-1b",
                         "cidrBlock": "10.0.1.0/24",
+                        "ipv6CidrBlock": {
+                          "Fn::Select": [
+                            1,
+                            {
+                              "Fn::Cidr": [
+                                {
+                                  "Fn::Select": [
+                                    0,
+                                    {
+                                      "Fn::GetAtt": [
+                                        "CurateAIVPC67003679",
+                                        "Ipv6CidrBlocks"
+                                      ]
+                                    }
+                                  ]
+                                },
+                                256,
+                                "64"
+                              ]
+                            }
+                          ]
+                        },
                         "mapPublicIpOnLaunch": true,
                         "tags": [
                           {
@@ -475,6 +521,63 @@
               "version": "2.120.0"
             }
           },
+          "VPC-IPv6-CIDR": {
+            "id": "VPC-IPv6-CIDR",
+            "path": "CurateAI-Network/VPC-IPv6-CIDR",
+            "attributes": {
+              "aws:cdk:cloudformation:type": "AWS::EC2::VPCCidrBlock",
+              "aws:cdk:cloudformation:props": {
+                "amazonProvidedIpv6CidrBlock": true,
+                "vpcId": {
+                  "Ref": "CurateAIVPC67003679"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_ec2.CfnVPCCidrBlock",
+              "version": "2.120.0"
+            }
+          },
+          "IPv6-Route-0": {
+            "id": "IPv6-Route-0",
+            "path": "CurateAI-Network/IPv6-Route-0",
+            "attributes": {
+              "aws:cdk:cloudformation:type": "AWS::EC2::Route",
+              "aws:cdk:cloudformation:props": {
+                "destinationIpv6CidrBlock": "::/0",
+                "gatewayId": {
+                  "Ref": "CurateAIVPCIGW27242168"
+                },
+                "routeTableId": {
+                  "Ref": "CurateAIVPCPublicSubnet1RouteTableB2BA8702"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_ec2.CfnRoute",
+              "version": "2.120.0"
+            }
+          },
+          "IPv6-Route-1": {
+            "id": "IPv6-Route-1",
+            "path": "CurateAI-Network/IPv6-Route-1",
+            "attributes": {
+              "aws:cdk:cloudformation:type": "AWS::EC2::Route",
+              "aws:cdk:cloudformation:props": {
+                "destinationIpv6CidrBlock": "::/0",
+                "gatewayId": {
+                  "Ref": "CurateAIVPCIGW27242168"
+                },
+                "routeTableId": {
+                  "Ref": "CurateAIVPCPublicSubnet2RouteTableEC7CE134"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_ec2.CfnRoute",
+              "version": "2.120.0"
+            }
+          },
           "Fargate-SG": {
             "id": "Fargate-SG",
             "path": "CurateAI-Network/Fargate-SG",
@@ -500,6 +603,13 @@
                         "fromPort": 8000,
                         "toPort": 8000,
                         "description": "Allow HTTP traffic from internet"
+                      },
+                      {
+                        "cidrIpv6": "::/0",
+                        "ipProtocol": "tcp",
+                        "fromPort": 8000,
+                        "toPort": 8000,
+                        "description": "Allow HTTP traffic from internet (IPv6)"
                       }
                     ],
                     "tags": [
@@ -1740,7 +1850,7 @@
                             },
                             "integrationMethod": "ANY",
                             "integrationType": "HTTP_PROXY",
-                            "integrationUri": "http://3.82.127.19:8000/health",
+                            "integrationUri": "http://100.31.118.198:8000/health",
                             "payloadFormatVersion": "1.0"
                           }
                         },
@@ -1809,7 +1919,7 @@
                             },
                             "integrationMethod": "ANY",
                             "integrationType": "HTTP_PROXY",
-                            "integrationUri": "http://3.82.127.19:8000/chat",
+                            "integrationUri": "http://100.31.118.198:8000/chat",
                             "payloadFormatVersion": "1.0"
                           }
                         },
@@ -1969,7 +2079,7 @@
                             },
                             "integrationMethod": "ANY",
                             "integrationType": "HTTP_PROXY",
-                            "integrationUri": "http://3.82.127.19:8000/events",
+                            "integrationUri": "http://100.31.118.198:8000/events",
                             "payloadFormatVersion": "1.0"
                           }
                         },
@@ -2041,7 +2151,7 @@
                             },
                             "integrationMethod": "ANY",
                             "integrationType": "HTTP_PROXY",
-                            "integrationUri": "http://3.82.127.19:8000/admin/products",
+                            "integrationUri": "http://100.31.118.198:8000/admin/products",
                             "payloadFormatVersion": "1.0"
                           }
                         },
@@ -2113,7 +2223,7 @@
                             },
                             "integrationMethod": "ANY",
                             "integrationType": "HTTP_PROXY",
-                            "integrationUri": "http://3.82.127.19:8000/admin/api-keys/rotate",
+                            "integrationUri": "http://100.31.118.198:8000/admin/api-keys/rotate",
                             "payloadFormatVersion": "1.0"
                           }
                         },

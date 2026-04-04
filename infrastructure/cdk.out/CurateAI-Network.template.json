@@ -42,8 +42,31 @@
   "CurateAIVPCPublicSubnet1SubnetB5E92D6E": {
    "Type": "AWS::EC2::Subnet",
    "Properties": {
+    "AssignIpv6AddressOnCreation": true,
     "AvailabilityZone": "us-east-1a",
     "CidrBlock": "10.0.0.0/24",
+    "Ipv6CidrBlock": {
+     "Fn::Select": [
+      0,
+      {
+       "Fn::Cidr": [
+        {
+         "Fn::Select": [
+          0,
+          {
+           "Fn::GetAtt": [
+            "CurateAIVPC67003679",
+            "Ipv6CidrBlocks"
+           ]
+          }
+         ]
+        },
+        256,
+        "64"
+       ]
+      }
+     ]
+    },
     "MapPublicIpOnLaunch": true,
     "Tags": [
      {
@@ -83,6 +106,9 @@
      "Ref": "CurateAIVPC67003679"
     }
    },
+   "DependsOn": [
+    "VPCIPv6CIDR"
+   ],
    "Metadata": {
     "aws:cdk:path": "CurateAI-Network/CurateAI-VPC/PublicSubnet1/Subnet"
    }
@@ -159,8 +185,31 @@
   "CurateAIVPCPublicSubnet2SubnetB85A5986": {
    "Type": "AWS::EC2::Subnet",
    "Properties": {
+    "AssignIpv6AddressOnCreation": true,
     "AvailabilityZone": "us-east-1b",
     "CidrBlock": "10.0.1.0/24",
+    "Ipv6CidrBlock": {
+     "Fn::Select": [
+      1,
+      {
+       "Fn::Cidr": [
+        {
+         "Fn::Select": [
+          0,
+          {
+           "Fn::GetAtt": [
+            "CurateAIVPC67003679",
+            "Ipv6CidrBlocks"
+           ]
+          }
+         ]
+        },
+        256,
+        "64"
+       ]
+      }
+     ]
+    },
     "MapPublicIpOnLaunch": true,
     "Tags": [
      {
@@ -200,6 +249,9 @@
      "Ref": "CurateAIVPC67003679"
     }
    },
+   "DependsOn": [
+    "VPCIPv6CIDR"
+   ],
    "Metadata": {
     "aws:cdk:path": "CurateAI-Network/CurateAI-VPC/PublicSubnet2/Subnet"
    }
@@ -432,6 +484,48 @@
     "aws:asset:property": "Code"
    }
   },
+  "VPCIPv6CIDR": {
+   "Type": "AWS::EC2::VPCCidrBlock",
+   "Properties": {
+    "AmazonProvidedIpv6CidrBlock": true,
+    "VpcId": {
+     "Ref": "CurateAIVPC67003679"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/VPC-IPv6-CIDR"
+   }
+  },
+  "IPv6Route0": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationIpv6CidrBlock": "::/0",
+    "GatewayId": {
+     "Ref": "CurateAIVPCIGW27242168"
+    },
+    "RouteTableId": {
+     "Ref": "CurateAIVPCPublicSubnet1RouteTableB2BA8702"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/IPv6-Route-0"
+   }
+  },
+  "IPv6Route1": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationIpv6CidrBlock": "::/0",
+    "GatewayId": {
+     "Ref": "CurateAIVPCIGW27242168"
+    },
+    "RouteTableId": {
+     "Ref": "CurateAIVPCPublicSubnet2RouteTableEC7CE134"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Network/IPv6-Route-1"
+   }
+  },
   "FargateSG3742C269": {
    "Type": "AWS::EC2::SecurityGroup",
    "Properties": {
@@ -447,6 +541,13 @@
      {
       "CidrIp": "0.0.0.0/0",
       "Description": "Allow HTTP traffic from internet",
+      "FromPort": 8000,
+      "IpProtocol": "tcp",
+      "ToPort": 8000
+     },
+     {
+      "CidrIpv6": "::/0",
+      "Description": "Allow HTTP traffic from internet (IPv6)",
       "FromPort": 8000,
       "IpProtocol": "tcp",
       "ToPort": 8000
@@ -485,7 +586,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/22QwQ6CMAyGn4X7mIBPgByINwLGqxmjYhU2s3USQnh3pxLx4Knt16b/3yY8TiIeBWKwoWxuYYc1nyoS8sY8OoFM+HS8S5ad1bHIWOHqDmXlagX0YmtWakdwEHUHK19Zaq2WKAi1+g6/kr0iMH4yFwSDGBeZpUrJ+7j0oIhVIJ1BGnOj3f0t8AtmVoLVzki/01nS/Vp6rf+twugHNmB2wgLz9oD81S2qdmbFSBetNlv/Gh4HV4sYGqcIe+DlJz4B0i6n0TYBAAA="
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/22QsQ7CMAxEv4U9DVC+ADogtqpFrChNDRjauEocUIX4dwxUlIHJvueT7uRUz9OZnk3MLSS2viQNVvpesrEXJWgPNtX3XWdVdnC7PFN5rBq0Zawc8IuNW0GRYWuqBkY+smUIZNEwkvuaX8vGMXhxrg3DzfRDzKCWLD1OLTgeeIa1XzUk3Uqw0SP3a0+xewf+gocqIFD0VjJiYGpHKdn/T7mnK9bgVyaAkrrA8oUjuuND5T2fyE0X8io9n5wDYuKjY2xBF5/5BKUawLxGAQAA"
    },
    "Metadata": {
     "aws:cdk:path": "CurateAI-Network/CDKMetadata/Default"

@@ -25,7 +25,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/2dc57f4ec640cb21026f476c8312d3a79999472e3ab8f51bc06bf023b273f9a0.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/80c23b6cfa75b8b031967472852501145ee39777bca4a7b16a08dc1f7b3fbf34.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -150,6 +150,24 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E"
+          }
+        ],
+        "/CurateAI-Network/VPC-IPv6-CIDR": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "VPCIPv6CIDR"
+          }
+        ],
+        "/CurateAI-Network/IPv6-Route-0": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "IPv6Route0"
+          }
+        ],
+        "/CurateAI-Network/IPv6-Route-1": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "IPv6Route1"
           }
         ],
         "/CurateAI-Network/Fargate-SG/Resource": [
@@ -425,7 +443,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/7c1212fb478b05d180ea1fd7cf31b91fc62716b9e4c3d5dafa6d946dbcc3208a.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/abda4dd67c3109912fe6fd6c76c7e306bc847e67e2f9b44c74029eb4f66766c9.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [

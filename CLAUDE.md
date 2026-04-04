@@ -4,236 +4,175 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-CurateAI is a multi-agent AI consultation system for product recommendations. It uses a polymorphic database schema to support multiple domains (wellness/skincare, tools, etc.) with domain-specific slot requirements and search filters.
+CurateAI is a multi-agent AI consultation system for personalized product recommendations. It uses LangGraph to orchestrate specialized agents, a knowledge graph (NetworkX + YAML) for domain intelligence, and hybrid search (pgvector + JSONB filters) over a polymorphic product catalog. The system is multi-tenant with API key authentication.
 
-## Architecture
-
-### Multi-Agent System
-
-Five specialized agents work together in a supervisor pattern:
-
-1. **Router Agent** - Classifies user intent and maps to a domain (e.g., "dark spots" → skin-care)
-2. **Interviewer Agent** - Fills required slots by asking clarifying questions before search
-3. **Search Architect Agent** - Expands queries and executes hybrid search (vector + SQL filters)
-4. **Reranker Agent** - Filters search results based on user constraints (budget, allergies, etc.)
-5. **Safety Agent** - Monitors output for medical claims and adds appropriate disclaimers
-
-### State Machine Flow
-
-- `AWAITING_SLOT`: System asked a question, waiting for user response
-- `collecting_info`: Gathering required slots before search
-- `completed`: Consultation finished with recommendations
-
-The Orchestrator checks session state before routing:
-1. If awaiting slot answer → send to Interviewer (bypass Router)
-2. If intent drift detected → trigger Re-Route
-3. If new conversation → trigger Router
-
-### Database Schema (PostgreSQL + pgvector)
-
-- **`domains`** - AI persona config, required slots, search filters per category
-- **`products`** - Universal catalog with JSONB `attributes` for domain-specific specs and `description_embedding` vector(1024) for semantic search
-- **`chat_sessions`** - Active state with `current_domain_id` and `extracted_context` JSONB (short-term memory)
-- **`chat_messages`** - Chronological history with `suggested_product_ids`
-
-### Context Management
-
-- **Long-term memory**: `extracted_context` JSONB in sessions (e.g., `{"skin_type": "oily"}`)
-- **Short-term memory**: Last 3-5 messages from `chat_messages`
-- **System prompt injection**: Current extracted facts to prevent repeated questions
-
-## Design Decisions
-
-| Aspect | Decision |
-|--------|----------|
-| **Domain Hierarchy** | 2 levels max (parent → child, e.g., wellness → skin-care) |
-| **Config Inheritance** | Child domains inherit + extend parent's slots/persona/safety rules |
-| **Vector Search** | Single description embedding per product (not multi-vector) |
-| **Memory** | Session-only, no user profiles (privacy-friendly, guests welcome) |
-| **Slot-filling** | Ask all required slots upfront, one more pass if missing, then proceed |
-| **Reranker** | Separate from Search Architect for filtering based on constraints |
-
-## Tech Stack
-
-```
-┌──────────────────────────────────────────────────┐
-│                  FastAPI                         │
-│            (async, Pydantic models)              │
-├──────────────────────────────────────────────────┤
-│                  LangGraph                       │
-│         (state machine, checkpointing)           │
-├──────────────────────────────────────────────────┤
-│                 AWS Bedrock                      │
-│   Claude 3.5 Haiku (agents)                      │
-│   Titan Embed v2 (embeddings, 1024 dims)         │
-├──────────────────────────────────────────────────┤
-│          PostgreSQL + pgvector                   │
-│     (products, domains, sessions, messages)      │
-└──────────────────────────────────────────────────┘
-```
-
-### Dependencies
-
-See `pyproject.toml` for full list. Key dependencies:
-- **FastAPI** + **uvicorn** - Async web framework
-- **SQLAlchemy 2.0** + **asyncpg** - Async database ORM
-- **pgvector** - Vector similarity search
-- **LangGraph** - Multi-agent state machine
-- **langchain-aws** - AWS Bedrock integration
-- **boto3** - AWS Bedrock for Titan embeddings
-- **Alembic** - Database migrations
-
-## Project Structure
-
-```
-curate-ai/
-├── app/
-│   ├── __init__.py
-│   ├── main.py                 # FastAPI app entry point ✅
-│   ├── config.py               # Pydantic settings ✅
-│   ├── api/
-│   │   ├── routes/
-│   │   │   └── chat.py         # POST /chat endpoint (TODO)
-│   │   └── deps.py             # dependencies (TODO)
-│   ├── agents/
-│   │   ├── graph.py            # LangGraph state machine (TODO)
-│   │   ├── router.py           # Router agent (TODO)
-│   │   ├── interviewer.py      # Slot-filler agent (TODO)
-│   │   ├── search.py           # Search Architect agent (TODO)
-│   │   ├── reranker.py         # Reranker agent (TODO)
-│   │   └── safety.py           # Safety agent (TODO)
-│   ├── db/
-│   │   ├── models.py           # SQLAlchemy models ✅
-│   │   ├── session.py          # Async DB connection ✅
-│   │   ├── seed_wellbeing.py   # Wellbeing Nutrition products ✅
-│   │   └── repositories/       # data access layer (TODO)
-│   └── services/
-│       ├── embeddings.py       # AWS Titan v2 embedding service ✅
-│       ├── generate_embeddings.py  # Script to embed products ✅
-│       └── search.py           # hybrid search logic (TODO)
-├── alembic/
-│   ├── env.py                  # Async migration config ✅
-│   ├── script.py.mako          # Migration template ✅
-│   └── versions/
-│       ├── 001_initial_schema.py  # Initial tables ✅
-│       └── 002_change_embedding_dimension.py  # Titan v2 (1024 dims) ✅
-├── tests/
-├── .env.example                # Environment template ✅
-├── .gitignore                  # Git ignores ✅
-├── .dockerignore               # Docker ignores ✅
-├── alembic.ini                 # Alembic config ✅
-├── docker-compose.yml          # Local dev services ✅
-├── Dockerfile                  # App container ✅
-├── pyproject.toml              # Dependencies ✅
-├── CLAUDE.md                   # Project guidance
-└── Database.md                 # Database architecture docs ✅
-```
-
-## Database Schema
-
-### domains table
-```sql
-CREATE TABLE domains (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name VARCHAR(50) UNIQUE NOT NULL,
-    slug VARCHAR(50) UNIQUE NOT NULL,
-    parent_domain_id UUID REFERENCES domains(id),  -- NULL for root
-    config JSONB NOT NULL,
-    -- config: {"required_slots": [], "optional_slots": [], "search_filters": [], "safety_disclaimers": []}
-    system_persona TEXT,
-    is_active BOOLEAN DEFAULT TRUE
-);
-```
-
-### Config merge logic (application layer)
-Child domains inherit parent config arrays and extend them. Child's `system_persona` overrides parent if set.
-
-## Configuration Decisions
-
-| Setting | Value | Notes |
-|---------|-------|-------|
-| **AWS Bedrock Region** | `us-east-1` | Primary region for Claude API calls |
-| **Authentication** | Open (none) | No auth for MVP; add later as needed |
-| **Deployment** | Local Docker | MVP runs via docker-compose; AWS deployment planned for later |
-
-## Quick Start
+## Development Commands
 
 ```bash
-# 1. Set up environment
-cp .env.example .env
-# Edit .env with your AWS credentials
-
-# 2. Start services
+# Start all services (PostgreSQL + pgvector, FastAPI app with hot-reload)
 docker compose up -d
 
-# 3. Run migrations
+# Run migrations
 docker compose exec app alembic upgrade head
 
-# 4. Seed sample data
+# Seed sample data (Wellbeing Nutrition products)
 docker compose exec app python -m app.db.seed
 
-# 5. Verify
+# Generate embeddings for seeded products
+docker compose exec app python -m app.services.generate_embeddings
+
+# Health check
 curl http://localhost:8000/health
-```
 
-## Useful Commands
-
-```bash
-# View logs
+# View app logs
 docker compose logs -f app
 
 # Access database
 docker compose exec db psql -U postgres -d curateai
 
-# Create new migration
+# Create a new migration
 docker compose exec app alembic revision --autogenerate -m "description"
 
-# Reset database
+# Reset database completely
 docker compose down -v && docker compose up -d
+```
 
-# Run tests (when implemented)
+### Linting & Type Checking
+
+```bash
+# Lint (ruff, line-length=100, py311)
+ruff check app/
+ruff check --fix app/
+
+# Type check (strict mode, pydantic plugin)
+mypy app/
+```
+
+### Testing
+
+```bash
+# Run all tests
 docker compose exec app pytest
+
+# Run a single test file
+docker compose exec app pytest tests/unit/agents/test_router.py
+
+# Run a specific test
+docker compose exec app pytest tests/unit/agents/test_router.py::test_function_name -v
+
+# Async mode is auto-configured (asyncio_mode = "auto" in pyproject.toml)
 ```
 
-## Seed Data
+## Architecture
 
-Data sourced from [Wellbeing Nutrition](https://wellbeingnutrition.com/)
+### LangGraph State Machine (10 nodes)
 
-### Domain Hierarchy
+The `ConsultationGraph` (`app/agents/graph.py`) compiles a LangGraph `StateGraph` with conditional routing. All agent state flows through `AgentState` (`app/agents/state.py`).
+
 ```
-Wellness (root)
-├── Melts         → health_goal (oral thin strips)
-├── Collagen      → skin_concern, collagen_preference
-├── Slow Capsules → health_goal, gender
-└── Effervescent  → health_goal
+Entry (should_route_to):
+├─ status="active" → router
+├─ status="awaiting_slot" → router (with safety override for slot answers)
+├─ status="completed" → refinement
+└─ status="fallback_conversation" → fallback
+
+Router Decision (after_router):
+├─ intent="fallback" → fallback
+├─ intent="journey" → journey
+├─ intent="ingredient_info" → ingredient_info
+├─ intent="direct_product" → search (bypass interviewer)
+├─ intent="filter" → refinement
+└─ default → interviewer
+
+Interviewer Decision (after_interviewer):
+├─ problem just identified → initial_products → interviewer
+├─ all slots filled → search → reranker → safety → END
+├─ missing slots → END (status=awaiting_slot)
+└─ user accepted initial products → safety → END
 ```
 
-### Products (34 total)
-| Domain | Count | Examples |
-|--------|-------|----------|
-| Melts | 11 | Vitamin B12, D3, Sleep, Energy, Hair, Iron, Calm |
-| Collagen | 8 | Pure Marine, Glow, Beauty, Matcha, Vegan Pro |
-| Slow Capsules | 10 | Magnesium, Multi for Her/Him, Probiotic, PCOS, Liver |
-| Effervescent | 5 | Probiotic, Daily Greens, Glutathione, ACV, Vitamin C |
+### Agent Responsibilities
 
-### Product Fields
-Each product includes: `name`, `brand`, `description`, `price`, `product_url`, `image_url`, and domain-specific `attributes` (health_goal, ingredients, format, etc.)
+| Agent | Purpose | LLM? |
+|-------|---------|------|
+| **Router** | Classify intent, map to domain, extract problem | Yes |
+| **Interviewer** | Fill required slots via graph-driven questions | Yes |
+| **Initial Products** | Fetch showcase products before interview completes | No (semantic search only) |
+| **Search Architect** | Build query from graph ingredients, execute hybrid search | No |
+| **Reranker** | Filter results by safety constraints (allergies, diet, pregnancy) | No (graph-based) |
+| **Safety** | Generate final response with disclaimers | Yes |
+| **Journey** | Match journey bundles, fetch products with usage guidance | Yes |
+| **Refinement** | Detect post-completion intent (refine, re-personalize, new topic) | Yes |
+| **Fallback** | Handle out-of-scope queries, search full catalog | Yes |
+| **Ingredient Info** | Answer educational ingredient questions without disrupting flow | Yes |
 
-## Implementation Progress
+### Knowledge Graph System
 
-- [x] Database models (Domain, Product, ChatSession, ChatMessage)
-- [x] Alembic migrations setup
-- [x] Docker Compose (PostgreSQL + pgvector, FastAPI app)
-- [x] Seed data script
-- [x] FastAPI app skeleton with health check
-- [x] Embeddings service (AWS Titan v2, 1024 dims)
-- [x] Generate embeddings for products
-- [x] Repository layer (Domain, Product, Session)
-- [x] Router Agent
-- [x] Interviewer Agent
-- [x] Search Architect Agent
-- [x] Reranker Agent
-- [x] Safety Agent
-- [x] LangGraph orchestration
-- [x] POST /chat endpoint
-- [ ] Integration tests
+Domain intelligence lives in YAML files (`app/knowledge/graphs/{domain}.yaml`) loaded into NetworkX DiGraphs at app startup.
+
+- **Graph Loader** (`app/knowledge/graph_loader.py`): YAML → NetworkX, cached at startup via FastAPI lifespan
+- **Query Engine** (`app/knowledge/query_engine.py`): Problem matching, ingredient boosting, constraint filtering
+- **Dynamic Questions** (`app/knowledge/dynamic_questions.py`): Generates interview questions from graph metadata
+
+The graph drives: slot requirements, search query expansion (problem → ingredients), safety constraint checks, and interview question generation.
+
+### Key State Fields in AgentState
+
+- `extracted_context.graph_state.filled_attributes` — Slot values from interview
+- `extracted_context.candidate_problem` — Unconfirmed problem for initial_products search
+- `extracted_context.pending_slot_question` — Current question (used by router's awaiting-slot safety override)
+- `extracted_context.inline_constraints` — Budget, diet, format from single message
+- `intent_type` — "query", "journey", "direct_product", "ingredient_info", "filter"
+- `status` — "active", "collecting_info", "awaiting_slot", "completed", "out_of_scope", "fallback_conversation"
+
+### Multi-Tenancy & Auth
+
+- **API key auth** (`app/api/middleware/auth.py`): X-API-Key header → SHA-256 hash → DB lookup with IP allowlist and expiry check
+- **Rate limiting** (`app/api/middleware/rate_limit.py`): In-memory sliding window per tenant (single-instance; needs Redis for multi-instance)
+- **Seed tenant** (UUID `00000000-0000-0000-0000-000000000001`): Fallback for requests without API key (backward compatibility)
+- **TenantContext** dataclass flows through all layers: enabled_domains, rate_limit_rpm, daily_cost_cap_cents
+
+### Database Layer
+
+- **ORM**: SQLAlchemy 2.0 async with asyncpg (`app/db/session.py`)
+- **Models** (`app/db/models.py`): Tenant, ApiKey, Product, ChatSession, ChatMessage, JourneyBundle, ProductEvent
+- **Repositories** (`app/db/repositories/`): SessionRepository, ProductRepository, TenantRepository, JourneyBundleRepository
+- **Hybrid search** (`ProductRepository.hybrid_search`): Cosine similarity on `description_embedding` (Vector 1024) + JSONB attribute filters + price filter, with fallback to lower similarity threshold if <3 results
+
+### LLM Integration
+
+- **Model**: Amazon Nova Pro via AWS Bedrock (`app/agents/llm.py`)
+- **Embeddings**: Amazon Titan Embed v2, 1024 dimensions (`app/services/embeddings.py`)
+- **Retry logic**: Tenacity with exponential backoff (1-8s, 4 attempts) for transient Bedrock errors
+- **LLM factory**: `get_bedrock_llm()` returns a retrying runnable wrapper around ChatBedrock
+
+## Design Decisions
+
+| Aspect | Decision |
+|--------|----------|
+| **Domain Hierarchy** | 2 levels max (parent → child); child inherits + extends parent config |
+| **Knowledge Graphs** | YAML + NetworkX (Phase 1); `use_db_graphs` setting for future DB-backed phase |
+| **Vector Search** | Single description embedding per product (not multi-vector) |
+| **Memory** | Session-only (`extracted_context` JSONB), no user profiles (privacy-friendly) |
+| **Slot-filling** | Ask all required slots upfront; one more pass if missing, then proceed |
+| **Reranker** | Graph-based constraint filtering, no LLM re-ranking |
+| **Awaiting-slot safety** | Router overrides out_of_scope classification when pending_slot_question exists (protects single-word answers like "Vegetarian") |
+| **Refinement UX** | Short contextual message for result filtering (no full LLM consultation repeat) |
+| **Product attributes** | JSONB polymorphic per domain (no schema changes needed for new domains) |
+
+## Configuration
+
+Settings are in `app/config.py` (Pydantic BaseSettings, loaded from env vars / `.env`).
+
+Key settings: `DATABASE_URL`, `AWS_REGION`, `BEDROCK_MODEL_ID` (default: `us.amazon.nova-pro-v1:0`), `EMBEDDING_MODEL_ID`, `EMBEDDING_DIMENSIONS` (1024), `ENVIRONMENT` (development/staging/production — controls docs visibility and log format).
+
+## API Endpoints
+
+- `POST /chat` — Main consultation endpoint. Takes `{message, session_id?}`, returns `{session_id, response, status, products, suggested_replies, journey_info?}`
+- `POST /events` — Product event tracking (click, add_to_cart, purchase)
+- `GET /health` — Database connectivity check
+- `/admin` — Admin routes
+
+## Middleware Stack (outermost → innermost)
+
+RequestLogging → CORS → Auth/RateLimit (per-route dependency)

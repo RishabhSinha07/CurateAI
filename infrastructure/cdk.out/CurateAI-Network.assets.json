@@ -15,7 +15,7 @@
         }
       }
     },
-    "2dc57f4ec640cb21026f476c8312d3a79999472e3ab8f51bc06bf023b273f9a0": {
+    "80c23b6cfa75b8b031967472852501145ee39777bca4a7b16a08dc1f7b3fbf34": {
       "source": {
         "path": "CurateAI-Network.template.json",
         "packaging": "file"
@@ -23,7 +23,7 @@
       "destinations": {
         "558599919081-us-east-1": {
           "bucketName": "cdk-hnb659fds-assets-558599919081-us-east-1",
-          "objectKey": "2dc57f4ec640cb21026f476c8312d3a79999472e3ab8f51bc06bf023b273f9a0.json",
+          "objectKey": "80c23b6cfa75b8b031967472852501145ee39777bca4a7b16a08dc1f7b3fbf34.json",
           "region": "us-east-1",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-file-publishing-role-558599919081-us-east-1"
         }
