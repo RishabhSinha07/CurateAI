@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 import logging
 from pydantic import BaseModel, Field, field_validator
 
@@ -45,6 +45,97 @@ def _get_default_disclaimer(domain_slug: str | None) -> list[str]:
         if domain_slug != "rural-equipment":
             disclaimer = _DOMAIN_DISCLAIMERS.get("wellness")
     return [disclaimer] if disclaimer else []
+
+
+# ---------------------------------------------------------------------------
+# Domain-aware response configuration
+# ---------------------------------------------------------------------------
+# Each entry controls the persona fallback, response layer wording, language
+# guidelines, and the suggested-reply filter chips shown after results.
+# Domains not listed here fall through to "_default" (wellness-style).
+
+_DOMAIN_RESPONSE_CONFIG: Dict[str, Dict[str, Any]] = {
+    "rural-equipment": {
+        "fallback_problem_label": "General equipment query",
+        "lifestyle_heading": "Practical Considerations",
+        "lifestyle_guidance": (
+            "2-3 practical, non-product suggestions relevant to the task "
+            "(safety precautions, maintenance tips, workspace or terrain setup)"
+        ),
+        "language_guidelines": (
+            '- Use phrases like "well-suited for", "designed to handle", "built for"\n'
+            "- Never overstate equipment capabilities beyond manufacturer specifications"
+        ),
+        # (attr_key, exclude_value_if_present, chip_label)
+        "refinement_filters": [
+            ("power_type", None, "Electric option"),
+            ("category", None, "Show accessories"),
+        ],
+    },
+    "_default": {
+        "fallback_problem_label": "General wellness query",
+        "lifestyle_heading": "Lifestyle Foundations",
+        "lifestyle_guidance": (
+            "2-3 practical, non-product suggestions relevant to the problem "
+            "(sleep, hydration, stress, diet tips)"
+        ),
+        "language_guidelines": (
+            '- Use phrases like "may support", "designed to help", "formulated for"\n'
+            "- Never claim products treat, cure, or prevent any disease"
+        ),
+        "refinement_filters": [
+            ("dietary_preference", "vegan", "Vegan options"),
+            ("format_preference", None, "Capsule form"),
+        ],
+    },
+}
+
+
+def _get_domain_response_config(domain_slug: str | None) -> Dict[str, Any]:
+    """Return the response config for *domain_slug*, falling back to _default."""
+    if domain_slug and domain_slug in _DOMAIN_RESPONSE_CONFIG:
+        return _DOMAIN_RESPONSE_CONFIG[domain_slug]
+    return _DOMAIN_RESPONSE_CONFIG["_default"]
+
+
+def _get_persona(domain_slug: str | None) -> str:
+    """Return the persona string from the knowledge graph, with fallback."""
+    if domain_slug:
+        try:
+            graph = get_knowledge_graph(domain_slug)
+            if graph.metadata and graph.metadata.persona:
+                return graph.metadata.persona
+        except Exception:
+            pass
+    return "You are a wellness consultant for CurateAI."
+
+
+def _build_filter_suggestions(
+    config: Dict[str, Any],
+    extracted_context: Dict[str, Any],
+    filled_attrs: Dict[str, Any],
+    new_constraints: Dict[str, Any] | None = None,
+) -> List[str]:
+    """Build domain-appropriate filter suggestion chips."""
+    suggestions: List[str] = []
+    check_source = new_constraints if new_constraints is not None else extracted_context
+    for attr_key, exclude_value, label in config["refinement_filters"]:
+        if exclude_value:
+            # Check if user already has this value
+            current_val = str(check_source.get(attr_key) or "").lower()
+            if new_constraints is None:
+                # Also check filled_attrs for the main flow
+                current_val += " " + " ".join(
+                    str(v.get("value", "")).lower()
+                    for v in filled_attrs.values()
+                    if isinstance(v, dict)
+                )
+            if exclude_value not in current_val:
+                suggestions.append(label)
+        else:
+            if attr_key not in check_source:
+                suggestions.append(label)
+    return suggestions
 
 
 class SafetyResponse(BaseModel):
@@ -216,11 +307,10 @@ async def safety_agent(state: AgentState) -> AgentState:
         # the slot question's answer options, which the Interviewer will provide
         # on the next turn. Leave empty here.
         if not resume_interview:
-            diet_val = str(new_constraints.get("dietary_preference", "")).lower()
-            if "vegan" not in diet_val:
-                filter_suggestions.append("Vegan options")
-            if "format_preference" not in new_constraints:
-                filter_suggestions.append("Capsule form")
+            refine_config = _get_domain_response_config(domain_slug)
+            filter_suggestions.extend(
+                _build_filter_suggestions(refine_config, extracted_context, {}, new_constraints)
+            )
         new_state["suggested_replies"] = filter_suggestions
         return new_state
 
@@ -244,7 +334,10 @@ async def safety_agent(state: AgentState) -> AgentState:
             product_summaries.append(summary)
         products_block = "\n".join(f"- {s}" for s in product_summaries) if product_summaries else "No product details available."
 
-        direct_prompt = f"""You are a wellness consultant for CurateAI. The user searched directly for **{direct_search_term}**.
+        dp_persona = _get_persona(domain_slug)
+        dp_config = _get_domain_response_config(domain_slug)
+
+        direct_prompt = f"""{dp_persona} The user searched directly for **{direct_search_term}**.
 
 Here are the top matching products (product cards are shown separately by the UI — do NOT list product names):
 {products_block}
@@ -257,10 +350,11 @@ Write a short, conversational response (60-100 words) that:
 **Rules:**
 - Do NOT list or name individual products — the UI handles that
 - Do NOT greet the user
-- Use hedging language: "may help", "known to support", "often used for"
-- Never claim products treat, cure, or prevent disease
 - Use **bold** for key terms
 - Keep it warm but concise
+
+**Language guidelines:**
+{dp_config["language_guidelines"]}
 
 Your Tasks:
 1. RESPONSE: Write the brief response
@@ -376,6 +470,10 @@ Your Tasks:
     else:
         ingredients_block = "No specific ingredient data available."
 
+    # Domain-aware config and persona for the main response flow
+    main_persona = _get_persona(domain_slug)
+    main_config = _get_domain_response_config(domain_slug)
+
     # Build problem block
     problem_block = ""
     if problem_display_name:
@@ -383,7 +481,7 @@ Your Tasks:
         if problem_description:
             problem_block += f" — {problem_description}"
     else:
-        problem_block = "General wellness query"
+        problem_block = main_config["fallback_problem_label"]
 
     # Regular query flow — product cards are rendered by the frontend,
     # so we only build the intro text here.
@@ -398,7 +496,7 @@ Applied Constraints:
 {constraint_list}
 """
 
-    system_prompt = f"""You are a wellness consultant for CurateAI. Generate a structured, deeply personalized response using **Markdown**.
+    system_prompt = f"""{main_persona} Generate a structured, deeply personalized response using **Markdown**.
 
 The product cards are displayed separately by the UI — do NOT list individual product names.
 
@@ -424,13 +522,13 @@ Write your response following these 4 layers IN ORDER:
 (Layer 1 — Reflect, 2-3 sentences) Restate the user's situation using their profile and concern. Show you understood their specific circumstances. No greetings, no filler, no acknowledgment phrases ("I heard you're looking for...").
 
 ## What's Going On
-(Layer 2 — Reframe, 2-3 sentences) Based on the problem description and treating ingredients, explain possible drivers or mechanisms behind the concern. Use hedging language — "may", "often", "could" — never diagnose.
+(Layer 2 — Reframe, 2-3 sentences) Based on the problem description and key information, explain possible drivers or mechanisms behind the concern. Use hedging language — "may", "often", "could".
 
 ## What Can Help
 (Layer 3 — Recommendations)
 
-**Lifestyle Foundations**
-- 2-3 practical, non-product suggestions relevant to the problem (sleep, hydration, stress, diet tips)
+**{main_config["lifestyle_heading"]}**
+- {main_config["lifestyle_guidance"]}
 
 (Do NOT list product names or specific ingredients — the product cards handle that.)
 
@@ -441,7 +539,7 @@ Write your response following these 4 layers IN ORDER:
 
 **Formatting rules:**
 - Use `##` headings exactly as shown above
-- **Bold** key terms and ingredient names
+- **Bold** key terms
 - Bullets for lists
 - Short paragraphs (2-3 sentences each)
 - Total response: ~150-250 words
@@ -449,8 +547,7 @@ Write your response following these 4 layers IN ORDER:
 - NEVER greet the user
 
 **Language guidelines:**
-- Use phrases like "may support", "designed to help", "formulated for"
-- Never claim products treat, cure, or prevent any disease
+{main_config["language_guidelines"]}
 
 Your Tasks:
 1. RESPONSE: Write the 4-layer response as described
@@ -516,20 +613,10 @@ Your Tasks:
         _symbol, _threshold = _currency_config.get(_currency, ("$", 50))
         filter_suggestions.append(f"Under {_symbol}{_threshold}")
 
-    # Dietary: only suggest vegan if user isn't already vegan/vegetarian
-    # Check multiple possible keys the LLM may have used
-    diet_pref = " ".join([
-        str(extracted_context.get("dietary_preference") or ""),
-        str(extracted_context.get("diet") or ""),
-        str(extracted_context.get("dietary") or ""),
-        *[str(v.get("value", "")) for v in filled_attrs.values() if isinstance(v, dict)],
-    ]).lower()
-    if "vegan" not in diet_pref:
-        filter_suggestions.append("Vegan options")
-
-    # Format: only suggest if user hasn't specified a format preference
-    if not extracted_context.get("format_preference"):
-        filter_suggestions.append("Capsule form")
+    # Domain-specific filter suggestions
+    filter_suggestions.extend(
+        _build_filter_suggestions(main_config, extracted_context, filled_attrs)
+    )
 
     # Update state
     new_state = state.copy()
