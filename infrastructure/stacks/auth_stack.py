@@ -179,12 +179,11 @@ class AuthStack(Stack):
             integration=chat_integration,
         )
 
-        # Protected routes (require Cognito auth)
+        # Chat route (public — protected by API key + origin check + rate limiting)
         self.api.add_routes(
             path="/chat",
             methods=[apigw.HttpMethod.POST],
             integration=chat_integration,
-            authorizer=self.authorizer,
         )
 
         # Events endpoint integration

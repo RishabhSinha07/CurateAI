@@ -65,6 +65,15 @@ async def get_tenant_context(
                     detail="Request from unauthorized IP address",
                 )
 
+        # Check Origin against tenant's allowed_origins
+        origin = request.headers.get("origin")
+        if tenant.allowed_origins and "*" not in tenant.allowed_origins:
+            if origin and origin not in tenant.allowed_origins:
+                raise HTTPException(
+                    status_code=403,
+                    detail="Request from unauthorized origin",
+                )
+
         # Update last_used_at (fire-and-forget, don't block response)
         await tenant_repo.touch_api_key(api_key.id)
 
