@@ -1,0 +1,10 @@
+{
+  "name": "curateai-jwt-authorizer",
+  "version": "1.0.0",
+  "description": "Lambda authorizer that verifies customer-signed JWTs via JWKS",
+  "dependencies": {
+    "aws-jwt-verify": "^4.0.0",
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@aws-sdk/lib-dynamodb": "^3.0.0"
+  }
+}

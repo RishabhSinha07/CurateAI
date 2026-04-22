@@ -2,23 +2,23 @@
 Authentication Stack for CurateAI
 
 Creates:
-- AWS Cognito User Pool for user authentication
-- API Gateway HTTP API with Cognito authorizer
+- AWS Cognito User Pool for admin/dashboard authentication
+- DynamoDB table for widget client configs (JWKS URLs, origins)
+- Lambda JWT authorizer for widget /chat endpoint
+- API Gateway HTTP API with dual auth (Lambda for /chat, Cognito for admin)
 - Direct integration with Fargate task (no ALB for cost optimization)
 
 Flow:
-Client → API Gateway (auth) → ECS Fargate (direct)
-
-Security:
-- Cognito JWT authentication required for all /chat endpoints
-- HTTPS only (API Gateway provides TLS)
-- Direct integration with Fargate public IP
+Widget → API Gateway → Lambda Authorizer (JWT verify) → ECS Fargate
+Dashboard → API Gateway → Cognito Authorizer → ECS Fargate
 
 Note:
 - No ALB to save ~$20/month
 - API Gateway integrates directly with Fargate task
 - Task IP changes on restart (requires stack update)
 """
+from pathlib import Path
+
 from aws_cdk import (
     Stack,
     Duration,
@@ -27,6 +27,8 @@ from aws_cdk import (
     aws_apigatewayv2 as apigw,
     aws_apigatewayv2_integrations as integrations,
     aws_apigatewayv2_authorizers as authorizers,
+    aws_dynamodb as dynamodb,
+    aws_lambda as _lambda,
     aws_logs as logs,
     RemovalPolicy,
     Tags,
@@ -48,24 +50,69 @@ class AuthStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
 
         # ============================================
-        # AWS Cognito User Pool
+        # DynamoDB — Widget Client Configuration
         # ============================================
 
-        # Cognito User Pool for authentication
+        self.widget_clients_table = dynamodb.Table(
+            self,
+            "WidgetClients",
+            table_name="CurateAI-WidgetClients",
+            partition_key=dynamodb.Attribute(
+                name="client_id",
+                type=dynamodb.AttributeType.STRING,
+            ),
+            billing_mode=dynamodb.BillingMode.PAY_PER_REQUEST,
+            removal_policy=RemovalPolicy.RETAIN,
+        )
+
+        # ============================================
+        # Lambda — JWT Authorizer
+        # ============================================
+
+        lambda_dir = Path(__file__).parent.parent / "lambda" / "jwt-authorizer"
+
+        self.jwt_authorizer_fn = _lambda.Function(
+            self,
+            "JWTAuthorizer",
+            function_name="CurateAI-JWTAuthorizer",
+            runtime=_lambda.Runtime.NODEJS_20_X,
+            handler="index.handler",
+            code=_lambda.Code.from_asset(str(lambda_dir)),
+            timeout=Duration.seconds(10),
+            memory_size=256,
+            environment={
+                "TABLE_NAME": self.widget_clients_table.table_name,
+                "EXPECTED_AUD": "curateai",
+            },
+            log_retention=logs.RetentionDays.ONE_WEEK,
+        )
+
+        # Grant Lambda read access to DynamoDB
+        self.widget_clients_table.grant_read_data(self.jwt_authorizer_fn)
+
+        # Lambda authorizer for API Gateway
+        self.jwt_authorizer = authorizers.HttpLambdaAuthorizer(
+            "JWTLambdaAuthorizer",
+            self.jwt_authorizer_fn,
+            response_types=[authorizers.HttpLambdaResponseType.IAM],
+            identity_source=["$request.header.Authorization"],
+            results_cache_ttl=Duration.minutes(5),
+        )
+
+        # ============================================
+        # AWS Cognito User Pool (admin/dashboard)
+        # ============================================
+
         self.user_pool = cognito.UserPool(
             self,
             "CurateAI-UserPool",
             user_pool_name="CurateAI-Users",
-            # Sign-in options
             sign_in_aliases=cognito.SignInAliases(
                 email=True,
                 username=True,
             ),
-            # Self-service sign-up
             self_sign_up_enabled=True,
-            # Auto-verify email
             auto_verify=cognito.AutoVerifiedAttrs(email=True),
-            # Password policy
             password_policy=cognito.PasswordPolicy(
                 min_length=8,
                 require_lowercase=True,
@@ -73,38 +120,30 @@ class AuthStack(Stack):
                 require_digits=True,
                 require_symbols=True,
             ),
-            # Standard attributes
             standard_attributes=cognito.StandardAttributes(
                 email=cognito.StandardAttribute(required=True, mutable=True),
                 given_name=cognito.StandardAttribute(required=False, mutable=True),
                 family_name=cognito.StandardAttribute(required=False, mutable=True),
             ),
-            # Account recovery
             account_recovery=cognito.AccountRecovery.EMAIL_ONLY,
-            # Email settings
             email=cognito.UserPoolEmail.with_cognito(),
-            # Removal policy
-            removal_policy=RemovalPolicy.RETAIN,  # Keep user data on stack deletion
+            removal_policy=RemovalPolicy.RETAIN,
         )
 
-        # User Pool Client for API access
         self.user_pool_client = self.user_pool.add_client(
             "CurateAI-Client",
             user_pool_client_name="CurateAI-API-Client",
             auth_flows=cognito.AuthFlow(
-                user_password=True,  # Allow username/password auth
-                user_srp=True,  # Secure Remote Password
-                admin_user_password=True,  # Allow admin to create users
+                user_password=True,
+                user_srp=True,
+                admin_user_password=True,
             ),
-            # Token validity
             id_token_validity=Duration.hours(1),
             access_token_validity=Duration.hours(1),
             refresh_token_validity=Duration.days(30),
-            # Prevent user existence errors
             prevent_user_existence_errors=True,
         )
 
-        # Create admin user (will need to set password via console/CLI)
         self.admin_user = cognito.CfnUserPoolUser(
             self,
             "AdminUser",
@@ -119,109 +158,106 @@ class AuthStack(Stack):
             desired_delivery_mediums=["EMAIL"],
         )
 
-        # ============================================
-        # API Gateway HTTP API
-        # ============================================
-
-        # Cognito Authorizer for API Gateway
-        self.authorizer = authorizers.HttpUserPoolAuthorizer(
+        # Cognito authorizer for admin/dashboard routes
+        self.cognito_authorizer = authorizers.HttpUserPoolAuthorizer(
             "CognitoAuthorizer",
             self.user_pool,
             user_pool_clients=[self.user_pool_client],
             identity_source=["$request.header.Authorization"],
         )
 
-        # HTTP API (cheaper than REST API)
+        # ============================================
+        # API Gateway HTTP API
+        # ============================================
+
         self.api = apigw.HttpApi(
             self,
             "CurateAI-API",
             api_name="CurateAI-API",
-            description="CurateAI API with Cognito authentication",
-            # CORS configuration
+            description="CurateAI API with JWT + Cognito authentication",
             cors_preflight=apigw.CorsPreflightOptions(
-                allow_origins=["*"],  # TODO: Restrict to your domain
+                allow_origins=["*"],
                 allow_methods=[
                     apigw.CorsHttpMethod.GET,
                     apigw.CorsHttpMethod.POST,
                     apigw.CorsHttpMethod.OPTIONS,
                 ],
-                allow_headers=["Authorization", "Content-Type", "X-Amz-Date", "X-Api-Key"],
+                allow_headers=[
+                    "Authorization",
+                    "Content-Type",
+                    "X-Amz-Date",
+                    "X-Api-Key",
+                ],
                 max_age=Duration.days(1),
             ),
         )
 
-        # Backend Integrations - create specific integration for each endpoint with full path
+        # ============================================
+        # Route Integrations
+        # ============================================
 
-        # Health endpoint integration
         health_integration = integrations.HttpUrlIntegration(
             "HealthIntegration",
             f"{backend_url}/health",
         )
-
-        # Chat endpoint integration
         chat_integration = integrations.HttpUrlIntegration(
             "ChatIntegration",
             f"{backend_url}/chat",
         )
+        events_integration = integrations.HttpUrlIntegration(
+            "EventsIntegration",
+            f"{backend_url}/events",
+        )
+        admin_products_integration = integrations.HttpUrlIntegration(
+            "AdminProductsIntegration",
+            f"{backend_url}/admin/products",
+        )
+        admin_keys_integration = integrations.HttpUrlIntegration(
+            "AdminKeysIntegration",
+            f"{backend_url}/admin/api-keys/rotate",
+        )
 
-        # Public routes (no auth required)
-        # Health check
+        # --- Public routes (no auth) ---
         self.api.add_routes(
             path="/health",
             methods=[apigw.HttpMethod.GET],
             integration=health_integration,
         )
-
-        # OPTIONS for CORS preflight - must not have authorizer
         self.api.add_routes(
             path="/chat",
             methods=[apigw.HttpMethod.OPTIONS],
             integration=chat_integration,
         )
 
-        # Chat route (public — protected by API key + origin check + rate limiting)
+        # --- Widget route (Lambda JWT authorizer) ---
         self.api.add_routes(
             path="/chat",
             methods=[apigw.HttpMethod.POST],
             integration=chat_integration,
+            authorizer=self.jwt_authorizer,
         )
 
-        # Events endpoint integration
-        events_integration = integrations.HttpUrlIntegration(
-            "EventsIntegration",
-            f"{backend_url}/events",
-        )
+        # --- Dashboard/admin routes (Cognito authorizer) ---
         self.api.add_routes(
             path="/events",
             methods=[apigw.HttpMethod.POST],
             integration=events_integration,
-            authorizer=self.authorizer,
-        )
-
-        # Admin endpoints integrations
-        admin_products_integration = integrations.HttpUrlIntegration(
-            "AdminProductsIntegration",
-            f"{backend_url}/admin/products",
+            authorizer=self.cognito_authorizer,
         )
         self.api.add_routes(
             path="/admin/products",
             methods=[apigw.HttpMethod.POST],
             integration=admin_products_integration,
-            authorizer=self.authorizer,
-        )
-
-        admin_keys_integration = integrations.HttpUrlIntegration(
-            "AdminKeysIntegration",
-            f"{backend_url}/admin/api-keys/rotate",
+            authorizer=self.cognito_authorizer,
         )
         self.api.add_routes(
             path="/admin/api-keys/rotate",
             methods=[apigw.HttpMethod.POST],
             integration=admin_keys_integration,
-            authorizer=self.authorizer,
+            authorizer=self.cognito_authorizer,
         )
 
-        # Configure default stage throttle (burst=50, rate=20/sec)
+        # Configure default stage throttle
         cfn_stage = self.api.default_stage.node.default_child
         cfn_stage.add_property_override(
             "DefaultRouteSettings.ThrottlingBurstLimit", 50
@@ -231,7 +267,7 @@ class AuthStack(Stack):
         )
 
         # ============================================
-        # CloudWatch Logs for API Gateway
+        # CloudWatch Logs
         # ============================================
 
         self.api_log_group = logs.LogGroup(
@@ -250,10 +286,21 @@ class AuthStack(Stack):
             self,
             "APIEndpoint",
             value=self.api.url or "N/A",
-            description="API Gateway endpoint (use this instead of direct ECS access)",
+            description="API Gateway endpoint",
             export_name="CurateAI-APIEndpoint",
         )
-
+        CfnOutput(
+            self,
+            "WidgetClientsTable",
+            value=self.widget_clients_table.table_name,
+            description="DynamoDB table for widget client configs",
+        )
+        CfnOutput(
+            self,
+            "JWTAuthorizerArn",
+            value=self.jwt_authorizer_fn.function_arn,
+            description="Lambda JWT authorizer ARN",
+        )
         CfnOutput(
             self,
             "UserPoolId",
@@ -261,34 +308,18 @@ class AuthStack(Stack):
             description="Cognito User Pool ID",
             export_name="CurateAI-UserPoolId",
         )
-
         CfnOutput(
             self,
             "UserPoolClientId",
             value=self.user_pool_client.user_pool_client_id,
-            description="Cognito User Pool Client ID (use for authentication)",
+            description="Cognito User Pool Client ID",
             export_name="CurateAI-UserPoolClientId",
         )
-
         CfnOutput(
             self,
             "AdminUsername",
             value="admin",
-            description="Admin username (set password via AWS Console or CLI)",
-        )
-
-        CfnOutput(
-            self,
-            "AdminEmail",
-            value=admin_email,
-            description="Admin email for password reset",
-        )
-
-        CfnOutput(
-            self,
-            "AuthenticationGuide",
-            value="See AUTH_SETUP.md for instructions on how to authenticate",
-            description="Next steps",
+            description="Admin username",
         )
 
         # Add tags
