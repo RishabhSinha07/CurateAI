@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-CurateAI is a multi-agent AI consultation system for personalized product recommendations. It uses LangGraph to orchestrate specialized agents, a knowledge graph (NetworkX + YAML) for domain intelligence, and hybrid search (pgvector + JSONB filters) over a polymorphic product catalog. The system is multi-tenant with API key authentication.
+CurateAI is a multi-agent AI consultation system for personalized product recommendations. It uses LangGraph to orchestrate specialized agents, a knowledge graph (NetworkX + YAML) for domain intelligence, and hybrid search (pgvector + JSONB filters) over a polymorphic product catalog. The system is multi-tenant with JWT authentication.
 
 ## Development Commands
 
@@ -127,10 +127,54 @@ The graph drives: slot requirements, search query expansion (problem → ingredi
 
 ### Multi-Tenancy & Auth
 
-- **API key auth** (`app/api/middleware/auth.py`): X-API-Key header → SHA-256 hash → DB lookup with IP allowlist and expiry check
+Authentication uses a two-layer approach: JWT verification at API Gateway, tenant resolution at the backend.
+
+**JWT Authentication (primary — widget `/chat` route):**
+
+```
+Customer site loads → customer backend mints JWT (15 min TTL, RS256)
+  → Widget sends Bearer token to API Gateway
+  → Lambda authorizer (CurateAI-JWTAuthorizer):
+      1. Decode JWT, extract client_id
+      2. Look up DynamoDB (CurateAI-WidgetClients) → get JWKS URL, tenant_id
+      3. Fetch customer's JWKS (cached in Lambda memory)
+      4. Verify signature, check exp/aud/iss, validate Origin
+      5. Pass tenant_id to backend via authorizer context
+  → API Gateway caches result ~5 min
+  → FastAPI backend resolves tenant from authorizer context
+```
+
+- **DynamoDB table** (`CurateAI-WidgetClients`): Stores per-customer config — `client_id` (PK), `jwks_url`, `allowed_origins`, `tenant_id`, `expected_iss`, `expected_aud`, `is_active`
+- **Lambda authorizer** (`infrastructure/lambda/jwt-authorizer/index.mjs`): Verifies RS256/ES256 JWTs, caches JWKS and client configs in memory
+- **Onboarding scripts**: `scripts/generate_jwks.py` (key pair generation), `scripts/create_widget_client.py` (DynamoDB registration)
+
+**Cognito Authentication (admin/dashboard routes):**
+
+- `/events`, `/admin/*` routes still use Cognito authorizer
+- User Pool: `CurateAI-Users` (us-east-1_4g15LXnhb)
+
+**API key auth (fallback for local dev):**
+
+- `app/api/middleware/auth.py` checks: (1) Lambda authorizer context → (2) X-API-Key header → (3) seed tenant fallback
 - **Rate limiting** (`app/api/middleware/rate_limit.py`): In-memory sliding window per tenant (single-instance; needs Redis for multi-instance)
-- **Seed tenant** (UUID `00000000-0000-0000-0000-000000000001`): Fallback for requests without API key (backward compatibility)
 - **TenantContext** dataclass flows through all layers: enabled_domains, rate_limit_rpm, daily_cost_cap_cents
+
+**Customer onboarding flow:**
+
+```bash
+# 1. Generate RSA key pair for the customer
+python3 -m scripts.generate_jwks --kid key-1 --out-dir ./keys/<customer-name>
+
+# 2. Register in DynamoDB
+python3 -m scripts.create_widget_client \
+  --client-id <id> \
+  --tenant-id <tenant-uuid> \
+  --jwks-url https://<domain>/.well-known/jwks.json \
+  --origins https://<domain> \
+  --iss <domain>
+
+# 3. Give customer: private.pem, jwks.json, integration guide
+```
 
 ### Database Layer
 
@@ -159,6 +203,8 @@ The graph drives: slot requirements, search query expansion (problem → ingredi
 | **Awaiting-slot safety** | Router overrides out_of_scope classification when pending_slot_question exists (protects single-word answers like "Vegetarian") |
 | **Refinement UX** | Short contextual message for result filtering (no full LLM consultation repeat) |
 | **Product attributes** | JSONB polymorphic per domain (no schema changes needed for new domains) |
+| **Widget auth** | Customer-signed JWTs (RS256) verified via Lambda authorizer + DynamoDB JWKS lookup. Each customer hosts their own JWKS. No shared secrets — asymmetric signing means leaked keys only affect one customer. |
+| **API Gateway auth** | Dual: Lambda JWT authorizer on `/chat` (widget), Cognito on admin routes. API key kept as fallback for local dev. |
 
 ## Configuration
 
@@ -176,3 +222,22 @@ Key settings: `DATABASE_URL`, `AWS_REGION`, `BEDROCK_MODEL_ID` (default: `us.ama
 ## Middleware Stack (outermost → innermost)
 
 RequestLogging → CORS → Auth/RateLimit (per-route dependency)
+
+## Widget Integration
+
+The CurateAI widget (`curateai-widget` repo) is an embeddable chatbot that third-party sites add to their pages. Hosted on Vercel at `https://curateai-widget.vercel.app/curateai-widget.js`.
+
+**Architecture:**
+```
+Customer's site → widget JS loads → calls customer's /api/token endpoint
+  → gets JWT → widget sends JWT to API Gateway → Lambda authorizer verifies
+  → request reaches FastAPI backend → products returned
+```
+
+**Widget config supports:** `apiUrl`, `apiKey` (legacy), `getAuthToken` (JWT), `welcomeTopics`, theme customization, and callbacks (`onProductClick`, `onMessage`, etc.).
+
+**Current clients:**
+| Client | client_id | Tenant |
+|--------|-----------|--------|
+| CurateAI Dashboard | `curateai_dashboard` | (deferred to API key) |
+| Rural Equip | `re_001` | `6a77550b-...` (rural-equipment) |
