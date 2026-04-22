@@ -94,7 +94,7 @@ class AuthStack(Stack):
         self.jwt_authorizer = authorizers.HttpLambdaAuthorizer(
             "JWTLambdaAuthorizer",
             self.jwt_authorizer_fn,
-            response_types=[authorizers.HttpLambdaResponseType.IAM],
+            response_types=[authorizers.HttpLambdaResponseType.SIMPLE],
             identity_source=["$request.header.Authorization"],
             results_cache_ttl=Duration.minutes(5),
         )

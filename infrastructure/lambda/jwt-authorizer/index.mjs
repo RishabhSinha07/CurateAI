@@ -13,13 +13,6 @@
 
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DynamoDBDocumentClient, GetCommand } from "@aws-sdk/lib-dynamodb";
-import {
-  JwksCache,
-  SimpleJwksCache,
-  assertStringEquals,
-  decomposeUnverifiedJwt,
-} from "aws-jwt-verify/jwt-rsa";
-import { fetchJwk } from "aws-jwt-verify/https";
 
 const TABLE_NAME = process.env.TABLE_NAME || "CurateAI-WidgetClients";
 const EXPECTED_AUD = process.env.EXPECTED_AUD || "curateai";
@@ -91,7 +84,9 @@ function findKey(keys, kid) {
  * Verify JWT signature using the Web Crypto API.
  */
 async function verifyJwt(token, jwksUrl) {
-  const { header, payload } = decomposeUnverifiedJwt(token);
+  const parts = token.split(".");
+  const header = JSON.parse(Buffer.from(parts[0], "base64url").toString());
+  const payload = JSON.parse(Buffer.from(parts[1], "base64url").toString());
 
   const keys = await getJwks(jwksUrl);
   const jwk = findKey(keys, header.kid);
@@ -152,19 +147,9 @@ function base64UrlDecode(str) {
 /**
  * Build an IAM policy for API Gateway.
  */
-function buildPolicy(principalId, effect, resource, context = {}) {
+function buildResponse(isAuthorized, context = {}) {
   return {
-    principalId,
-    policyDocument: {
-      Version: "2012-10-17",
-      Statement: [
-        {
-          Action: "execute-api:Invoke",
-          Effect: effect,
-          Resource: resource,
-        },
-      ],
-    },
+    isAuthorized,
     context,
   };
 }
@@ -178,29 +163,31 @@ export async function handler(event) {
 
   if (!token) {
     console.log("No Bearer token provided");
-    return buildPolicy("anonymous", "Deny", event.routeArn);
+    return buildResponse(false);
   }
 
   try {
     // Decode without verification to get claims
-    const { payload: unverified } = decomposeUnverifiedJwt(token);
+    const parts = token.split(".");
+    if (parts.length !== 3) throw new Error("Invalid JWT format");
+    const unverified = JSON.parse(Buffer.from(parts[1], "base64url").toString());
     const clientId = unverified.client_id;
 
     if (!clientId) {
       console.log("JWT missing client_id claim");
-      return buildPolicy("anonymous", "Deny", event.routeArn);
+      return buildResponse(false);
     }
 
     // Look up client config
     const config = await getClientConfig(clientId);
     if (!config) {
       console.log(`Unknown client_id: ${clientId}`);
-      return buildPolicy("anonymous", "Deny", event.routeArn);
+      return buildResponse(false);
     }
 
     if (!config.is_active) {
       console.log(`Client ${clientId} is inactive`);
-      return buildPolicy("anonymous", "Deny", event.routeArn);
+      return buildResponse(false);
     }
 
     // Verify JWT signature against customer's JWKS
@@ -210,7 +197,7 @@ export async function handler(event) {
     const now = Math.floor(Date.now() / 1000);
     if (payload.exp && payload.exp < now) {
       console.log(`Token expired: exp=${payload.exp}, now=${now}`);
-      return buildPolicy("anonymous", "Deny", event.routeArn);
+      return buildResponse(false);
     }
 
     // Check audience
@@ -218,14 +205,14 @@ export async function handler(event) {
       const tokenAud = Array.isArray(payload.aud) ? payload.aud : [payload.aud];
       if (!tokenAud.includes(EXPECTED_AUD)) {
         console.log(`Invalid audience: ${payload.aud}`);
-        return buildPolicy("anonymous", "Deny", event.routeArn);
+        return buildResponse(false);
       }
     }
 
     // Check issuer matches config
     if (config.expected_iss && payload.iss !== config.expected_iss) {
       console.log(`Issuer mismatch: got ${payload.iss}, expected ${config.expected_iss}`);
-      return buildPolicy("anonymous", "Deny", event.routeArn);
+      return buildResponse(false);
     }
 
     // Validate Origin header
@@ -233,19 +220,19 @@ export async function handler(event) {
     if (origin && config.allowed_origins?.length > 0) {
       if (!config.allowed_origins.includes(origin)) {
         console.log(`Origin ${origin} not in allowed list for ${clientId}`);
-        return buildPolicy("anonymous", "Deny", event.routeArn);
+        return buildResponse(false);
       }
     }
 
     // Allow — pass tenant context to backend
     console.log(`Authorized: client=${clientId}, sub=${payload.sub}`);
-    return buildPolicy(payload.sub || clientId, "Allow", event.routeArn, {
-      tenant_id: config.tenant_id,
+    return buildResponse(true, {
+      tenant_id: config.tenant_id || "",
       client_id: clientId,
       user_id: payload.sub || "",
     });
   } catch (err) {
     console.error("Authorization failed:", err.message);
-    return buildPolicy("anonymous", "Deny", event.routeArn);
+    return buildResponse(false);
   }
 }
