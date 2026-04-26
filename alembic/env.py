@@ -12,8 +12,10 @@ from app.db.models import Base
 config = context.config
 settings = get_settings()
 
-# Set the database URL from settings
-config.set_main_option("sqlalchemy.url", settings.database_url)
+# Set the database URL from settings.
+# Escape `%` to `%%` because alembic's config goes through configparser,
+# which treats `%` as interpolation syntax.
+config.set_main_option("sqlalchemy.url", settings.database_url.replace("%", "%%"))
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
