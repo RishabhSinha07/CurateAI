@@ -1,6 +1,390 @@
 {
  "Description": "Authentication layer with API Gateway and Cognito (direct Fargate integration)",
  "Resources": {
+  "WidgetClients84A10A18": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "client_id",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "client_id",
+      "KeyType": "HASH"
+     }
+    ],
+    "TableName": "CurateAI-WidgetClients",
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "Authentication"
+     },
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/WidgetClients/Resource"
+   }
+  },
+  "JWTAuthorizerServiceRole0286AA10": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "Authentication"
+     },
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/JWTAuthorizer/ServiceRole/Resource"
+   }
+  },
+  "JWTAuthorizerServiceRoleDefaultPolicy7D08C44F": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:Query",
+        "dynamodb:Scan"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "WidgetClients84A10A18",
+          "Arn"
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "JWTAuthorizerServiceRoleDefaultPolicy7D08C44F",
+    "Roles": [
+     {
+      "Ref": "JWTAuthorizerServiceRole0286AA10"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/JWTAuthorizer/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "JWTAuthorizerE8D8D90E": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-558599919081-us-east-1",
+     "S3Key": "1649cab183fd25dcc3a529a2a178cad1d6b133184d74500e5c96ef469204ef2c.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "TABLE_NAME": {
+       "Ref": "WidgetClients84A10A18"
+      },
+      "EXPECTED_AUD": "curateai"
+     }
+    },
+    "FunctionName": "CurateAI-JWTAuthorizer",
+    "Handler": "index.handler",
+    "MemorySize": 256,
+    "Role": {
+     "Fn::GetAtt": [
+      "JWTAuthorizerServiceRole0286AA10",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "Authentication"
+     },
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ],
+    "Timeout": 10
+   },
+   "DependsOn": [
+    "JWTAuthorizerServiceRoleDefaultPolicy7D08C44F",
+    "JWTAuthorizerServiceRole0286AA10"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/JWTAuthorizer/Resource",
+    "aws:asset:path": "asset.1649cab183fd25dcc3a529a2a178cad1d6b133184d74500e5c96ef469204ef2c",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "JWTAuthorizerLogRetentionF183EEF3": {
+   "Type": "Custom::LogRetention",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A",
+      "Arn"
+     ]
+    },
+    "LogGroupName": {
+     "Fn::Join": [
+      "",
+      [
+       "/aws/lambda/",
+       {
+        "Ref": "JWTAuthorizerE8D8D90E"
+       }
+      ]
+     ]
+    },
+    "RetentionInDays": 7
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/JWTAuthorizer/LogRetention/Resource"
+   }
+  },
+  "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "Authentication"
+     },
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource"
+   }
+  },
+  "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "logs:DeleteRetentionPolicy",
+        "logs:PutRetentionPolicy"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
+    "Roles": [
+     {
+      "Ref": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Handler": "index.handler",
+    "Runtime": "nodejs18.x",
+    "Timeout": 900,
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-558599919081-us-east-1",
+     "S3Key": "4e26bf2d0a26f2097fb2b261f22bb51e3f6b4b52635777b1e54edbd8e2d58c35.zip"
+    },
+    "Role": {
+     "Fn::GetAtt": [
+      "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB",
+      "Arn"
+     ]
+    },
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "Authentication"
+     },
+     {
+      "Key": "Environment",
+      "Value": "Production"
+     },
+     {
+      "Key": "ManagedBy",
+      "Value": "CDK"
+     },
+     {
+      "Key": "Phase",
+      "Value": "1"
+     },
+     {
+      "Key": "Project",
+      "Value": "CurateAI"
+     },
+     {
+      "Key": "Repository",
+      "Value": "RishabhSinha07/CurateAI"
+     }
+    ]
+   },
+   "DependsOn": [
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB",
+    "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Resource",
+    "aws:asset:path": "asset.4e26bf2d0a26f2097fb2b261f22bb51e3f6b4b52635777b1e54edbd8e2d58c35",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
   "CurateAIUserPoolD28FCD6D": {
    "Type": "AWS::Cognito::UserPool",
    "Properties": {
@@ -161,7 +545,7 @@
      ],
      "MaxAge": 86400
     },
-    "Description": "CurateAI API with Cognito authentication",
+    "Description": "CurateAI API with JWT + Cognito authentication",
     "Name": "CurateAI-API",
     "ProtocolType": "HTTP",
     "Tags": {
@@ -210,7 +594,7 @@
     },
     "IntegrationMethod": "ANY",
     "IntegrationType": "HTTP_PROXY",
-    "IntegrationUri": "http://100.31.118.198:8000/health",
+    "IntegrationUri": "http://52.55.71.206:8000/health",
     "PayloadFormatVersion": "1.0"
    },
    "Metadata": {
@@ -249,7 +633,7 @@
     },
     "IntegrationMethod": "ANY",
     "IntegrationType": "HTTP_PROXY",
-    "IntegrationUri": "http://100.31.118.198:8000/chat",
+    "IntegrationUri": "http://52.55.71.206:8000/chat",
     "PayloadFormatVersion": "1.0"
    },
    "Metadata": {
@@ -286,9 +670,9 @@
     "ApiId": {
      "Ref": "CurateAIAPIBE2DA4B3"
     },
-    "AuthorizationType": "JWT",
+    "AuthorizationType": "CUSTOM",
     "AuthorizerId": {
-     "Ref": "CurateAIAPICognitoAuthorizerF1F98089"
+     "Ref": "CurateAIAPIJWTLambdaAuthorizerB06283BC"
     },
     "RouteKey": "POST /chat",
     "Target": {
@@ -305,6 +689,113 @@
    },
    "Metadata": {
     "aws:cdk:path": "CurateAI-Auth/CurateAI-API/POST--chat/Resource"
+   }
+  },
+  "CurateAIAPIJWTLambdaAuthorizerB06283BC": {
+   "Type": "AWS::ApiGatewayV2::Authorizer",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "AuthorizerPayloadFormatVersion": "2.0",
+    "AuthorizerResultTtlInSeconds": 300,
+    "AuthorizerType": "REQUEST",
+    "AuthorizerUri": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:apigateway:us-east-1:lambda:path/2015-03-31/functions/",
+       {
+        "Fn::GetAtt": [
+         "JWTAuthorizerE8D8D90E",
+         "Arn"
+        ]
+       },
+       "/invocations"
+      ]
+     ]
+    },
+    "EnableSimpleResponses": true,
+    "IdentitySource": [
+     "$request.header.Authorization"
+    ],
+    "Name": "JWTLambdaAuthorizer"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/JWTLambdaAuthorizer/Resource"
+   }
+  },
+  "CurateAIAPICurateAIAuthCurateAIAPIJWTLambdaAuthorizer4CC5D626PermissionA1249280": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "JWTAuthorizerE8D8D90E",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-east-1:558599919081:",
+       {
+        "Ref": "CurateAIAPIBE2DA4B3"
+       },
+       "/authorizers/",
+       {
+        "Ref": "CurateAIAPIJWTLambdaAuthorizerB06283BC"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/CurateAIAuthCurateAIAPIJWTLambdaAuthorizer4CC5D626-Permission"
+   }
+  },
+  "CurateAIAPIPOSTeventsEventsIntegrationD52C7774": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "IntegrationMethod": "ANY",
+    "IntegrationType": "HTTP_PROXY",
+    "IntegrationUri": "http://52.55.71.206:8000/events",
+    "PayloadFormatVersion": "1.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/POST--events/EventsIntegration/Resource"
+   }
+  },
+  "CurateAIAPIPOSTeventsA10A1D68": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "AuthorizationType": "JWT",
+    "AuthorizerId": {
+     "Ref": "CurateAIAPICognitoAuthorizerF1F98089"
+    },
+    "RouteKey": "POST /events",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "CurateAIAPIPOSTeventsEventsIntegrationD52C7774"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/POST--events/Resource"
    }
   },
   "CurateAIAPICognitoAuthorizerF1F98089": {
@@ -341,48 +832,6 @@
     "aws:cdk:path": "CurateAI-Auth/CurateAI-API/CognitoAuthorizer/Resource"
    }
   },
-  "CurateAIAPIPOSTeventsEventsIntegrationD52C7774": {
-   "Type": "AWS::ApiGatewayV2::Integration",
-   "Properties": {
-    "ApiId": {
-     "Ref": "CurateAIAPIBE2DA4B3"
-    },
-    "IntegrationMethod": "ANY",
-    "IntegrationType": "HTTP_PROXY",
-    "IntegrationUri": "http://100.31.118.198:8000/events",
-    "PayloadFormatVersion": "1.0"
-   },
-   "Metadata": {
-    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/POST--events/EventsIntegration/Resource"
-   }
-  },
-  "CurateAIAPIPOSTeventsA10A1D68": {
-   "Type": "AWS::ApiGatewayV2::Route",
-   "Properties": {
-    "ApiId": {
-     "Ref": "CurateAIAPIBE2DA4B3"
-    },
-    "AuthorizationType": "JWT",
-    "AuthorizerId": {
-     "Ref": "CurateAIAPICognitoAuthorizerF1F98089"
-    },
-    "RouteKey": "POST /events",
-    "Target": {
-     "Fn::Join": [
-      "",
-      [
-       "integrations/",
-       {
-        "Ref": "CurateAIAPIPOSTeventsEventsIntegrationD52C7774"
-       }
-      ]
-     ]
-    }
-   },
-   "Metadata": {
-    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/POST--events/Resource"
-   }
-  },
   "CurateAIAPIPOSTadminproductsAdminProductsIntegration3AC9A32F": {
    "Type": "AWS::ApiGatewayV2::Integration",
    "Properties": {
@@ -391,7 +840,7 @@
     },
     "IntegrationMethod": "ANY",
     "IntegrationType": "HTTP_PROXY",
-    "IntegrationUri": "http://100.31.118.198:8000/admin/products",
+    "IntegrationUri": "http://52.55.71.206:8000/admin/products",
     "PayloadFormatVersion": "1.0"
    },
    "Metadata": {
@@ -433,7 +882,7 @@
     },
     "IntegrationMethod": "ANY",
     "IntegrationType": "HTTP_PROXY",
-    "IntegrationUri": "http://100.31.118.198:8000/admin/api-keys/rotate",
+    "IntegrationUri": "http://52.55.71.206:8000/admin/api-keys/rotate",
     "PayloadFormatVersion": "1.0"
    },
    "Metadata": {
@@ -465,6 +914,45 @@
    },
    "Metadata": {
     "aws:cdk:path": "CurateAI-Auth/CurateAI-API/POST--admin--api-keys--rotate/Resource"
+   }
+  },
+  "CurateAIAPIANYadmindashboardproxyDashboardIntegration949B2536": {
+   "Type": "AWS::ApiGatewayV2::Integration",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "IntegrationMethod": "ANY",
+    "IntegrationType": "HTTP_PROXY",
+    "IntegrationUri": "http://52.55.71.206:8000/admin/dashboard/{proxy}",
+    "PayloadFormatVersion": "1.0"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/ANY--admin--dashboard--{proxy+}/DashboardIntegration/Resource"
+   }
+  },
+  "CurateAIAPIANYadmindashboardproxyF4C295F6": {
+   "Type": "AWS::ApiGatewayV2::Route",
+   "Properties": {
+    "ApiId": {
+     "Ref": "CurateAIAPIBE2DA4B3"
+    },
+    "AuthorizationType": "NONE",
+    "RouteKey": "ANY /admin/dashboard/{proxy+}",
+    "Target": {
+     "Fn::Join": [
+      "",
+      [
+       "integrations/",
+       {
+        "Ref": "CurateAIAPIANYadmindashboardproxyDashboardIntegration949B2536"
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CurateAI-Auth/CurateAI-API/ANY--admin--dashboard--{proxy+}/Resource"
    }
   },
   "APILogs5362790F": {
@@ -518,7 +1006,7 @@
   "CDKMetadata": {
    "Type": "AWS::CDK::Metadata",
    "Properties": {
-    "Analytics": "v2:deflate64:H4sIAAAAAAAA/2WQwU7DMBBEv6V3x7ThC6oeWiSkVkGckZsuZknwWvaaKLX872QbtVRwmjez47XlWq/qpV4uzBCr9tRVPR51fmHTdmqK3nJL1iGTzq8RwoGoV5t3d+MrbHoEx/ej/4loUcajNQyDGb9rnXfMfu1RaiJip7stSDCDRA0lnunJMdhgGMlJ5Y/97a0Tf1DAM4TL6psrqicbdX4muw2UvEyvXIq4fWKfLu9uIFIKLRR1GKfz7uFx+iq9WnxGxCokx/gFupn1Bwf4HbZGAQAA"
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/2WR204DIRCGn6X3FGv7BG0TD4mJm1WvG8qOiGWZDQw2K+HdBTZbG736v3+OYVjz2/WKrxbi7JeyOy2NPvL4QkKeWA4dYjda0WOXg6/iaIDt322FxIzoj53g8S5YSRptSV1zA67X3meXmBY9jy1O/VUbNFqOta5SYn5zEN4Deb4tkj3fBXkC2gkPzKDyPD6haoHA1h3Z3DsMQxkyc2ISldWEPL55cA2iKekLz7A3Ok+5Tv2PFE1MDFoJgrMYv9Y8PhAN20GXsiLF5mOp+q4JSqjFQBM9WgLlxHyTP/a3bhvoA53+BldHX1xKrAWPwUlg9Sxlibaqds+JzM+BhkCJNWPutDeb/Kv8dvHptV66kM/VA28n/QHSSoUQ8QEAAA=="
    },
    "Metadata": {
     "aws:cdk:path": "CurateAI-Auth/CDKMetadata/Default"
@@ -527,7 +1015,7 @@
  },
  "Outputs": {
   "APIEndpoint": {
-   "Description": "API Gateway endpoint (use this instead of direct ECS access)",
+   "Description": "API Gateway endpoint",
    "Value": {
     "Fn::Join": [
      "",
@@ -548,6 +1036,21 @@
     "Name": "CurateAI-APIEndpoint"
    }
   },
+  "WidgetClientsTable": {
+   "Description": "DynamoDB table for widget client configs",
+   "Value": {
+    "Ref": "WidgetClients84A10A18"
+   }
+  },
+  "JWTAuthorizerArn": {
+   "Description": "Lambda JWT authorizer ARN",
+   "Value": {
+    "Fn::GetAtt": [
+     "JWTAuthorizerE8D8D90E",
+     "Arn"
+    ]
+   }
+  },
   "UserPoolId": {
    "Description": "Cognito User Pool ID",
    "Value": {
@@ -558,7 +1061,7 @@
    }
   },
   "UserPoolClientId": {
-   "Description": "Cognito User Pool Client ID (use for authentication)",
+   "Description": "Cognito User Pool Client ID",
    "Value": {
     "Ref": "CurateAIUserPoolCurateAIClient54BE623F"
    },
@@ -567,16 +1070,8 @@
    }
   },
   "AdminUsername": {
-   "Description": "Admin username (set password via AWS Console or CLI)",
+   "Description": "Admin username",
    "Value": "admin"
-  },
-  "AdminEmail": {
-   "Description": "Admin email for password reset",
-   "Value": "admin@noeticex.com"
-  },
-  "AuthenticationGuide": {
-   "Description": "Next steps",
-   "Value": "See AUTH_SETUP.md for instructions on how to authenticate"
   }
  },
  "Parameters": {

@@ -35,6 +35,10 @@ docker compose exec app alembic revision --autogenerate -m "description"
 
 # Reset database completely
 docker compose down -v && docker compose up -d
+
+# Create an admin user for the dashboard
+docker compose exec app python -m scripts.create_admin_user \
+  --email admin@company.com --password secret --tenant-slug default --role owner
 ```
 
 ### Linting & Type Checking
@@ -148,10 +152,32 @@ Customer site loads → customer backend mints JWT (15 min TTL, RS256)
 - **Lambda authorizer** (`infrastructure/lambda/jwt-authorizer/index.mjs`): Verifies RS256/ES256 JWTs, caches JWKS and client configs in memory
 - **Onboarding scripts**: `scripts/generate_jwks.py` (key pair generation), `scripts/create_widget_client.py` (DynamoDB registration)
 
-**Cognito Authentication (admin/dashboard routes):**
+**Admin Dashboard Authentication (self-signed JWT):**
 
-- `/events`, `/admin/*` routes still use Cognito authorizer
-- User Pool: `CurateAI-Users` (us-east-1_4g15LXnhb)
+Dashboard endpoints use email + password authentication with self-signed JWTs. No external auth provider required.
+
+```
+Admin calls POST /admin/dashboard/login {email, password}
+  → Backend verifies bcrypt hash against admin_users table
+  → Returns HS256 JWT (signed with JWT_SECRET, 24hr TTL)
+  → Admin sends Bearer token on all /admin/dashboard/* requests
+  → Middleware decodes JWT, looks up admin_users → resolves tenant_id
+```
+
+- **Model**: `AdminUser` (`app/db/models.py`) — maps email + password_hash to a tenant
+- **Middleware**: `app/api/middleware/cognito.py` — `get_admin_context` dependency decodes JWT → returns `AdminContext(admin_id, tenant_id, email, role)`
+- **Config**: `JWT_SECRET` (required in production), `JWT_EXPIRY_HOURS` (default: 24)
+
+**Admin onboarding:**
+
+```bash
+# Register an admin user for a tenant
+docker compose exec app python -m scripts.create_admin_user \
+  --email admin@company.com \
+  --password secure-password \
+  --tenant-slug acme \
+  --role owner
+```
 
 **API key auth (fallback for local dev):**
 
@@ -179,8 +205,8 @@ python3 -m scripts.create_widget_client \
 ### Database Layer
 
 - **ORM**: SQLAlchemy 2.0 async with asyncpg (`app/db/session.py`)
-- **Models** (`app/db/models.py`): Tenant, ApiKey, Product, ChatSession, ChatMessage, JourneyBundle, ProductEvent
-- **Repositories** (`app/db/repositories/`): SessionRepository, ProductRepository, TenantRepository, JourneyBundleRepository
+- **Models** (`app/db/models.py`): Tenant, ApiKey, AdminUser, Product, ChatSession, ChatMessage, JourneyBundle, ProductEvent
+- **Repositories** (`app/db/repositories/`): SessionRepository, ProductRepository, TenantRepository, JourneyBundleRepository, DashboardRepository
 - **Hybrid search** (`ProductRepository.hybrid_search`): Cosine similarity on `description_embedding` (Vector 1024) + JSONB attribute filters + price filter, with fallback to lower similarity threshold if <3 results
 
 ### LLM Integration
@@ -204,20 +230,55 @@ python3 -m scripts.create_widget_client \
 | **Refinement UX** | Short contextual message for result filtering (no full LLM consultation repeat) |
 | **Product attributes** | JSONB polymorphic per domain (no schema changes needed for new domains) |
 | **Widget auth** | Customer-signed JWTs (RS256) verified via Lambda authorizer + DynamoDB JWKS lookup. Each customer hosts their own JWKS. No shared secrets — asymmetric signing means leaked keys only affect one customer. |
-| **API Gateway auth** | Dual: Lambda JWT authorizer on `/chat` (widget), Cognito on admin routes. API key kept as fallback for local dev. |
+| **API Gateway auth** | Lambda JWT authorizer on `/chat` (widget), Cognito on `/events` and `/admin` (product upload, key rotation). API key kept as fallback for local dev. |
+| **Dashboard auth** | Self-signed HS256 JWTs via `admin_users` table (email + bcrypt password). No Cognito dependency. `JWT_SECRET` env var required in production. |
 
 ## Configuration
 
 Settings are in `app/config.py` (Pydantic BaseSettings, loaded from env vars / `.env`).
 
-Key settings: `DATABASE_URL`, `AWS_REGION`, `BEDROCK_MODEL_ID` (default: `us.amazon.nova-pro-v1:0`), `EMBEDDING_MODEL_ID`, `EMBEDDING_DIMENSIONS` (1024), `ENVIRONMENT` (development/staging/production — controls docs visibility and log format).
+Key settings: `DATABASE_URL`, `AWS_REGION`, `BEDROCK_MODEL_ID` (default: `us.amazon.nova-pro-v1:0`), `EMBEDDING_MODEL_ID`, `EMBEDDING_DIMENSIONS` (1024), `ENVIRONMENT` (development/staging/production — controls docs visibility and log format), `JWT_SECRET` (signs admin dashboard tokens — **change in production**), `JWT_EXPIRY_HOURS` (default: 24).
 
 ## API Endpoints
 
 - `POST /chat` — Main consultation endpoint. Takes `{message, session_id?}`, returns `{session_id, response, status, products, suggested_replies, journey_info?}`
 - `POST /events` — Product event tracking (click, add_to_cart, purchase)
 - `GET /health` — Database connectivity check
-- `/admin` — Admin routes
+- `/admin/products` — Product upload (Cognito auth)
+- `/admin/api-keys/rotate` — API key rotation (Cognito auth)
+- `/admin/dashboard/*` — Dashboard analytics (self-signed JWT auth, see below)
+
+### Dashboard API (`app/api/routes/dashboard.py`)
+
+All dashboard endpoints require `Authorization: Bearer <token>` from the login endpoint. All query endpoints take `start_date` and `end_date` query params (format: `YYYY-MM-DD`). Data is scoped to the authenticated admin's tenant.
+
+**Authentication:**
+
+```
+POST /admin/dashboard/login
+  Body: {"email": "...", "password": "..."}
+  Returns: {access_token, token_type, admin_id, email, role, tenant_id}
+```
+
+**Endpoints:**
+
+| Endpoint | Extra Params | Returns |
+|----------|-------------|---------|
+| `GET /admin/dashboard/overview` | — | KPI cards: total_sessions, unique_users, total_messages, avg_messages_per_session, avg_session_duration_seconds, completion_rate_pct, drop_off_rate_pct, status_breakdown, domain_breakdown |
+| `GET /admin/dashboard/traffic` | `granularity` (day/week/month) | daily_sessions (line chart data), peak_hours (heatmap: day_of_week x hour) |
+| `GET /admin/dashboard/funnel` | — | Conversion funnel: total_sessions → sessions_with_recommendations → clicks → add_to_cart → purchases (each with total + unique_sessions). Daily event trend. |
+| `GET /admin/dashboard/products` | `sort_by` (recommended/clicked/conversion), `limit` | Top products table: name, brand, price, times_recommended, clicks, add_to_cart, purchases, conversion_pct. Plus never_recommended_count. |
+| `GET /admin/dashboard/products/{id}` | — | Single product drill-down: recommendation count, event breakdown (click/add_to_cart/purchase), daily event trend. |
+
+**Data sources (no extra tables needed):**
+
+| Metric Category | Source Tables |
+|----------------|--------------|
+| Traffic & sessions | `chat_sessions` (status, domain, created_at, updated_at) |
+| Message counts | `chat_messages` (role, created_at) |
+| Recommendations | `chat_messages.suggested_product_ids` (UUID array, unnested) |
+| Conversion events | `product_events` (event_type: click/add_to_cart/purchase) |
+| Product info | `products` (name, brand, price) |
 
 ## Middleware Stack (outermost → innermost)
 

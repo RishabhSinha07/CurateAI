@@ -178,7 +178,10 @@
         "secretsmanager:GetSecretValue"
        ],
        "Effect": "Allow",
-       "Resource": "arn:aws:secretsmanager:us-east-1:558599919081:secret:curateai/database-url-??????"
+       "Resource": [
+        "arn:aws:secretsmanager:us-east-1:558599919081:secret:curateai/database-url-??????",
+        "arn:aws:secretsmanager:us-east-1:558599919081:secret:curateai/jwt-secret-UimI55"
+       ]
       },
       {
        "Action": [
@@ -426,6 +429,10 @@
        {
         "Name": "DATABASE_URL",
         "ValueFrom": "arn:aws:secretsmanager:us-east-1:558599919081:secret:curateai/database-url"
+       },
+       {
+        "Name": "JWT_SECRET",
+        "ValueFrom": "arn:aws:secretsmanager:us-east-1:558599919081:secret:curateai/jwt-secret-UimI55"
        }
       ]
      }
@@ -550,6 +557,7 @@
     }
    },
    "DependsOn": [
+    "TaskExecutionRoleDefaultPolicy96A62DFB",
     "TaskRoleDefaultPolicy2F37F892",
     "TaskRole1951A240"
    ],

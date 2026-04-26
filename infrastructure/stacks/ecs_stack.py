@@ -76,11 +76,19 @@ class EcsStack(Stack):
         # ============================================
         # Secrets Manager (DB credentials)
         # ============================================
-        # Import the existing secret (created manually via CLI)
+        # Import the existing secrets (created manually via CLI)
         self.db_secret = sm.Secret.from_secret_name_v2(
             self,
             "CurateAI-DB-Secret",
             secret_name="curateai/database-url",
+        )
+        # Use complete ARN (with random suffix) because partial-ARN lookup
+        # in Secrets Manager fails for this secret with ResourceNotFoundException.
+        # If the secret is rotated/recreated the suffix changes — update this.
+        self.jwt_secret = sm.Secret.from_secret_complete_arn(
+            self,
+            "CurateAI-JWT-Secret",
+            "arn:aws:secretsmanager:us-east-1:558599919081:secret:curateai/jwt-secret-UimI55",
         )
 
         # ============================================
@@ -147,6 +155,7 @@ class EcsStack(Stack):
 
         # Grant task execution role access to secrets
         self.db_secret.grant_read(self.task_execution_role)
+        self.jwt_secret.grant_read(self.task_execution_role)
 
         # ============================================
         # Fargate Task Definition
@@ -190,6 +199,7 @@ class EcsStack(Stack):
             },
             secrets={
                 "DATABASE_URL": ecs.Secret.from_secrets_manager(self.db_secret),
+                "JWT_SECRET": ecs.Secret.from_secrets_manager(self.jwt_secret),
             },
             health_check=ecs.HealthCheck(
                 command=[
@@ -238,6 +248,15 @@ class EcsStack(Stack):
             # Enable circuit breaker for safe deployments
             circuit_breaker=ecs.DeploymentCircuitBreaker(rollback=True),
         )
+
+        # CFN otherwise updates the task execution role's inline policy in
+        # parallel with the service rollout. New tasks then try to pull
+        # secrets before the IAM grant has propagated, fail with
+        # AccessDeniedException, and trip the circuit breaker. Force the
+        # service rollout to wait for the policy update.
+        task_exec_policy = self.task_execution_role.node.try_find_child("DefaultPolicy")
+        if task_exec_policy is not None:
+            self.service.node.add_dependency(task_exec_policy)
 
         # ============================================
         # Outputs

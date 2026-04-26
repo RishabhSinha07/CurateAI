@@ -1,6 +1,9 @@
 from functools import lru_cache
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+DEFAULT_JWT_SECRET = "change-me-in-production"
 
 
 class Settings(BaseSettings):
@@ -31,8 +34,21 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["*"]  # Override in production
     enable_metrics: bool = True
 
+    # Admin dashboard auth (self-signed JWT)
+    jwt_secret: str = DEFAULT_JWT_SECRET
+    jwt_expiry_hours: int = 24
+
     # Knowledge Graphs - Phase 1 uses YAML only
     use_db_graphs: bool = False
+
+    @model_validator(mode="after")
+    def _reject_default_jwt_secret_in_production(self) -> "Settings":
+        if self.environment == "production" and self.jwt_secret == DEFAULT_JWT_SECRET:
+            raise ValueError(
+                "JWT_SECRET must be set to a strong random value in production. "
+                "Refusing to start with the default placeholder."
+            )
+        return self
 
 
 @lru_cache

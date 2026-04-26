@@ -216,6 +216,13 @@ class AuthStack(Stack):
             "AdminKeysIntegration",
             f"{backend_url}/admin/api-keys/rotate",
         )
+        # Dashboard uses {proxy+} so all sub-paths (login, overview, traffic, ...)
+        # forward to the backend. Auth is handled by FastAPI (self-signed JWT),
+        # not by an API Gateway authorizer.
+        dashboard_integration = integrations.HttpUrlIntegration(
+            "DashboardIntegration",
+            f"{backend_url}/admin/dashboard/{{proxy}}",
+        )
 
         # --- Public routes (no auth) ---
         self.api.add_routes(
@@ -255,6 +262,13 @@ class AuthStack(Stack):
             methods=[apigw.HttpMethod.POST],
             integration=admin_keys_integration,
             authorizer=self.cognito_authorizer,
+        )
+
+        # --- Dashboard routes (FastAPI handles JWT auth, no API Gateway authorizer) ---
+        self.api.add_routes(
+            path="/admin/dashboard/{proxy+}",
+            methods=[apigw.HttpMethod.ANY],
+            integration=dashboard_integration,
         )
 
         # Configure default stage throttle

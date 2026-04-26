@@ -239,7 +239,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/b6db128a11a6a96e639068da0e87babc3b72c61a5d84a578f29d030fc807413e.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/fab32f09095f393d850b00660f1ed14f9a744452f11e2cf8e80906be79a0ffb5.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -443,7 +443,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-deploy-role-558599919081-us-east-1",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::558599919081:role/cdk-hnb659fds-cfn-exec-role-558599919081-us-east-1",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/abda4dd67c3109912fe6fd6c76c7e306bc847e67e2f9b44c74029eb4f66766c9.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-558599919081-us-east-1/6676f376e7b6d7ab32d602e109c21823f5a72630fad50390513f56f1cd943b32.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -489,6 +489,62 @@
                 "Value": "RishabhSinha07/CurateAI"
               }
             ]
+          }
+        ],
+        "/CurateAI-Auth/WidgetClients": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "WidgetClients84A10A18"
+            }
+          }
+        ],
+        "/CurateAI-Auth/WidgetClients/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WidgetClients84A10A18"
+          }
+        ],
+        "/CurateAI-Auth/JWTAuthorizer/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JWTAuthorizerServiceRole0286AA10"
+          }
+        ],
+        "/CurateAI-Auth/JWTAuthorizer/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JWTAuthorizerServiceRoleDefaultPolicy7D08C44F"
+          }
+        ],
+        "/CurateAI-Auth/JWTAuthorizer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JWTAuthorizerE8D8D90E"
+          }
+        ],
+        "/CurateAI-Auth/JWTAuthorizer/LogRetention/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JWTAuthorizerLogRetentionF183EEF3"
+          }
+        ],
+        "/CurateAI-Auth/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRole9741ECFB"
+          }
+        ],
+        "/CurateAI-Auth/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aServiceRoleDefaultPolicyADDA7DEB"
+          }
+        ],
+        "/CurateAI-Auth/LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8a/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogRetentionaae0aa3c5b4d4f87b02d85b201efdd8aFD4BFC8A"
           }
         ],
         "/CurateAI-Auth/CurateAI-UserPool/Resource": [
@@ -551,10 +607,16 @@
             "data": "CurateAIAPIPOSTchat2AD85353"
           }
         ],
-        "/CurateAI-Auth/CurateAI-API/CognitoAuthorizer/Resource": [
+        "/CurateAI-Auth/CurateAI-API/JWTLambdaAuthorizer/Resource": [
           {
             "type": "aws:cdk:logicalId",
-            "data": "CurateAIAPICognitoAuthorizerF1F98089"
+            "data": "CurateAIAPIJWTLambdaAuthorizerB06283BC"
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-API/CurateAIAuthCurateAIAPIJWTLambdaAuthorizer4CC5D626-Permission": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPICurateAIAuthCurateAIAPIJWTLambdaAuthorizer4CC5D626PermissionA1249280"
           }
         ],
         "/CurateAI-Auth/CurateAI-API/POST--events/EventsIntegration/Resource": [
@@ -567,6 +629,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "CurateAIAPIPOSTeventsA10A1D68"
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-API/CognitoAuthorizer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPICognitoAuthorizerF1F98089"
           }
         ],
         "/CurateAI-Auth/CurateAI-API/POST--admin--products/AdminProductsIntegration/Resource": [
@@ -593,6 +661,18 @@
             "data": "CurateAIAPIPOSTadminapikeysrotateA8097BB3"
           }
         ],
+        "/CurateAI-Auth/CurateAI-API/ANY--admin--dashboard--{proxy+}/DashboardIntegration/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPIANYadmindashboardproxyDashboardIntegration949B2536"
+          }
+        ],
+        "/CurateAI-Auth/CurateAI-API/ANY--admin--dashboard--{proxy+}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CurateAIAPIANYadmindashboardproxyF4C295F6"
+          }
+        ],
         "/CurateAI-Auth/API-Logs/Resource": [
           {
             "type": "aws:cdk:logicalId",
@@ -603,6 +683,18 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "APIEndpoint"
+          }
+        ],
+        "/CurateAI-Auth/WidgetClientsTable": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "WidgetClientsTable"
+          }
+        ],
+        "/CurateAI-Auth/JWTAuthorizerArn": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "JWTAuthorizerArn"
           }
         ],
         "/CurateAI-Auth/UserPoolId": [
@@ -621,18 +713,6 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "AdminUsername"
-          }
-        ],
-        "/CurateAI-Auth/AdminEmail": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "AdminEmail"
-          }
-        ],
-        "/CurateAI-Auth/AuthenticationGuide": [
-          {
-            "type": "aws:cdk:logicalId",
-            "data": "AuthenticationGuide"
           }
         ],
         "/CurateAI-Auth/CDKMetadata/Default": [
