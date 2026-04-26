@@ -5,6 +5,7 @@ All dashboard endpoints are scoped to the authenticated admin's tenant
 via self-signed JWT auth.
 """
 
+import logging
 import uuid
 from datetime import date
 from decimal import Decimal
@@ -24,6 +25,8 @@ from app.api.middleware.cognito import (
     get_admin_context,
     verify_password,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/admin/dashboard", tags=["dashboard"])
 
@@ -280,7 +283,13 @@ async def get_product_detail(
 ) -> ProductDetailResponse:
     """Get detailed metrics for a single product."""
     repo = DashboardRepository(db)
-    data = await repo.get_product_detail(admin.tenant_id, product_id, start_date, end_date)
+    try:
+        data = await repo.get_product_detail(admin.tenant_id, product_id, start_date, end_date)
+    except Exception as e:
+        # Surface the underlying exception both to logs (CloudWatch) and to
+        # the response so we can diagnose without server access.
+        logger.exception("get_product_detail failed for product_id=%s", product_id)
+        raise HTTPException(status_code=500, detail=f"{type(e).__name__}: {e}")
     if data is None:
         raise HTTPException(status_code=404, detail="Product not found")
     return ProductDetailResponse(**data)
