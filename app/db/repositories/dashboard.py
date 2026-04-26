@@ -8,7 +8,7 @@ by tenant_id and a [start, end) date range.
 import uuid
 from datetime import date, datetime, time, timedelta, timezone
 
-from sqlalchemy import Select, and_, case, func, select
+from sqlalchemy import ARRAY, Select, Uuid, and_, case, cast, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import ChatMessage, ChatSession, Product, ProductEvent
@@ -420,10 +420,13 @@ class DashboardRepository:
             return None
 
         # Query B: recommendation count
+        # Cast the lookup array to uuid[] explicitly; without the cast,
+        # Postgres binds the literal as text[] and the @> comparison fails
+        # with `operator does not exist: uuid[] @> text[]` (HTTP 500).
         msg_filters = [
             ChatMessage.tenant_id == tenant_id,
             ChatMessage.suggested_product_ids.is_not(None),
-            ChatMessage.suggested_product_ids.contains([product_id]),
+            ChatMessage.suggested_product_ids.contains(cast([product_id], ARRAY(Uuid))),
             ChatMessage.created_at >= start_dt,
             ChatMessage.created_at < end_dt,
         ]
