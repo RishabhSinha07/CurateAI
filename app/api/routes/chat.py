@@ -11,7 +11,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.db.repositories.session import SessionRepository
-from app.agents.graph import get_consultation_graph, create_initial_state
+from app.agents.graph import create_initial_state
+from app.agents.shared.registry import get_vertical
 from app.api.middleware.auth import TenantContext, get_tenant_context
 from app.api.middleware.rate_limit import check_rate_limit
 
@@ -123,10 +124,10 @@ async def chat(
         tenant_enabled_domains=tenant.enabled_domains,
     )
 
-    # Run the consultation graph
-    graph = get_consultation_graph()
+    # Dispatch to the vertical that owns this tenant's agent graph.
+    vertical = get_vertical(tenant.vertical)
     try:
-        final_state = await graph.run(initial_state, db)
+        final_state = await vertical.run(initial_state, db)
     except Exception as e:
         # Log and return graceful error
         raise HTTPException(

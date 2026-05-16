@@ -50,6 +50,9 @@ class Tenant(Base):
     )
     name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     slug: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    vertical: Mapped[str] = mapped_column(
+        String(50), nullable=False, server_default="commerce"
+    )
     enabled_domains: Mapped[list[str]] = mapped_column(
         ARRAY(String(50)), nullable=False, server_default="{*}"
     )
