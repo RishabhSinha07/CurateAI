@@ -1,0 +1,24 @@
+# Dental services knowledge graph (placeholder)
+#
+# This folder will hold per-domain knowledge graphs for the dental_services
+# vertical (implants.yaml, orthodontics.yaml, cosmetic.yaml, general.yaml,
+# etc.). The structure mirrors the commerce-vertical graphs under
+# app/knowledge/graphs/*.yaml.
+#
+# Real graph definitions land in Phase 2 alongside the dental agent nodes
+# that consume them. Each graph encodes:
+#
+#   - concerns (e.g. missing_tooth, crowded_teeth, sensitivity)
+#   - treatments (implant, bridge, denture, aligner, braces, whitening)
+#   - relations: concern --treats--> treatment
+#                treatment --precedes--> treatment    (for treatment_planner)
+#                treatment --alternative_to--> treatment (for comparison)
+#   - slot definitions for the interviewer (bone_health, timeline, surgery_comfort)
+#   - clinical-safety constraints (pregnancy + x-ray, cardiac history, etc.)
+#
+# This file exists only to keep the folder under version control. The dental
+# vertical's graph loader (TBD) will skip files starting with an underscore.
+
+metadata:
+  placeholder: true
+  description: "Dental KG scaffold — real graphs land in Phase 2."

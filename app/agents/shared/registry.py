@@ -46,11 +46,15 @@ def _bootstrap() -> None:
     avoids circular imports: verticals depend on shared primitives, not the
     other way around.
     """
-    # Commerce vertical wraps the existing ConsultationGraph.
     from app.agents.verticals.commerce.vertical import CommerceVertical  # noqa: F401
+    from app.agents.verticals.dental_services.vertical import (  # noqa: F401
+        DentalServicesVertical,
+    )
 
     if "commerce" not in _REGISTRY:
         register(CommerceVertical())
+    if "dental_services" not in _REGISTRY:
+        register(DentalServicesVertical())
 
 
 _bootstrap()
