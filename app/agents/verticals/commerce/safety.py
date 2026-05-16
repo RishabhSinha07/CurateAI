@@ -2,12 +2,12 @@ from typing import Any, Dict, List, Optional, Tuple
 import logging
 from pydantic import BaseModel, Field, field_validator
 
-from app.agents.validators import parse_list, parse_bool
+from app.agents.shared.validators import parse_list, parse_bool
 
 from app.config import get_settings
-from app.agents.state import AgentState
-from app.agents.llm import get_bedrock_llm
-from app.agents.response_formatter import (
+from app.agents.verticals.commerce.state import AgentState
+from app.agents.shared.llm import get_bedrock_llm
+from app.agents.verticals.commerce.response_formatter import (
     format_intro_with_constraints,
     format_disclaimers,
     format_no_results_message,

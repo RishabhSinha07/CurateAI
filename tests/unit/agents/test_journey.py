@@ -1,5 +1,5 @@
 import pytest
-from app.agents.journey import journey_agent
+from app.agents.verticals.commerce.journey import journey_agent
 from app.db.session import async_session_factory
 
 @pytest.mark.asyncio

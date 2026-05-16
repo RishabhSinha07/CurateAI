@@ -22,9 +22,9 @@ from pydantic import BaseModel, Field, field_validator
 from langchain_core.messages import HumanMessage, SystemMessage
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.agents.state import AgentState
-from app.agents.llm import get_bedrock_llm
-from app.agents.validators import parse_list, parse_bool
+from app.agents.verticals.commerce.state import AgentState
+from app.agents.shared.llm import get_bedrock_llm
+from app.agents.shared.validators import parse_list, parse_bool
 from app.db.repositories.product import ProductRepository
 from app.knowledge.graph_loader import get_knowledge_graph, list_available_graphs
 

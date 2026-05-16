@@ -13,11 +13,15 @@ load-bearing.
 
 from __future__ import annotations
 
-from typing import Protocol, runtime_checkable
+from typing import Any, Mapping, MutableMapping, Protocol, runtime_checkable
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.agents.state import AgentState
+
+# Each vertical defines its own concrete state type (typically a TypedDict).
+# The kernel passes state as a generic mapping; the vertical is responsible
+# for narrowing it inside its own graph.
+AgentStateLike = MutableMapping[str, Any]
 
 
 @runtime_checkable
@@ -26,6 +30,6 @@ class Vertical(Protocol):
 
     name: str
 
-    async def run(self, state: AgentState, db: AsyncSession) -> AgentState:
+    async def run(self, state: AgentStateLike, db: AsyncSession) -> AgentStateLike:
         """Execute one turn of the conversation for this vertical."""
         ...

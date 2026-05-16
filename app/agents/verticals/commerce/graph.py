@@ -28,18 +28,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 
-from app.agents.state import AgentState
-from app.agents.router import router_agent
-from app.agents.initial_products import initial_products_agent
-from app.agents.interviewer import interviewer_agent
-from app.agents.search import search_architect_agent
-from app.agents.reranker import reranker_agent
-from app.agents.safety import safety_agent
-from app.agents.refinement import refinement_agent
-from app.agents.journey import journey_agent
-from app.agents.fallback import fallback_agent
-from app.agents.ingredient_info import ingredient_info_agent
-from app.agents.product_detail import product_detail_agent
+from app.agents.verticals.commerce.state import AgentState
+from app.agents.verticals.commerce.router import router_agent
+from app.agents.verticals.commerce.initial_products import initial_products_agent
+from app.agents.verticals.commerce.interviewer import interviewer_agent
+from app.agents.verticals.commerce.search import search_architect_agent
+from app.agents.verticals.commerce.reranker import reranker_agent
+from app.agents.verticals.commerce.safety import safety_agent
+from app.agents.verticals.commerce.refinement import refinement_agent
+from app.agents.verticals.commerce.journey import journey_agent
+from app.agents.verticals.commerce.fallback import fallback_agent
+from app.agents.verticals.commerce.ingredient_info import ingredient_info_agent
+from app.agents.verticals.commerce.product_detail import product_detail_agent
 
 
 def create_initial_state(

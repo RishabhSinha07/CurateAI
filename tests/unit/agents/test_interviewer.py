@@ -1,5 +1,5 @@
 import pytest
-from app.agents.interviewer import interviewer_agent
+from app.agents.verticals.commerce.interviewer import interviewer_agent
 
 @pytest.mark.asyncio
 async def test_interviewer_problem_identification(base_state):

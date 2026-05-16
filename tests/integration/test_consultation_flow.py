@@ -1,6 +1,6 @@
 import pytest
 import uuid
-from app.agents.graph import get_consultation_graph, create_initial_state
+from app.agents.verticals.commerce.graph import get_consultation_graph, create_initial_state
 from app.db.session import async_session_factory
 
 @pytest.mark.asyncio

@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.session import get_db
 from app.db.repositories.session import SessionRepository
-from app.agents.graph import create_initial_state
+from app.agents.verticals.commerce.graph import create_initial_state
 from app.agents.shared.registry import get_vertical
 from app.api.middleware.auth import TenantContext, get_tenant_context
 from app.api.middleware.rate_limit import check_rate_limit

@@ -3,11 +3,11 @@ from pydantic import BaseModel, Field, field_validator
 from langchain_core.messages import HumanMessage, SystemMessage
 import logging
 
-from app.agents.validators import parse_dict, parse_list, parse_bool
+from app.agents.shared.validators import parse_dict, parse_list, parse_bool
 
 from app.config import get_settings
-from app.agents.state import AgentState
-from app.agents.llm import get_bedrock_llm
+from app.agents.verticals.commerce.state import AgentState
+from app.agents.shared.llm import get_bedrock_llm
 from app.knowledge.query_engine import GraphQueryEngine
 from app.knowledge.graph_loader import get_knowledge_graph
 

@@ -9,8 +9,8 @@ from __future__ import annotations
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.agents.graph import get_consultation_graph
-from app.agents.state import AgentState
+from app.agents.verticals.commerce.graph import get_consultation_graph
+from app.agents.verticals.commerce.state import AgentState
 
 
 class CommerceVertical:

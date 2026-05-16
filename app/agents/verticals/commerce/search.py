@@ -1,13 +1,13 @@
 from typing import Any, Dict, List
 from pydantic import BaseModel, Field, field_validator
 
-from app.agents.validators import parse_dict, parse_list
+from app.agents.shared.validators import parse_dict, parse_list
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 
 from app.config import get_settings
-from app.agents.state import AgentState
-from app.agents.llm import get_bedrock_llm
+from app.agents.verticals.commerce.state import AgentState
+from app.agents.shared.llm import get_bedrock_llm
 from app.db.repositories.product import ProductRepository
 from app.services.embeddings import generate_embedding_async
 from app.knowledge.query_engine import GraphQueryEngine

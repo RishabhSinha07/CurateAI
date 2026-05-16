@@ -4,8 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 
 from app.config import get_settings
-from app.agents.state import AgentState
-from app.agents.llm import get_bedrock_llm
+from app.agents.verticals.commerce.state import AgentState
+from app.agents.shared.llm import get_bedrock_llm
 from app.knowledge.query_engine import GraphQueryEngine
 from app.knowledge.graph_loader import list_available_graphs, get_all_active_domains, get_knowledge_graph
 

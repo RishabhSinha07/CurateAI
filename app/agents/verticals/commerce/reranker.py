@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 import logging
 
-from app.agents.state import AgentState
+from app.agents.verticals.commerce.state import AgentState
 from app.knowledge.query_engine import GraphQueryEngine
 
 logger = logging.getLogger(__name__)
