@@ -28,3 +28,11 @@ docker compose exec app python -m app.db.seed_wellbeing
 # Generate embeddings
 docker compose exec app python -m app.services.generate_embeddings
 ```
+
+## TODO
+
+### Router cost: stage-1 broad-bucket classifier
+
+The dental router (and commerce router) pays a full LLM round-trip per turn even for follow-up slot answers — the only deterministic shortcut catches `awaiting_slot`, so every fresh message goes through the LLM.
+
+Cheapest mitigation when volume picks up: a stage-1 LLM call with a tiny prompt that does broad bucketing ("question vs recommendation vs filter") and only escalates to the full router prompt for ambiguous cases. Worth doing once volume picks up, not now.
