@@ -126,7 +126,7 @@ def _treatment_to_item(t: Treatment, *, detail: bool = False) -> dict[str, Any]:
         "price": None,
         "currency": "INR",
         "image_url": None,
-        "url": f"https://www.dezy.com/treatments/{t['url_slug']}",
+        "url": f"https://www.dezy.com{t['url_path']}",
         "description": t.get("short"),
         "badges": badges,
         "attributes": attrs,
@@ -187,7 +187,7 @@ async def comparison_agent(state: DentalAgentState) -> DentalAgentState:
     if rec is not None:
         cta_links.append({
             "label": f"Learn more about {rec['name']}",
-            "url": f"https://www.dezy.com/treatments/{rec['url_slug']}",
+            "url": f"https://www.dezy.com{rec['url_path']}",
             "kind": "secondary",
         })
     state["cta_links"] = cta_links

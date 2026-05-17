@@ -72,7 +72,7 @@ def _treatment_to_item(t: dict[str, Any], *, detail: bool = False) -> dict[str, 
         "price": None,                  # show price_band as a string in attributes
         "currency": "INR",
         "image_url": None,
-        "url": f"https://www.dezy.com/treatments/{t['url_slug']}",
+        "url": f"https://www.dezy.com{t['url_path']}",
         "description": t.get("short"),
         "badges": badges,
         "attributes": attrs,
@@ -167,7 +167,7 @@ async def treatment_recommender_agent(state: DentalAgentState) -> DentalAgentSta
     cta_links: list[dict[str, Any]] = [
         {
             "label": f"Learn more about {picked['name']}",
-            "url": f"https://www.dezy.com/treatments/{picked['url_slug']}",
+            "url": f"https://www.dezy.com{picked['url_path']}",
             "kind": "secondary",
         }
     ]

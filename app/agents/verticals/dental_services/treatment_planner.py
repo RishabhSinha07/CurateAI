@@ -86,7 +86,7 @@ def _treatment_to_item(t: Treatment) -> dict[str, Any]:
         "price": None,
         "currency": "INR",
         "image_url": None,
-        "url": f"https://www.dezy.com/treatments/{t['url_slug']}",
+        "url": f"https://www.dezy.com{t['url_path']}",
         "description": t.get("short"),
         "badges": badges,
         "attributes": {

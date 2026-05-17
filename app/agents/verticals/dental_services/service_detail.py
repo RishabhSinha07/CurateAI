@@ -63,7 +63,7 @@ def _treatment_to_detail_item(t: Treatment) -> dict[str, Any]:
         "price": None,
         "currency": "INR",
         "image_url": None,
-        "url": f"https://www.dezy.com/treatments/{t['url_slug']}",
+        "url": f"https://www.dezy.com{t['url_path']}",
         "description": t.get("short"),
         "badges": badges,
         "attributes": {
@@ -142,7 +142,7 @@ Rules:
     state["cta_links"] = [
         {
             "label": f"Learn more about {picked['name']}",
-            "url": f"https://www.dezy.com/treatments/{picked['url_slug']}",
+            "url": f"https://www.dezy.com{picked['url_path']}",
             "kind": "secondary",
         },
     ]
