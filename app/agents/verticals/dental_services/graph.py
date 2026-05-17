@@ -224,7 +224,8 @@ class DentalConsultationGraph:
         return await self._timed("treatment_recommender", treatment_recommender_agent(state))
 
     async def _content_qa_wrapper(self, state: DentalAgentState) -> DentalAgentState:
-        return await self._timed("content_qa", content_qa_agent(state))
+        assert self._current_db is not None
+        return await self._timed("content_qa", content_qa_agent(state, self._current_db))
 
     async def _doctor_search_wrapper(self, state: DentalAgentState) -> DentalAgentState:
         # doctor_search needs db
