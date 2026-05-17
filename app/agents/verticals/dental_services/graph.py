@@ -102,9 +102,12 @@ def after_interviewer(
     return END
 
 
-def after_refinement(state: DentalAgentState) -> Literal["router", "safety"]:
-    if state.get("next_agent") == "router":
+def after_refinement(state: DentalAgentState) -> Literal["router", "service_detail", "safety"]:
+    next_agent = state.get("next_agent")
+    if next_agent == "router":
         return "router"
+    if next_agent == "service_detail":
+        return "service_detail"
     return "safety"
 
 
@@ -171,11 +174,11 @@ class DentalConsultationGraph:
             },
         )
 
-        # Refinement: either re-route to router or go straight to safety
+        # Refinement: re-route to router for new topics, or service_detail for follow-ups
         builder.add_conditional_edges(
             "refinement",
             after_refinement,
-            {"router": "router", "safety": "safety"},
+            {"router": "router", "service_detail": "service_detail", "safety": "safety"},
         )
 
         # Linear edges → safety → END
