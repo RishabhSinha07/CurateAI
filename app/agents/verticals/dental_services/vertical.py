@@ -54,10 +54,8 @@ class DentalServicesVertical:
         )
 
     async def run(self, state: DentalAgentState, db: AsyncSession) -> DentalAgentState:
-        # db isn't used by the Phase 1 placeholder graph; Phase 2 agents
-        # (doctor_search, content_qa) will read from dental repositories.
         graph = get_dental_graph()
-        return await graph.run(state)
+        return await graph.run(state, db)
 
     async def finalize(
         self,
