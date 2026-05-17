@@ -78,9 +78,14 @@ Classify the user's latest message into exactly one intent.
 INTENTS:
 - treatment_query: User describes a problem or asks what to do about a dental issue.
   Examples: "I have a missing tooth", "what should I do about crooked teeth", "I want to fix yellow teeth"
-- content_qa: User asks a procedural/educational question (how long, how painful,
-  what's the recovery, what's the process). Examples: "How painful is an implant?",
-  "How long is recovery for full mouth implants?", "Is whitening safe?"
+- content_qa: User asks a procedural / educational / policy / brand question.
+  Covers HOW questions (how long, how painful, what's recovery, what's the process),
+  WHAT questions about Dezy itself (what technology do you use, what makes Dezy
+  different), and POLICY questions (do you offer refunds, EMI, warranties).
+  Examples: "How painful is an implant?", "How long is recovery for full mouth
+  implants?", "Is whitening safe?", "What technology does Dezy use?", "Do you
+  offer a refund if I'm not happy?", "Why should I choose Dezy?",
+  "Do you have EMI?"
 - comparison: User asks which option is better, or to compare two treatments.
   Examples: "Aligners vs braces for me", "Should I get an implant or a bridge?"
 - doctor_search: User asks for a doctor / clinic with structured attributes

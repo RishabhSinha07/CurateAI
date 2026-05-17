@@ -63,8 +63,13 @@ async def upsert_service(s: AsyncSession, tenant_id: uuid.UUID, row: dict) -> tu
         )
     ).scalar_one_or_none()
 
-    desc_for_embed = (row.get("description") or row.get("name") or row["slug"]).strip()
-    embedding = await _embed(desc_for_embed)
+    incoming_attrs = dict(row.get("attributes") or {})
+    desc = (row.get("description") or "").strip()
+    desc_for_embed = (desc or row.get("name") or row["slug"]).strip()
+    # Skip embedding when this is a pure attribute-patch row (no description
+    # text to embed — e.g. brand-doc service patches that only carry
+    # dezy_advantage). Existing embeddings on the row are preserved.
+    embedding = await _embed(desc_for_embed) if desc else None
 
     if existing is None:
         svc = Service(
@@ -73,8 +78,8 @@ async def upsert_service(s: AsyncSession, tenant_id: uuid.UUID, row: dict) -> tu
             name=row["name"],
             category=row["category"],
             subcategory=None,
-            short_description=(row.get("description") or "")[:500] or None,
-            description=row.get("description"),
+            short_description=(desc or "")[:500] or None,
+            description=desc or None,
             duration_minutes=None,
             recovery_period=None,
             price_min=row.get("price_min"),
@@ -83,23 +88,34 @@ async def upsert_service(s: AsyncSession, tenant_id: uuid.UUID, row: dict) -> tu
             emi_eligible=False,
             url=row.get("url"),
             image_url=None,
-            attributes={"source": "dezy.com"},
+            attributes={"source": "dezy.com", **incoming_attrs},
             description_embedding=embedding,
             is_active=True,
         )
         s.add(svc)
         return (row["slug"], True)
 
-    existing.name = row["name"]
-    existing.category = row["category"]
-    existing.short_description = (row.get("description") or "")[:500] or None
-    existing.description = row.get("description")
-    existing.price_min = row.get("price_min")
-    existing.price_max = row.get("price_max")
-    existing.currency = row.get("currency", "INR")
-    existing.url = row.get("url")
-    existing.description_embedding = embedding
-    existing.attributes = dict(existing.attributes or {}, source="dezy.com")
+    # PATCH semantics: only overwrite scalar fields when the incoming row
+    # actually provides them (so brand-doc rows can patch attributes without
+    # blanking out scraped descriptions).
+    if row.get("name") and row["name"] != row["slug"].replace("-", " ").title():
+        existing.name = row["name"]
+    if row.get("category") and row["category"] != "general":
+        existing.category = row["category"]
+    if desc:
+        existing.short_description = desc[:500] or None
+        existing.description = desc
+    if row.get("price_min") is not None:
+        existing.price_min = row["price_min"]
+    if row.get("price_max") is not None:
+        existing.price_max = row["price_max"]
+    if row.get("currency"):
+        existing.currency = row["currency"]
+    if row.get("url"):
+        existing.url = row["url"]
+    if embedding is not None:
+        existing.description_embedding = embedding
+    existing.attributes = {**(existing.attributes or {}), **incoming_attrs, "source": existing.attributes.get("source", "dezy.com") if existing.attributes else "dezy.com"}
     existing.is_active = True
     return (row["slug"], False)
 
@@ -143,14 +159,21 @@ async def upsert_doctor(s: AsyncSession, tenant_id: uuid.UUID, row: dict) -> tup
         )
     ).scalar_one_or_none()
 
-    embedding = await _embed(row.get("bio") or row.get("full_name") or row["slug"])
+    incoming_attrs = dict(row.get("attributes") or {})
+    bio = row.get("bio")
+    # Skip embedding for pure attribute patches (brand-doc doctor overrides
+    # send no bio); preserve any existing bio_embedding.
+    embedding = await _embed(bio or row.get("full_name") or row["slug"]) if bio else None
 
-    attributes = {
-        "source": "dezy.com",
-        "url": row.get("url"),
-        "rating": row.get("rating"),
-        "cases_done": row.get("cases_done"),
-    }
+    base_attrs = {"source": "dezy.com"}
+    if row.get("url"):
+        base_attrs["url"] = row["url"]
+    if row.get("rating") is not None:
+        base_attrs["rating"] = row["rating"]
+    if row.get("cases_done") is not None:
+        base_attrs["cases_done"] = row["cases_done"]
+    # incoming_attrs wins (brand doc takes precedence over scrape values)
+    merged_attrs = {**base_attrs, **incoming_attrs}
 
     if existing is None:
         doc = Doctor(
@@ -164,29 +187,42 @@ async def upsert_doctor(s: AsyncSession, tenant_id: uuid.UUID, row: dict) -> tup
             experience_years=row.get("experience_years"),
             credentials=row.get("credentials") or [],
             languages=row.get("languages") or [],
-            bio=row.get("bio"),
+            bio=bio,
             bio_url=row.get("url"),
             photo_url=None,
-            attributes=attributes,
+            attributes=merged_attrs,
             bio_embedding=embedding,
             is_active=True,
         )
         s.add(doc)
         return (row["slug"], True)
 
-    existing.full_name = row["full_name"]
+    # PATCH semantics: only update fields the incoming row actually provides.
+    # Skip full_name overwrite when the incoming value looks like a default
+    # derived from the slug (so brand patches preserve scraped formatting).
+    incoming_name = row.get("full_name") or ""
+    slug_derived = row["slug"].replace("-", " ").title().replace("Dr ", "Dr. ")
+    if incoming_name and incoming_name != slug_derived:
+        existing.full_name = incoming_name
     if row.get("gender") is not None:
         existing.gender = row["gender"]
-    existing.specializations = row.get("specializations") or []
-    existing.city = row.get("city") or existing.city
+    if row.get("specializations"):
+        existing.specializations = row["specializations"]
+    if row.get("city"):
+        existing.city = row["city"]
     if row.get("experience_years") is not None:
         existing.experience_years = row["experience_years"]
-    existing.credentials = row.get("credentials") or []
-    existing.languages = row.get("languages") or []
-    existing.bio = row.get("bio") or existing.bio
-    existing.bio_url = row.get("url") or existing.bio_url
-    existing.attributes = {**(existing.attributes or {}), **attributes}
-    existing.bio_embedding = embedding
+    if row.get("credentials"):
+        existing.credentials = row["credentials"]
+    if row.get("languages"):
+        existing.languages = row["languages"]
+    if bio:
+        existing.bio = bio
+    if row.get("url"):
+        existing.bio_url = row["url"]
+    if embedding is not None:
+        existing.bio_embedding = embedding
+    existing.attributes = {**(existing.attributes or {}), **merged_attrs}
     existing.is_active = True
     return (row["slug"], False)
 
