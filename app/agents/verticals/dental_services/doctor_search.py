@@ -125,6 +125,32 @@ async def doctor_search_agent(state: DentalAgentState, db: AsyncSession) -> Dent
     state["items"] = items
     state["matched_doctors"] = items
 
+    # Persist the shown doctors so refinement / doctor_detail on the next turn
+    # know exactly who the user just saw (and in what order — "first doctor"
+    # means matches[0]). We store a compact dict per doctor with all the
+    # fields doctor_detail might cite.
+    ctx = state.get("extracted_context") or {}
+    ctx["shown_doctors"] = [
+        {
+            "id": str(d.id),
+            "slug": d.slug,
+            "full_name": d.full_name,
+            "city": d.city,
+            "gender": d.gender,
+            "specializations": list(d.specializations or []),
+            "credentials": list(d.credentials or []),
+            "languages": list(d.languages or []),
+            "experience_years": d.experience_years,
+            "bio": d.bio,
+            "bio_url": d.bio_url,
+            "cases_done": (d.attributes or {}).get("cases_done"),
+            "rating": (d.attributes or {}).get("rating"),
+            "tier": (d.attributes or {}).get("tier"),
+        }
+        for d in matches
+    ]
+    state["extracted_context"] = ctx
+
     if relaxed:
         lead = (
             f"I didn't find a {described} exactly, but here are matching clinicians "

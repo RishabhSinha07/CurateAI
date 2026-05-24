@@ -34,6 +34,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.verticals.dental_services.comparison import comparison_agent
 from app.agents.verticals.dental_services.content_qa import content_qa_agent
+from app.agents.verticals.dental_services.doctor_detail import doctor_detail_agent
 from app.agents.verticals.dental_services.doctor_search import doctor_search_agent
 from app.agents.verticals.dental_services.fallback import fallback_agent
 from app.agents.verticals.dental_services.initial_treatments import initial_treatments_agent
@@ -102,12 +103,14 @@ def after_interviewer(
     return END
 
 
-def after_refinement(state: DentalAgentState) -> Literal["router", "service_detail", "safety"]:
+def after_refinement(state: DentalAgentState) -> Literal["router", "service_detail", "doctor_detail", "safety"]:
     next_agent = state.get("next_agent")
     if next_agent == "router":
         return "router"
     if next_agent == "service_detail":
         return "service_detail"
+    if next_agent == "doctor_detail":
+        return "doctor_detail"
     return "safety"
 
 
@@ -136,6 +139,7 @@ class DentalConsultationGraph:
         builder.add_node("comparison", self._comparison_wrapper)
         builder.add_node("treatment_planner", self._treatment_planner_wrapper)
         builder.add_node("service_detail", self._service_detail_wrapper)
+        builder.add_node("doctor_detail", self._doctor_detail_wrapper)
         builder.add_node("refinement", self._refinement_wrapper)
         builder.add_node("fallback", self._fallback_wrapper)
         builder.add_node("safety", self._safety_wrapper)
@@ -174,11 +178,17 @@ class DentalConsultationGraph:
             },
         )
 
-        # Refinement: re-route to router for new topics, or service_detail for follow-ups
+        # Refinement: new topics → router; treatment follow-up → service_detail;
+        # doctor follow-up → doctor_detail; otherwise → safety
         builder.add_conditional_edges(
             "refinement",
             after_refinement,
-            {"router": "router", "service_detail": "service_detail", "safety": "safety"},
+            {
+                "router": "router",
+                "service_detail": "service_detail",
+                "doctor_detail": "doctor_detail",
+                "safety": "safety",
+            },
         )
 
         # Linear edges → safety → END
@@ -189,6 +199,7 @@ class DentalConsultationGraph:
         builder.add_edge("comparison", "safety")
         builder.add_edge("treatment_planner", "safety")
         builder.add_edge("service_detail", "safety")
+        builder.add_edge("doctor_detail", "safety")
         builder.add_edge("fallback", "safety")
         builder.add_edge("safety", END)
 
@@ -243,6 +254,9 @@ class DentalConsultationGraph:
 
     async def _service_detail_wrapper(self, state: DentalAgentState) -> DentalAgentState:
         return await self._timed("service_detail", service_detail_agent(state))
+
+    async def _doctor_detail_wrapper(self, state: DentalAgentState) -> DentalAgentState:
+        return await self._timed("doctor_detail", doctor_detail_agent(state))
 
     async def _refinement_wrapper(self, state: DentalAgentState) -> DentalAgentState:
         return await self._timed("refinement", refinement_agent(state))
