@@ -1,5 +1,5 @@
 import pytest
-from app.agents.search import search_architect_agent
+from app.agents.verticals.commerce.search import search_architect_agent
 from app.db.session import async_session_factory
 
 @pytest.mark.asyncio

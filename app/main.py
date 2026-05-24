@@ -71,6 +71,11 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         except Exception as e:
             logger.error(f"Failed to load knowledge graphs: {e}", exc_info=True)
 
+    # Import the vertical registry so verticals self-register at startup
+    # (fail fast on misconfiguration instead of on first request).
+    from app.agents.shared.registry import registered_verticals
+    logger.info(f"Registered verticals: {registered_verticals()}")
+
     yield
     # Shutdown
     logger.info("Shutting down CurateAI")

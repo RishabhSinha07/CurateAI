@@ -14,7 +14,7 @@ it falls back to fetching the newest products in the domain.
 import logging
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.agents.state import AgentState
+from app.agents.verticals.commerce.state import AgentState
 from app.db.repositories.product import ProductRepository
 from app.knowledge.graph_loader import get_knowledge_graph
 from app.knowledge.query_engine import GraphQueryEngine

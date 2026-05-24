@@ -25,6 +25,7 @@ SEED_TENANT_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")
 class TenantContext:
     tenant_id: uuid.UUID
     tenant_slug: str
+    vertical: str
     enabled_domains: list[str]
     allowed_origins: list[str]
     rate_limit_rpm: int
@@ -77,6 +78,7 @@ async def get_tenant_context(
         return TenantContext(
             tenant_id=tenant.id,
             tenant_slug=tenant.slug,
+            vertical=tenant.vertical,
             enabled_domains=list(tenant.enabled_domains),
             allowed_origins=list(tenant.allowed_origins),
             rate_limit_rpm=60,
@@ -131,6 +133,7 @@ async def get_tenant_context(
         return TenantContext(
             tenant_id=tenant.id,
             tenant_slug=tenant.slug,
+            vertical=tenant.vertical,
             enabled_domains=list(tenant.enabled_domains),
             allowed_origins=list(tenant.allowed_origins),
             rate_limit_rpm=api_key.rate_limit_rpm,
@@ -149,6 +152,7 @@ async def get_tenant_context(
     return TenantContext(
         tenant_id=seed_tenant.id,
         tenant_slug=seed_tenant.slug,
+        vertical=seed_tenant.vertical,
         enabled_domains=list(seed_tenant.enabled_domains),
         allowed_origins=list(seed_tenant.allowed_origins),
         rate_limit_rpm=60,

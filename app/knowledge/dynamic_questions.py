@@ -9,9 +9,9 @@ import logging
 from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field, field_validator
 
-from app.agents.validators import parse_list
+from app.agents.shared.validators import parse_list
 
-from app.agents.llm import get_bedrock_llm
+from app.agents.shared.llm import get_bedrock_llm
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,5 @@
 import pytest
-from app.agents.router import router_agent
+from app.agents.verticals.commerce.router import router_agent
 from app.db.session import async_session_factory
 
 @pytest.mark.asyncio

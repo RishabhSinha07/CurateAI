@@ -17,8 +17,8 @@ from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field
 import logging
 
-from app.agents.state import AgentState
-from app.agents.llm import get_bedrock_llm
+from app.agents.verticals.commerce.state import AgentState
+from app.agents.shared.llm import get_bedrock_llm
 from app.knowledge.graph_loader import get_knowledge_graph, list_available_graphs
 
 logger = logging.getLogger(__name__)

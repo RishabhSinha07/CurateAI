@@ -9,12 +9,12 @@ entire product catalog (no domain filter).
 from typing import Any, Literal, Optional
 from pydantic import BaseModel, Field, field_validator
 
-from app.agents.validators import parse_list, parse_literal_lower
+from app.agents.shared.validators import parse_list, parse_literal_lower
 from sqlalchemy.ext.asyncio import AsyncSession
 import logging
 
-from app.agents.state import AgentState
-from app.agents.llm import get_bedrock_llm
+from app.agents.verticals.commerce.state import AgentState
+from app.agents.shared.llm import get_bedrock_llm
 from app.db.repositories.product import ProductRepository
 from app.services.embeddings import generate_embedding_async
 

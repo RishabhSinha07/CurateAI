@@ -1,5 +1,5 @@
 import pytest
-from app.agents.reranker import reranker_agent
+from app.agents.verticals.commerce.reranker import reranker_agent
 
 @pytest.mark.asyncio
 async def test_reranker_agent_safety_filter(base_state):

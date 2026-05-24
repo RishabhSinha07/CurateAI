@@ -1,5 +1,5 @@
 import pytest
-from app.agents.safety import safety_agent
+from app.agents.verticals.commerce.safety import safety_agent
 
 @pytest.mark.asyncio
 async def test_safety_out_of_scope(base_state):

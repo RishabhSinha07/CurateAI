@@ -5,11 +5,11 @@ When a user asks for a specific product/ingredient by name (e.g., "I want melato
 the system should bypass the interviewer and show results immediately.
 """
 import pytest
-from app.agents.router import router_agent
-from app.agents.search import search_architect_agent
-from app.agents.safety import safety_agent
-from app.agents.interviewer import interviewer_agent
-from app.agents.graph import after_router
+from app.agents.verticals.commerce.router import router_agent
+from app.agents.verticals.commerce.search import search_architect_agent
+from app.agents.verticals.commerce.safety import safety_agent
+from app.agents.verticals.commerce.interviewer import interviewer_agent
+from app.agents.verticals.commerce.graph import after_router
 from app.db.session import async_session_factory
 
 
@@ -113,7 +113,7 @@ async def test_search_still_uses_graph_for_normal_queries(base_state):
 async def test_safety_direct_product_llm_response(base_state):
     """Safety should return an LLM-generated response for direct_product with benefits."""
     from unittest.mock import AsyncMock, patch
-    from app.agents.safety import SafetyResponse
+    from app.agents.verticals.commerce.safety import SafetyResponse
 
     mock_result = SafetyResponse(
         response="**Melatonin** is a naturally occurring hormone known to support your body's sleep-wake cycle. It may help with falling asleep faster and improving overall sleep quality. Look for products with clear dosage info to find the right fit for your routine.",
@@ -130,7 +130,7 @@ async def test_safety_direct_product_llm_response(base_state):
         {"id": "1", "name": "Restful Sleep", "brand": "NatureCo", "description": "Melatonin supplement"}
     ]
 
-    with patch("app.agents.safety.get_safety_model", return_value=mock_model):
+    with patch("app.agents.verticals.commerce.safety.get_safety_model", return_value=mock_model):
         result = await safety_agent(base_state)
 
     assert "melatonin" in result["response"].lower()
@@ -157,7 +157,7 @@ async def test_safety_direct_product_llm_fallback(base_state):
         {"id": "1", "name": "Restful Sleep", "description": "Melatonin supplement"}
     ]
 
-    with patch("app.agents.safety.get_safety_model", return_value=mock_model):
+    with patch("app.agents.verticals.commerce.safety.get_safety_model", return_value=mock_model):
         result = await safety_agent(base_state)
 
     assert "melatonin" in result["response"].lower()
@@ -170,7 +170,7 @@ async def test_safety_direct_product_llm_fallback(base_state):
 async def test_safety_direct_product_includes_match_reasons_in_prompt(base_state):
     """Safety should pass product match reasons to the LLM prompt."""
     from unittest.mock import AsyncMock, patch, call
-    from app.agents.safety import SafetyResponse
+    from app.agents.verticals.commerce.safety import SafetyResponse
 
     mock_result = SafetyResponse(
         response="**Vitamin C** is known to support immune function and may help with skin radiance.",
@@ -188,7 +188,7 @@ async def test_safety_direct_product_includes_match_reasons_in_prompt(base_state
         {"id": "2", "name": "C Complex", "brand": "NutraLife", "match_reasons": "Buffered vitamin C"},
     ]
 
-    with patch("app.agents.safety.get_safety_model", return_value=mock_model):
+    with patch("app.agents.verticals.commerce.safety.get_safety_model", return_value=mock_model):
         result = await safety_agent(base_state)
 
     # Verify the LLM prompt includes product context

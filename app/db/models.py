@@ -50,6 +50,9 @@ class Tenant(Base):
     )
     name: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     slug: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)
+    vertical: Mapped[str] = mapped_column(
+        String(50), nullable=False, server_default="commerce"
+    )
     enabled_domains: Mapped[list[str]] = mapped_column(
         ARRAY(String(50)), nullable=False, server_default="{*}"
     )
@@ -365,4 +368,211 @@ class ProductEvent(Base):
 
     __table_args__ = (
         Index("idx_product_events_type_created", "event_type", "created_at"),
+    )
+
+
+# ============================================
+# Dental Services Vertical Models
+# ============================================
+#
+# These tables back the `dental_services` vertical. They live alongside the
+# commerce-vertical Product table; both are tenant-scoped and each tenant
+# uses one or the other based on `tenants.vertical`.
+
+
+class Service(Base):
+    """
+    A treatment or service offered to patients (e.g. "Single Tooth Implant",
+    "Clear Aligners", "Teeth Whitening").
+    """
+
+    __tablename__ = "services"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid()
+    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id"), nullable=False, index=True
+    )
+    slug: Mapped[str] = mapped_column(String(120), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    category: Mapped[str] = mapped_column(
+        String(50), nullable=False, index=True
+    )  # implants | orthodontics | cosmetic | general | ...
+    subcategory: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    short_description: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    description: Mapped[str | None] = mapped_column(Text, nullable=True)
+    duration_minutes: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    recovery_period: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    price_min: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), nullable=True)
+    price_max: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), nullable=True)
+    currency: Mapped[str] = mapped_column(String(3), default="INR", nullable=False)
+    emi_eligible: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    image_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    attributes: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    description_embedding: Mapped[list[float] | None] = mapped_column(
+        Vector(1024), nullable=True
+    )
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "slug", name="uq_services_tenant_slug"),
+        Index("idx_services_attributes", "attributes", postgresql_using="gin"),
+        Index(
+            "idx_services_embedding",
+            "description_embedding",
+            postgresql_using="ivfflat",
+            postgresql_with={"lists": 100},
+            postgresql_ops={"description_embedding": "vector_cosine_ops"},
+        ),
+    )
+
+
+class Clinic(Base):
+    """A physical clinic location where services are delivered."""
+
+    __tablename__ = "clinics"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid()
+    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id"), nullable=False, index=True
+    )
+    slug: Mapped[str] = mapped_column(String(120), nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    address: Mapped[str | None] = mapped_column(Text, nullable=True)
+    city: Mapped[str | None] = mapped_column(String(100), nullable=True, index=True)
+    state: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    postal_code: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    country: Mapped[str] = mapped_column(String(2), default="IN", nullable=False)
+    lat: Mapped[Decimal | None] = mapped_column(Numeric(9, 6), nullable=True)
+    lng: Mapped[Decimal | None] = mapped_column(Numeric(9, 6), nullable=True)
+    phone: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    email: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    hours: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
+    services_offered: Mapped[list[uuid.UUID] | None] = mapped_column(
+        ARRAY(Uuid), nullable=True
+    )
+    attributes: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "slug", name="uq_clinics_tenant_slug"),
+    )
+
+
+class Doctor(Base):
+    """A clinician practising at one or more clinics, performing one or more services."""
+
+    __tablename__ = "doctors"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid()
+    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id"), nullable=False, index=True
+    )
+    slug: Mapped[str] = mapped_column(String(120), nullable=False)
+    full_name: Mapped[str] = mapped_column(String(255), nullable=False)
+    gender: Mapped[str | None] = mapped_column(
+        String(10), nullable=True, index=True
+    )  # "F" | "M" | "other"
+    specializations: Mapped[list[str]] = mapped_column(
+        ARRAY(String(80)), nullable=False, server_default="{}"
+    )
+    city: Mapped[str | None] = mapped_column(String(100), nullable=True, index=True)
+    clinic_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("clinics.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    experience_years: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    credentials: Mapped[list[str]] = mapped_column(
+        ARRAY(String(40)), nullable=False, server_default="{}"
+    )
+    languages: Mapped[list[str]] = mapped_column(
+        ARRAY(String(40)), nullable=False, server_default="{}"
+    )
+    bio: Mapped[str | None] = mapped_column(Text, nullable=True)
+    bio_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    photo_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    attributes: Mapped[dict] = mapped_column(JSONB, nullable=False, default=dict)
+    bio_embedding: Mapped[list[float] | None] = mapped_column(
+        Vector(1024), nullable=True
+    )
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        UniqueConstraint("tenant_id", "slug", name="uq_doctors_tenant_slug"),
+        Index("idx_doctors_specializations", "specializations", postgresql_using="gin"),
+    )
+
+
+class ContentChunk(Base):
+    """
+    A chunk of website content (procedure pages, FAQs, comparisons) embedded
+    for retrieval-augmented Q&A.
+    """
+
+    __tablename__ = "content_chunks"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid()
+    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id"), nullable=False, index=True
+    )
+    source_url: Mapped[str] = mapped_column(Text, nullable=False)
+    source_type: Mapped[str] = mapped_column(
+        String(40), nullable=False, server_default="page"
+    )  # page | faq | blog | comparison
+    title: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    chunk_text: Mapped[str] = mapped_column(Text, nullable=False)
+    chunk_index: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    token_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    embedding: Mapped[list[float] | None] = mapped_column(
+        Vector(1024), nullable=True
+    )
+    chunk_metadata: Mapped[dict] = mapped_column(
+        "metadata", JSONB, nullable=False, default=dict
+    )
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "tenant_id", "source_url", "chunk_index",
+            name="uq_content_chunks_source_chunk",
+        ),
+        Index("idx_content_chunks_metadata", "metadata", postgresql_using="gin"),
+        Index(
+            "idx_content_chunks_embedding",
+            "embedding",
+            postgresql_using="ivfflat",
+            postgresql_with={"lists": 100},
+            postgresql_ops={"embedding": "vector_cosine_ops"},
+        ),
     )

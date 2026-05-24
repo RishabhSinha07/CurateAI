@@ -10,13 +10,13 @@ Covers three layers:
 import uuid
 import pytest
 
-from app.agents.ingredient_info import (
+from app.agents.verticals.commerce.ingredient_info import (
     _build_user_context,
     _find_ingredients_in_graphs,
     _find_products_with_ingredient,
     ingredient_info_agent,
 )
-from app.agents.graph import (
+from app.agents.verticals.commerce.graph import (
     should_route_to,
     after_router,
 )
@@ -557,7 +557,7 @@ async def test_ingredient_info_agent_preserves_awaiting_slot_status_through_rout
     checking the intent type. After the fix the status must remain 'awaiting_slot'
     so the interrupted slot question resumes correctly on the next turn.
     """
-    from app.agents.router import router_agent
+    from app.agents.verticals.commerce.router import router_agent
     from app.db.session import async_session_factory
 
     state = _make_full_state(
@@ -657,7 +657,7 @@ async def test_ingredient_info_agent_uses_filled_attributes_context():
 @pytest.mark.asyncio
 async def test_router_classifies_how_does_as_ingredient_info(base_state):
     """Router must classify 'How does collagen work?' as ingredient_info."""
-    from app.agents.router import router_agent
+    from app.agents.verticals.commerce.router import router_agent
     from app.db.session import async_session_factory
 
     base_state["user_message"] = "How does collagen work?"
@@ -671,7 +671,7 @@ async def test_router_classifies_how_does_as_ingredient_info(base_state):
 @pytest.mark.asyncio
 async def test_router_classifies_benefits_as_ingredient_info(base_state):
     """Router must classify 'Benefits of zinc' as ingredient_info."""
-    from app.agents.router import router_agent
+    from app.agents.verticals.commerce.router import router_agent
     from app.db.session import async_session_factory
 
     base_state["user_message"] = "Benefits of zinc for skin"
@@ -689,7 +689,7 @@ async def test_router_distinguishes_ingredient_info_from_direct_product(base_sta
     'Show me collagen' is direct_product.
     The router must not confuse the two.
     """
-    from app.agents.router import router_agent
+    from app.agents.verticals.commerce.router import router_agent
     from app.db.session import async_session_factory
 
     base_state["user_message"] = "Show me collagen products"
@@ -703,7 +703,7 @@ async def test_router_distinguishes_ingredient_info_from_direct_product(base_sta
 @pytest.mark.asyncio
 async def test_router_still_classifies_symptom_as_query(base_state):
     """Symptom descriptions must not be reclassified as ingredient_info."""
-    from app.agents.router import router_agent
+    from app.agents.verticals.commerce.router import router_agent
     from app.db.session import async_session_factory
 
     base_state["user_message"] = "I have dull skin and want to improve my glow"

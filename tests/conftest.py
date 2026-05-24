@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from app.config import get_settings
-from app.agents.state import AgentState
+from app.agents.verticals.commerce.state import AgentState
 
 settings = get_settings()
 
