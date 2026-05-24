@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.shared.llm import get_bedrock_llm
 from app.agents.verticals.dental_services.knowledge import (
+    CONTACT_CHANNELS_CTAS,
     COST_CALCULATOR_CTA,
     PERSONA_SYSTEM_PROMPT,
 )
@@ -100,9 +101,11 @@ async def content_qa_agent(state: DentalAgentState, db: AsyncSession) -> DentalA
     except Exception as e:
         logger.warning("content_qa embedding failed: %s", e)
         state["response"] = (
-            "I'm having trouble looking up the answer right now. The fastest way "
-            "to get a clear, personalised answer is a free consultation."
+            "I'm having trouble looking up the answer right now — and I don't "
+            "want to guess on a dental question. The Dezy team can help you "
+            "directly; pick whichever way's easiest for you below."
         )
+        state["cta_links"] = list(CONTACT_CHANNELS_CTAS)
         return state
 
     # 2) Retrieve top chunks
@@ -115,13 +118,13 @@ async def content_qa_agent(state: DentalAgentState, db: AsyncSession) -> DentalA
     )
 
     if not chunks:
-        # Graceful fallback when content isn't ingested (or no good match)
+        # Low-confidence fallback: be honest, hand the user a real human.
         state["response"] = (
-            "I don't have a confident answer to that from Dezy's published material "
-            "yet. The most accurate next step is a free consultation — a Dezy clinician "
-            "can walk you through this specifically for your situation."
+            "I'm not 100% sure on this — and you deserve a clear answer rather "
+            "than my best guess. The Dezy team can give you a tailored answer in "
+            "person, on chat, or over a call. Pick whichever way's easiest below."
         )
-        state["cta_links"] = [COST_CALCULATOR_CTA]
+        state["cta_links"] = list(CONTACT_CHANNELS_CTAS)
         state["items"] = []
         state["suggested_replies"] = ["Talk to a dentist", "Show me prices", "Find a doctor"]
         return state

@@ -145,7 +145,7 @@ async def treatment_planner_agent(state: DentalAgentState) -> DentalAgentState:
     state["cta_links"] = [
         {
             "label": "Book all of these together",
-            "url": "https://www.dezy.com/book",
+            "url": "https://www.dezy.com/new-appointment-flow",
             "kind": "secondary",
         },
     ]

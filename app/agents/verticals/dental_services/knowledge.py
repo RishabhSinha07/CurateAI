@@ -30,35 +30,35 @@ CONCERNS: dict[str, Concern] = {
         "display": "Missing tooth",
         "synonyms": ["lost tooth", "tooth fell out", "gap from missing tooth", "no tooth"],
         "treats": ["single_implant", "bridge", "denture_partial"],
-        "typical_slots": ["tooth_location", "missing_duration", "bone_health_known", "permanence_preference"],
+        "typical_slots": ["permanence_preference"],
     },
     "multiple_missing_teeth": {
         "id": "multiple_missing_teeth",
         "display": "Multiple missing teeth",
         "synonyms": ["several missing teeth", "lost many teeth", "no teeth", "edentulous"],
         "treats": ["full_mouth_implant", "denture_full", "bridge"],
-        "typical_slots": ["how_many_missing", "missing_duration", "surgery_comfort", "budget_band"],
+        "typical_slots": ["surgery_comfort"],
     },
     "crowded_teeth": {
         "id": "crowded_teeth",
         "display": "Crowded or crooked teeth",
         "synonyms": ["crooked teeth", "overlapping teeth", "misaligned", "want straighter teeth"],
         "treats": ["clear_aligners", "metal_braces"],
-        "typical_slots": ["severity", "timeline_months", "visibility_preference", "budget_band"],
+        "typical_slots": ["severity", "timeline_months", "visibility_preference"],
     },
     "gap_between_teeth": {
         "id": "gap_between_teeth",
         "display": "Gap between teeth",
         "synonyms": ["diastema", "small gap", "teeth gap", "space between teeth"],
         "treats": ["clear_aligners", "dental_bonding", "veneers"],
-        "typical_slots": ["severity", "timeline_months", "budget_band"],
+        "typical_slots": ["severity", "timeline_months"],
     },
     "stained_teeth": {
         "id": "stained_teeth",
         "display": "Yellow or stained teeth",
         "synonyms": ["yellow teeth", "discolored teeth", "want whiter smile", "teeth discoloration"],
         "treats": ["teeth_whitening", "veneers", "cleaning"],
-        "typical_slots": ["sensitivity_known", "budget_band"],
+        "typical_slots": ["sensitivity_known"],
     },
     "tooth_pain": {
         "id": "tooth_pain",
@@ -75,7 +75,6 @@ CONCERNS: dict[str, Concern] = {
         "typical_slots": [],
     },
 }
-
 
 # ============================================================================
 # Treatments — the catalog of services Dezy provides
@@ -308,35 +307,11 @@ class Slot(TypedDict):
 
 
 SLOTS: dict[str, Slot] = {
-    "tooth_location": {
-        "id": "tooth_location",
-        "question": "Which tooth is affected? (e.g. upper left molar, lower front, etc.)",
-        "quick_replies": ["Upper front", "Upper back", "Lower front", "Lower back"],
-        "accepts_freeform": True,
-    },
-    "missing_duration": {
-        "id": "missing_duration",
-        "question": "How long has the tooth been missing?",
-        "quick_replies": ["Less than 6 months", "6-12 months", "1-3 years", "More than 3 years"],
-        "accepts_freeform": True,
-    },
-    "bone_health_known": {
-        "id": "bone_health_known",
-        "question": "Do you know if your jawbone health is good in that area? (it's fine if you're unsure)",
-        "quick_replies": ["Yes, good", "Yes, weak", "Not sure"],
-        "accepts_freeform": False,
-    },
     "permanence_preference": {
         "id": "permanence_preference",
         "question": "Do you want a permanent fix, or something removable?",
         "quick_replies": ["Permanent", "Removable", "Open to both"],
         "accepts_freeform": False,
-    },
-    "how_many_missing": {
-        "id": "how_many_missing",
-        "question": "Roughly how many teeth are missing?",
-        "quick_replies": ["1-3", "4-6", "More than 6", "Most of one arch"],
-        "accepts_freeform": True,
     },
     "surgery_comfort": {
         "id": "surgery_comfort",
@@ -443,7 +418,7 @@ DEFAULT_DISCLAIMER = (
 
 BOOK_CONSULT_CTA = {
     "label": "Book a Free Consultation",
-    "url": "https://www.dezy.com/book",
+    "url": "https://www.dezy.com/new-appointment-flow",
     "kind": "primary",
 }
 
@@ -452,6 +427,33 @@ COST_CALCULATOR_CTA = {
     "url": "https://www.dezy.com/cost-calculator",
     "kind": "secondary",
 }
+
+# Multi-channel contact options shown when the agent can't confidently answer
+# and wants to hand the user to a real human. Order matters — primary
+# Book CTA first, then easiest-to-fastest alternative channels.
+CONTACT_CHANNELS_CTAS = [
+    BOOK_CONSULT_CTA,
+    {
+        "label": "Chat on WhatsApp",
+        "url": "https://api.whatsapp.com/send?phone=+917618792440&text=Hello%20Dezy",
+        "kind": "secondary",
+    },
+    {
+        "label": "Call (New Patients)",
+        "url": "tel:+917618792440",
+        "kind": "secondary",
+    },
+    {
+        "label": "Call (Ongoing Patients)",
+        "url": "tel:+918047362299",
+        "kind": "secondary",
+    },
+    {
+        "label": "Browse FAQs",
+        "url": "https://www.dezy.com/faqs",
+        "kind": "secondary",
+    },
+]
 
 
 def find_concern(text: str) -> Concern | None:
