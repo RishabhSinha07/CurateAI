@@ -39,6 +39,57 @@ def visible_text(html: str) -> str:
     return WS_RE.sub(" ", stripped).strip()
 
 
+# Matches dezy.com's top nav (ends right before the page body starts) and
+# its footer link block (begins right after the page body ends). Tuned
+# against /why-dezy-is-different but stable across the content pages.
+TOP_NAV_END_RE = re.compile(
+    r"Book a Free Consultation\s+Account\s+Call Us\s+Call Us\s+",
+)
+FOOTER_START_RE = re.compile(
+    r"About Dezy\s+About Us\s+Our Clinics",
+)
+
+
+def strip_chrome(text: str) -> str:
+    """Strip the global nav from the start and the footer link list from
+    the end of a content page's visible text. Conservative: if either
+    marker isn't found, we leave that side untouched."""
+    m_top = TOP_NAV_END_RE.search(text)
+    if m_top:
+        text = text[m_top.end():]
+    m_foot = FOOTER_START_RE.search(text)
+    if m_foot:
+        text = text[: m_foot.start()]
+    return text.strip()
+
+
+def chunk_text(text: str, *, target_words: int = 400, overlap_words: int = 40) -> list[str]:
+    """Word-window chunker. Splits on whitespace, batches into ~target_words
+    chunks with `overlap_words` of overlap so semantic boundaries crossing
+    a chunk edge still appear in one of the chunks."""
+    words = text.split()
+    if not words:
+        return []
+    if len(words) <= target_words:
+        return [" ".join(words)]
+    chunks: list[str] = []
+    start = 0
+    while start < len(words):
+        end = min(start + target_words, len(words))
+        chunks.append(" ".join(words[start:end]))
+        if end == len(words):
+            break
+        start = end - overlap_words
+    return chunks
+
+
+def _clean_title(raw_title: str | None) -> str:
+    if not raw_title:
+        return ""
+    # Strip trailing "| Dezy" / " - Dezy" / " - Dezy Dental Treatments" etc.
+    return re.sub(r"\s*[|\-–]\s*Dezy.*$", "", raw_title, flags=re.IGNORECASE).strip()
+
+
 def parse_json_ld(html: str) -> list[Any]:
     """Yield parsed JSON-LD objects from a page (skipping malformed blocks)."""
     blocks: list[Any] = []
@@ -327,3 +378,49 @@ def parse_clinic_page(url: str, city: str, slug: str, html: str) -> dict | None:
         "address": address,
         "postal_code": postal,
     }
+
+
+# ---------------------------------------------------------------------------
+# Generic content-page parser (why-dezy, how-it-works, cost, faqs, concern
+# landings, etc.) — pages with long-form body text instead of structured
+# Schema.org Service/MedicalProcedure markup.
+# ---------------------------------------------------------------------------
+
+def parse_content_page(url: str, slug: str, html: str) -> list[dict]:
+    """Strip nav/footer chrome, chunk the body into ~400-word windows with
+    overlap, return content_chunks rows. Caller should additionally call
+    parse_faq_chunks(url, title, html) to capture any FAQPage JSON-LD on
+    these pages — those Q&As are first-class chunks too.
+
+    chunk_index for body chunks starts at 0. parse_faq_chunks also starts at 0
+    on its end; the (tenant_id, source_url, chunk_index) DB unique constraint
+    means we offset FAQ indices into a different range. Easiest: shift body
+    chunks to start at 1000 so faq_chunks (0..999) and procedure_chunks (100+)
+    never collide.
+    """
+    title_match = re.search(r"<title[^>]*>([^<]+)</title>", html, re.IGNORECASE)
+    raw_title = title_match.group(1).strip() if title_match else slug
+    title = _clean_title(raw_title) or slug.replace("-", " ").title()
+
+    body = strip_chrome(visible_text(html))
+    if not body or len(body.split()) < 30:
+        # Very thin page (e.g. a booking landing with mostly form chrome) —
+        # skip body chunking; FAQ extraction can still run from JSON-LD.
+        return []
+
+    chunks: list[dict] = []
+    for i, chunk_body in enumerate(chunk_text(body)):
+        chunks.append({
+            "source_url": url,
+            "source_type": "page",
+            "title": title,
+            # Shift body chunks above FAQ (0..N) and procedure (100..N) ranges
+            "chunk_index": 1000 + i,
+            "chunk_text": chunk_body,
+            "metadata": {
+                "page_title": title,
+                "section": "body",
+                "slug": slug,
+            },
+        })
+    return chunks

@@ -31,6 +31,7 @@ from urllib.parse import urlsplit
 from scripts.scrape_dezy.fetcher import PoliteFetcher
 from scripts.scrape_dezy.parsers import (
     parse_clinic_page,
+    parse_content_page,
     parse_doctor_page,
     parse_faq_chunks,
     parse_procedure_chunks,
@@ -42,17 +43,49 @@ SITEMAP_URL = "https://www.dezy.com/sitemap.xml"
 logger = logging.getLogger("scrape_dezy")
 
 
+# Top-level pages we explicitly skip (legal boilerplate + blog SEO).
+SKIP_TOP_LEVEL = {"privacy-policy", "terms"}
+
+# Catalog index pages — content lives in the per-item pages we already walk.
+SKIP_INDEX = {"services", "meet-your-dentists"}
+
+
 def _classify(url: str) -> tuple[str, str, str | None]:
     """Return (kind, slug, city_or_none) for a sitemap URL we care about."""
     path = urlsplit(url).path.rstrip("/")
     parts = [p for p in path.split("/") if p]
+
+    if not parts:
+        return ("skip", "", None)  # home page
+
+    # /services/<slug>
     if len(parts) >= 2 and parts[0] == "services":
-        # /services/<slug>
         return ("service", parts[1], None)
+
+    # /meet-your-dentists/<slug>
     if len(parts) >= 2 and parts[0] == "meet-your-dentists":
         return ("doctor", parts[1], None)
+
+    # /clinics/<city>/<leaf-slug> — individual clinic detail page
     if len(parts) >= 3 and parts[0] == "clinics":
         return ("clinic", parts[2], parts[1])
+
+    # /clinics/<city> — city aggregator page (mostly FAQs at the bottom worth grabbing)
+    if len(parts) == 2 and parts[0] == "clinics":
+        return ("content", f"clinics-{parts[1]}", None)
+
+    # Skip the blog tree entirely (we have FAQ + service content; blogs are SEO noise)
+    if parts[0] == "blogs":
+        return ("skip", "", None)
+
+    # Top-level content pages (/why-dezy-is-different, /how-it-works-implants,
+    # /cost-of-dental-implants, /faqs, /crowded-teeth, etc.)
+    if len(parts) == 1:
+        slug = parts[0]
+        if slug in SKIP_TOP_LEVEL or slug in SKIP_INDEX:
+            return ("skip", "", None)
+        return ("content", slug, None)
+
     return ("skip", "", None)
 
 
@@ -83,7 +116,7 @@ async def scrape(out_path: Path, *, limit_per_kind: int | None = None) -> None:
 
         # Group URLs by kind for predictable progress and easy limiting.
         by_kind: dict[str, list[tuple[str, str, str | None]]] = {
-            "service": [], "doctor": [], "clinic": [],
+            "service": [], "doctor": [], "clinic": [], "content": [],
         }
         for url in urls:
             kind, slug, city = _classify(url)
@@ -133,6 +166,18 @@ async def scrape(out_path: Path, *, limit_per_kind: int | None = None) -> None:
             cl = parse_clinic_page(url, city or "", slug, html)
             if cl is not None:
                 clinics.append(cl)
+
+        # 5) Content pages (why-dezy / how-it-works / cost / faqs / concern landings / etc.)
+        for i, (url, slug, _) in enumerate(by_kind["content"], 1):
+            try:
+                html = await fetcher.get(url)
+            except Exception as e:
+                logger.warning("[content %d/%d] fetch failed for %s: %s", i, len(by_kind["content"]), url, e)
+                continue
+            content_chunks.extend(parse_content_page(url, slug, html))
+            # Also surface FAQPage JSON-LD blocks if present
+            title = _title(html)
+            content_chunks.extend(parse_faq_chunks(url, title, html))
 
     snapshot = {
         "services": services,
