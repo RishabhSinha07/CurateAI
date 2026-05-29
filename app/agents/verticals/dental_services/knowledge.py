@@ -424,7 +424,13 @@ BOOK_CONSULT_CTA = {
 
 COST_CALCULATOR_CTA = {
     "label": "Open Cost Calculator",
-    "url": "https://www.dezy.com/cost-calculator",
+    "url": "https://www.dezy.com/treatment-cost-calculator",
+    "kind": "secondary",
+}
+
+IMPLANT_COST_CALCULATOR_CTA = {
+    "label": "Open Cost Calculator",
+    "url": "https://www.dezy.com/dental-implants-cost-calculator",
     "kind": "secondary",
 }
 

@@ -19,6 +19,7 @@ from app.agents.shared.llm import get_bedrock_llm
 from app.agents.verticals.dental_services.knowledge import (
     CONTACT_CHANNELS_CTAS,
     COST_CALCULATOR_CTA,
+    IMPLANT_COST_CALCULATOR_CTA,
     PERSONA_SYSTEM_PROMPT,
 )
 from app.agents.verticals.dental_services.state import DentalAgentState
@@ -30,6 +31,17 @@ logger = logging.getLogger(__name__)
 
 MIN_SIMILARITY = 0.45
 TOP_K = 5
+
+
+def _pick_cost_calculator(user_message: str, chunks_with_score: list[tuple] | None = None) -> dict:
+    haystack = user_message.lower()
+    if chunks_with_score:
+        for chunk, _ in chunks_with_score:
+            haystack += " " + (chunk.source_url or "").lower()
+            haystack += " " + (chunk.title or "").lower()
+    if "implant" in haystack:
+        return IMPLANT_COST_CALCULATOR_CTA
+    return COST_CALCULATOR_CTA
 
 
 class ContentQAResponse(BaseModel):
@@ -145,7 +157,7 @@ async def content_qa_agent(state: DentalAgentState, db: AsyncSession) -> DentalA
             f"> {best_chunk.chunk_text.strip()[:600]}\n\n"
             "A clinician can answer this more specifically during a free consultation."
         )
-        state["cta_links"] = [COST_CALCULATOR_CTA]
+        state["cta_links"] = [_pick_cost_calculator(user_message, chunks)]
         return state
 
     cited_ids = set(result.cited_chunk_ids)
@@ -170,7 +182,7 @@ async def content_qa_agent(state: DentalAgentState, db: AsyncSession) -> DentalA
 
     state["response"] = result.answer
     state["items"] = []
-    state["cta_links"] = [COST_CALCULATOR_CTA]
+    state["cta_links"] = [_pick_cost_calculator(user_message, chunks)]
     state["suggested_replies"] = result.suggested_replies or []
     state["content_citations"] = citations
     state["status"] = "completed"
