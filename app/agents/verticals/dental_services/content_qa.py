@@ -29,7 +29,7 @@ from app.services.embeddings import generate_embedding_async
 logger = logging.getLogger(__name__)
 
 
-MIN_SIMILARITY = 0.45
+MIN_SIMILARITY = 0.30
 TOP_K = 5
 
 
