@@ -223,6 +223,10 @@ class AuthStack(Stack):
             "DashboardIntegration",
             f"{backend_url}/admin/dashboard/{{proxy}}",
         )
+        widget_config_integration = integrations.HttpUrlIntegration(
+            "WidgetConfigIntegration",
+            f"{backend_url}/widget/config",
+        )
 
         # --- Public routes (no auth) ---
         self.api.add_routes(
@@ -234,6 +238,11 @@ class AuthStack(Stack):
             path="/chat",
             methods=[apigw.HttpMethod.OPTIONS],
             integration=chat_integration,
+        )
+        self.api.add_routes(
+            path="/widget/config",
+            methods=[apigw.HttpMethod.GET, apigw.HttpMethod.OPTIONS],
+            integration=widget_config_integration,
         )
 
         # --- Widget route (Lambda JWT authorizer) ---
