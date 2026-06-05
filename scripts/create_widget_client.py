@@ -13,6 +13,7 @@ Requires AWS credentials with DynamoDB write access.
 """
 
 import argparse
+import json
 import sys
 
 try:
@@ -32,6 +33,7 @@ def create_client(
     origins: list[str],
     expected_iss: str,
     rate_limit_rpm: int = 60,
+    theme: dict | None = None,
 ) -> None:
     dynamodb = boto3.resource("dynamodb", region_name=REGION)
     table = dynamodb.Table(TABLE_NAME)
@@ -45,6 +47,8 @@ def create_client(
         "rate_limit_rpm": rate_limit_rpm,
         "is_active": True,
     }
+    if theme:
+        item["theme"] = theme
 
     table.put_item(Item=item)
 
@@ -90,12 +94,36 @@ def main():
     parser.add_argument("--iss", required=True, help="Expected JWT issuer claim")
     parser.add_argument("--rpm", type=int, default=60, help="Rate limit RPM (default: 60)")
     parser.add_argument(
+        "--theme",
+        default=None,
+        help=(
+            "Theme as JSON string or @path/to/theme.json. Keys mirror the widget "
+            'CurateAIWidgetConfig fields (e.g. {"primaryColor":"#A57548",'
+            '"title":"Acme Help"}). Served by /widget/config to the widget at runtime.'
+        ),
+    )
+    parser.add_argument(
         "--profile",
         default="CurateAI",
         help="AWS profile name (default: CurateAI)",
     )
 
     args = parser.parse_args()
+
+    theme: dict | None = None
+    if args.theme:
+        raw = args.theme
+        if raw.startswith("@"):
+            with open(raw[1:], "r", encoding="utf-8") as f:
+                raw = f.read()
+        try:
+            theme = json.loads(raw)
+        except json.JSONDecodeError as e:
+            print(f"ERROR: --theme is not valid JSON: {e}")
+            sys.exit(1)
+        if not isinstance(theme, dict):
+            print("ERROR: --theme must be a JSON object")
+            sys.exit(1)
 
     # Set AWS profile
     import os
@@ -108,6 +136,7 @@ def main():
         origins=args.origins.split(","),
         expected_iss=args.iss,
         rate_limit_rpm=args.rpm,
+        theme=theme,
     )
 
 

@@ -15,6 +15,7 @@ from app.api.routes.chat import router as chat_router
 from app.api.routes.events import router as events_router
 from app.api.routes.admin import router as admin_router
 from app.api.routes.dashboard import router as dashboard_router
+from app.api.routes.widget_config import router as widget_config_router
 from app.api.middleware.logging import RequestLoggingMiddleware
 
 settings = get_settings()
@@ -167,3 +168,4 @@ app.include_router(chat_router)
 app.include_router(events_router)
 app.include_router(admin_router)
 app.include_router(dashboard_router)
+app.include_router(widget_config_router)
