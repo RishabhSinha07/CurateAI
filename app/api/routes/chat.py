@@ -19,6 +19,7 @@ from app.agents.shared.response import ChatResponse
 from app.api.middleware.auth import TenantContext, get_tenant_context
 from app.api.middleware.rate_limit import check_rate_limit
 from app.db.repositories.session import SessionRepository
+from app.db.repositories.widget_user import WidgetUserRepository
 from app.db.session import get_db
 
 router = APIRouter(prefix="/chat", tags=["chat"])
@@ -31,6 +32,25 @@ class ChatRequest(BaseModel):
     session_id: Optional[uuid.UUID] = Field(
         None, description="Existing session ID for continuation"
     )
+    # Stable per-visitor id minted by the widget and persisted in localStorage.
+    # Omitted by non-widget callers (admin UI, tests); when present, the route
+    # enforces the lead-capture gate against tenants.free_message_limit.
+    anonymous_id: Optional[str] = Field(
+        None, max_length=64, description="Widget visitor ID from localStorage"
+    )
+
+
+class RegisterRequest(BaseModel):
+    """Lead-capture payload — flips an anonymous visitor to registered."""
+
+    anonymous_id: str = Field(..., min_length=1, max_length=64)
+    name: str = Field(..., min_length=1, max_length=255)
+    email: str = Field(..., min_length=1, max_length=255)
+    phone: str = Field(..., min_length=1, max_length=50)
+
+
+class RegisterResponse(BaseModel):
+    status: str
 
 
 @router.post("", response_model=ChatResponse)
@@ -41,6 +61,34 @@ async def chat(
 ) -> ChatResponse:
     """Process a chat message and return a polymorphic consultation response."""
     session_repo = SessionRepository(db)
+    widget_user_repo = WidgetUserRepository(db)
+
+    # Lead-capture gate: when the widget supplies an anonymous_id, count the
+    # incoming user message against the tenant's free quota. Once an
+    # unregistered visitor exceeds the quota, short-circuit with
+    # status="auth_required" so the widget can render the registration form.
+    widget_user = None
+    if request.anonymous_id:
+        widget_user = await widget_user_repo.get_or_create(
+            tenant_id=tenant.tenant_id,
+            anonymous_id=request.anonymous_id,
+        )
+        if (
+            not widget_user.is_registered
+            and widget_user.message_count >= tenant.free_message_limit
+        ):
+            existing_session_id = (
+                request.session_id if request.session_id else uuid.uuid4()
+            )
+            return ChatResponse(
+                session_id=existing_session_id,
+                response=(
+                    "Before we continue, could you share your name, email, "
+                    "and phone number? It just takes a moment and helps us "
+                    "stay in touch."
+                ),
+                status="auth_required",
+            )
 
     try:
         chat_session = await session_repo.get_or_create(
@@ -116,7 +164,32 @@ async def chat(
         suggested_product_ids=item_ids or None,
     )
 
+    if widget_user is not None and not widget_user.is_registered:
+        await widget_user_repo.increment_message_count(widget_user.id)
+
     return response
+
+
+@router.post("/register", response_model=RegisterResponse)
+async def register_widget_user(
+    request: RegisterRequest,
+    tenant: TenantContext = Depends(check_rate_limit),
+    db: AsyncSession = Depends(get_db),
+) -> RegisterResponse:
+    """Lift the lead-capture gate for an anonymous visitor.
+
+    Stores name/email/phone as-is — no validation here per design; verification
+    (if any) is the caller's responsibility.
+    """
+    widget_user_repo = WidgetUserRepository(db)
+    await widget_user_repo.mark_registered(
+        tenant_id=tenant.tenant_id,
+        anonymous_id=request.anonymous_id,
+        name=request.name,
+        email=request.email,
+        phone=request.phone,
+    )
+    return RegisterResponse(status="ok")
 
 
 @router.get("/{session_id}/history")

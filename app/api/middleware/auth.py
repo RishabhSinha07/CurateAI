@@ -30,6 +30,7 @@ class TenantContext:
     allowed_origins: list[str]
     rate_limit_rpm: int
     daily_cost_cap_cents: int
+    free_message_limit: int
     user_id: uuid.UUID | None = None
 
 
@@ -83,6 +84,7 @@ async def get_tenant_context(
             allowed_origins=list(tenant.allowed_origins),
             rate_limit_rpm=60,
             daily_cost_cap_cents=tenant.daily_bedrock_cost_cap_cents,
+            free_message_limit=tenant.free_message_limit,
             user_id=user_id,
         )
 
@@ -138,6 +140,7 @@ async def get_tenant_context(
             allowed_origins=list(tenant.allowed_origins),
             rate_limit_rpm=api_key.rate_limit_rpm,
             daily_cost_cap_cents=tenant.daily_bedrock_cost_cap_cents,
+            free_message_limit=tenant.free_message_limit,
             user_id=user_id,
         )
 
@@ -157,4 +160,5 @@ async def get_tenant_context(
         allowed_origins=list(seed_tenant.allowed_origins),
         rate_limit_rpm=60,
         daily_cost_cap_cents=seed_tenant.daily_bedrock_cost_cap_cents,
+        free_message_limit=seed_tenant.free_message_limit,
     )

@@ -63,6 +63,12 @@ class Tenant(Base):
     daily_bedrock_cost_cap_cents: Mapped[int] = mapped_column(
         Integer, default=500, nullable=False
     )
+    # Max user messages an anonymous widget visitor can send before being
+    # asked to register name/email/phone. Per-tenant so each customer can tune
+    # their lead-capture aggressiveness.
+    free_message_limit: Mapped[int] = mapped_column(
+        Integer, nullable=False, server_default="3"
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
@@ -135,6 +141,47 @@ class AdminUser(Base):
 
     # Relationships
     tenant: Mapped["Tenant"] = relationship("Tenant")
+
+
+class WidgetUser(Base):
+    """
+    Anonymous-or-registered widget visitor, identified by a localStorage UUID.
+
+    Tracks how many user messages an anonymous visitor has sent so the
+    backend can gate further consultation behind a lead-capture form
+    (name / email / phone). Once `is_registered=True`, the gate no longer
+    fires for that visitor.
+    """
+
+    __tablename__ = "widget_users"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, primary_key=True, default=uuid.uuid4, server_default=func.gen_random_uuid()
+    )
+    tenant_id: Mapped[uuid.UUID] = mapped_column(
+        Uuid, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    # UUID generated client-side by the widget and persisted in localStorage.
+    # Bypassable (incognito / cleared storage); accepted as the cost of a
+    # frictionless first-message experience.
+    anonymous_id: Mapped[str] = mapped_column(String(64), nullable=False)
+    name: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    email: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    phone: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    is_registered: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
+    message_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        UniqueConstraint(
+            "tenant_id", "anonymous_id", name="uq_widget_users_tenant_anon"
+        ),
+    )
 
 
 # ============================================
