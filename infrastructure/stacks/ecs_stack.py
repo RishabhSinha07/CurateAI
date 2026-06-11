@@ -153,6 +153,18 @@ class EcsStack(Stack):
             )
         )
 
+        # Read-only access to the widget clients table for the /widget/config
+        # endpoint, which serves tenant-specific theming to the embedded widget.
+        self.task_role.add_to_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                actions=["dynamodb:GetItem"],
+                resources=[
+                    f"arn:aws:dynamodb:us-east-1:{self.account}:table/CurateAI-WidgetClients",
+                ],
+            )
+        )
+
         # Grant task execution role access to secrets
         self.db_secret.grant_read(self.task_execution_role)
         self.jwt_secret.grant_read(self.task_execution_role)
