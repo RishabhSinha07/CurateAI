@@ -153,6 +153,18 @@ class EcsStack(Stack):
             )
         )
 
+        # Read access to the widget clients table, used by GET /widget/config
+        # to look up per-tenant theme and allowed origins.
+        self.task_role.add_to_policy(
+            iam.PolicyStatement(
+                effect=iam.Effect.ALLOW,
+                actions=["dynamodb:GetItem"],
+                resources=[
+                    f"arn:aws:dynamodb:{self.region}:{self.account}:table/CurateAI-WidgetClients"
+                ],
+            )
+        )
+
         # Grant task execution role access to secrets
         self.db_secret.grant_read(self.task_execution_role)
         self.jwt_secret.grant_read(self.task_execution_role)

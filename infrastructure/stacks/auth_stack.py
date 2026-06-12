@@ -204,6 +204,10 @@ class AuthStack(Stack):
             "ChatIntegration",
             f"{backend_url}/chat",
         )
+        chat_register_integration = integrations.HttpUrlIntegration(
+            "ChatRegisterIntegration",
+            f"{backend_url}/chat/register",
+        )
         events_integration = integrations.HttpUrlIntegration(
             "EventsIntegration",
             f"{backend_url}/events",
@@ -250,6 +254,17 @@ class AuthStack(Stack):
             path="/chat",
             methods=[apigw.HttpMethod.POST],
             integration=chat_integration,
+            authorizer=self.jwt_authorizer,
+        )
+        self.api.add_routes(
+            path="/chat/register",
+            methods=[apigw.HttpMethod.OPTIONS],
+            integration=chat_register_integration,
+        )
+        self.api.add_routes(
+            path="/chat/register",
+            methods=[apigw.HttpMethod.POST],
+            integration=chat_register_integration,
             authorizer=self.jwt_authorizer,
         )
 
