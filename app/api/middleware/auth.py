@@ -49,11 +49,14 @@ async def get_tenant_context(
     tenant_repo = TenantRepository(db)
 
     # --- 1. Lambda authorizer context (JWT-authenticated requests) ---
-    # API Gateway forwards Lambda authorizer context as request context.
-    # For HTTP APIs with IAM policy response, context fields are passed
-    # as headers prefixed with x-amzn-lambda-authorizer-.
+    # API Gateway maps the Lambda authorizer context onto request headers via
+    # an integration parameter mapping ($context.authorizer.tenant_id ->
+    # x-ca-tenant-id). The `x-amzn-*` names are a reserved API Gateway header
+    # namespace and cannot be set by a mapping, so we use the x-ca-* names;
+    # the legacy names are kept only as a fallback.
     authorizer_tenant_id = (
-        request.headers.get("x-amzn-lambda-authorizer-tenant_id")
+        request.headers.get("x-ca-tenant-id")
+        or request.headers.get("x-amzn-lambda-authorizer-tenant_id")
         or request.headers.get("x-amzn-lambda-authorizer-tenant-id")
     )
 
@@ -69,7 +72,10 @@ async def get_tenant_context(
 
         # Extract user_id from authorizer context
         user_id = None
-        user_id_str = request.headers.get("x-amzn-lambda-authorizer-user_id")
+        user_id_str = (
+            request.headers.get("x-ca-user-id")
+            or request.headers.get("x-amzn-lambda-authorizer-user_id")
+        )
         if user_id_str:
             try:
                 user_id = uuid.UUID(user_id_str)
