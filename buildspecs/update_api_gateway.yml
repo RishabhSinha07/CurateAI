@@ -21,7 +21,21 @@ phases:
           PATH_PART=$(echo "$URI" | sed 's|http://[^/]*||')
           if [ -n "$PATH_PART" ]; then
             NEW_URI="${BASE}${PATH_PART}"
-            aws apigatewayv2 update-integration --api-id "$API_ID" --integration-id "$ID" --region "$AWS_DEFAULT_REGION" --integration-uri "$NEW_URI"
+            case "$PATH_PART" in
+              /chat|/chat/register)
+                # Widget routes sit behind the Lambda authorizer. Re-assert the
+                # mapping that forwards its context to the backend so a redeploy
+                # can never drop it (missing tenant_id => silent seed-tenant
+                # fallback). x-amzn-* is a reserved header namespace, so the
+                # backend reads x-ca-tenant-id / x-ca-user-id instead.
+                aws apigatewayv2 update-integration --api-id "$API_ID" --integration-id "$ID" --region "$AWS_DEFAULT_REGION" \
+                  --integration-uri "$NEW_URI" \
+                  --request-parameters '{"overwrite:header.x-ca-tenant-id":"$context.authorizer.tenant_id","overwrite:header.x-ca-user-id":"$context.authorizer.user_id"}'
+                ;;
+              *)
+                aws apigatewayv2 update-integration --api-id "$API_ID" --integration-id "$ID" --region "$AWS_DEFAULT_REGION" --integration-uri "$NEW_URI"
+                ;;
+            esac
             echo "Updated integration $ID: $NEW_URI"
           fi
         done
