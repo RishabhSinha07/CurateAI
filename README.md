@@ -1,4 +1,4 @@
-# CurateAI
+# CurateAI - v1
 
 A multi-agent AI consultation system for personalized product recommendations. Users describe a health concern and the system identifies their problem, personalizes via clarifying questions, then recommends products using semantic search guided by a knowledge graph.
 
